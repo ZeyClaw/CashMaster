@@ -48,6 +48,39 @@ struct ContentView: View {
         return months.map { $0.solde }.reduce(0, +)
     }
     
+    // Vue pour afficher toutes les transactions de tous les mois
+    struct AllTransactionsView: View {
+        var months: [Month]  // Liste des mois contenant les transactions
+
+        var body: some View {
+            List {
+                // Boucle à travers chaque mois
+                ForEach(months) { month in
+                    // Créer une section pour chaque mois avec son nom comme en-tête
+                    Section(header: Text(month.name)) {
+                        // Boucle à travers les transactions de ce mois
+                        ForEach(month.transactions) { transaction in
+                            // Affichage de chaque transaction
+                            HStack {
+                                // Afficher le montant de la transaction
+                                Text("\(transaction.amount, specifier: "%.2f") €")
+                                    .foregroundColor(transaction.amount >= 0 ? .green : .red)  // Couleur basée sur le montant
+                                Spacer()  // Espace flexible entre le montant et la date
+                                // Afficher la date de la transaction
+                                Text(transaction.date, style: .date)
+                                Spacer()  // Espace flexible entre la date et le commentaire
+                                // Afficher le commentaire de la transaction
+                                Text(transaction.comment)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Toutes les Transactions")  // Titre de la vue
+        }
+    }
+
+    
     var body: some View {
             NavigationView {
                 ZStack {
@@ -59,20 +92,23 @@ struct ContentView: View {
                                 GridItem(.flexible()),  // Première colonne flexible
                                 GridItem(.flexible())   // Deuxième colonne flexible
                             ], spacing: 10) {  // Espacement entre les colonnes
-                                Rectangle()
-                                    .fill(Color(UIColor.secondarySystemGroupedBackground))  // Couleur de fond systeme (meme que liste)
-                                    .cornerRadius(15)  // Arrondir les bords des rectangles
-                                    .overlay(
-                                        VStack {
-                                            Text("Solde Total:")
-                                                .font(.headline)
-                                            // Affichage du solde total
-                                            Text("\(totalSolde(), specifier: "%.2f") €")
-                                                .font(.title)
-                                                .foregroundColor(totalSolde() >= 0 ? .green : .red)  // Vert si positif, rouge si négatif
-                                        }
-                                    )
-                                    .frame(height: 100)  // Hauteur des rectangles
+                                NavigationLink(destination: AllTransactionsView(months: months)) {
+                                    Rectangle()
+                                        .fill(Color(UIColor.secondarySystemGroupedBackground))  // Couleur de fond systeme (meme que liste)
+                                        .cornerRadius(15)  // Arrondir les bords des rectangles
+                                        .overlay(
+                                            VStack {
+                                                Text("Solde Total:")
+                                                    .font(.headline)
+                                                    .foregroundStyle(.black)
+                                                // Affichage du solde total
+                                                Text("\(totalSolde(), specifier: "%.2f") €")
+                                                    .font(.title)
+                                                    .foregroundStyle(totalSolde() >= 0 ? .green : .red)  // Vert si positif, rouge si négatif
+                                            }
+                                        )
+                                        .frame(height: 100)  // Hauteur des rectangles
+                                }
                                 
                                 Rectangle()
                                     .fill(Color(UIColor.secondarySystemGroupedBackground))  // Couleur de fond systeme (meme que liste)
