@@ -100,7 +100,7 @@ struct ContentView: View {
                                             VStack {
                                                 Text("Solde Total:")
                                                     .font(.headline)
-                                                    .foregroundStyle(.black)
+													.foregroundStyle(Color(UIColor { $0.userInterfaceStyle == .dark ? .white : .black }))
                                                 // Affichage du solde total
                                                 Text("\(totalSolde(), specifier: "%.2f") €")
                                                     .font(.title)
@@ -118,7 +118,7 @@ struct ContentView: View {
 										.overlay(
 											Text("Futur")
 												.font(.headline)
-												.foregroundStyle(.black)
+												.foregroundStyle(Color(UIColor { $0.userInterfaceStyle == .dark ? .white : .black }))
 										)
 										.frame(height: 100)
 								}
