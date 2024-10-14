@@ -35,32 +35,21 @@ struct MonthView: View {
 			
 			// Boutons pour ajouter ou soustraire un montant
 			HStack {
-				Button(action: {
+				TransactionButton(action: {
 					transactionType = "+"
-					transactionAmount = nil  // Réinitialiser le montant
-					transactionComment = ""  // Réinitialiser le commentaire
+					transactionAmount = nil
+					transactionComment = ""
 					showingTransactionAlert = true
-				}) {
-					Text("+")
-						.foregroundColor(.white)
-						.padding()
-						.background(Color.green)
-						.cornerRadius(10)
-				}
+				}, title: "+", color: .green)
 				
-				Button(action: {
+				TransactionButton(action: {
 					transactionType = "-"
-					transactionAmount = nil  // Réinitialiser le montant
-					transactionComment = ""  // Réinitialiser le commentaire
+					transactionAmount = nil
+					transactionComment = ""
 					showingTransactionAlert = true
-				}) {
-					Text("-")
-						.foregroundColor(.white)
-						.padding()
-						.background(Color.red)
-						.cornerRadius(10)
-				}
+				}, title: "-", color: .red)
 			}
+
 			
 			// Liste des transactions avec la fonctionnalité de suppression
 			List {

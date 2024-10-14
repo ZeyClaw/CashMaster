@@ -33,32 +33,21 @@ struct PotentialTransactionsView: View {
 			
 			// Boutons pour ajouter ou soustraire un montant potentiel
 			HStack {
-				Button(action: {
+				TransactionButton(action: {
 					transactionType = "+"
-					transactionAmount = nil  // Réinitialiser le montant
-					transactionComment = ""  // Réinitialiser le commentaire
+					transactionAmount = nil
+					transactionComment = ""
 					showingTransactionAlert = true
-				}) {
-					Text("+")
-						.foregroundColor(.white)
-						.padding()
-						.background(Color.green)
-						.cornerRadius(10)
-				}
+				}, title: "+", color: .green)
 				
-				Button(action: {
+				TransactionButton(action: {
 					transactionType = "-"
-					transactionAmount = nil  // Réinitialiser le montant
-					transactionComment = ""  // Réinitialiser le commentaire
+					transactionAmount = nil
+					transactionComment = ""
 					showingTransactionAlert = true
-				}) {
-					Text("-")
-						.foregroundColor(.white)
-						.padding()
-						.background(Color.red)
-						.cornerRadius(10)
-				}
+				}, title: "-", color: .red)
 			}
+
 			.padding()
 			
 			// Liste des transactions potentielles
