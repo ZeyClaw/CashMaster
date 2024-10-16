@@ -40,7 +40,7 @@ struct ContentView: View {
 						GridItem(.flexible()),  // Première colonne flexible
 						GridItem(.flexible())   // Deuxième colonne flexible
 					], spacing: 10) {  // Espacement entre les colonnes
-						NavigationLink(destination: AllTransactionsView(months: months)) {
+						NavigationLink(destination: AllTransactionsView(months: $months)) {
 							Rectangle()
 								.fill(Color(UIColor.secondarySystemGroupedBackground))  // Couleur de fond systeme (meme que liste)
 								.cornerRadius(15)  // Arrondir les bords des rectangles

@@ -50,29 +50,21 @@ struct MonthView: View {
 					}
 					.swipeActions {
 						Button {
-							// Action de suppression ici
+							// Appeler la fonction de suppression définie dans TransactionHelper.swift
 							if let index = month.transactions.firstIndex(where: { $0.id == transaction.id }) {
-								month.solde -= month.transactions[index].amount  // Soustraire le montant du solde
-								month.transactions.remove(at: index)  // Supprimer la transaction
+								deleteTransaction(from: &month, at: IndexSet(integer: index))
 							}
 						} label: {
 							Label("Supprimer", systemImage: "trash")
 						}
-						.tint(.red) // Change la couleur de la zone de swipe
+						.tint(.red)
 					}
 				}
-				.onDelete(perform: deleteTransaction) // Ajoute le support pour supprimer
+				.onDelete { offsets in
+					deleteTransaction(from: &month, at: offsets)  // Utiliser la fonction de suppression
+				}
 			}
 			Spacer()  // Pousse le contenu vers le haut
-		}
-	}
-	
-	// Méthode pour supprimer une transaction
-	private func deleteTransaction(at offsets: IndexSet) {
-		for index in offsets {
-			let transaction = month.transactions[index]
-			month.solde -= transaction.amount // Ajuste le solde en retirant le montant de la transaction
-			month.transactions.remove(at: index) // Supprime la transaction
 		}
 	}
 }
