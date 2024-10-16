@@ -1,11 +1,10 @@
 //
-//  ButtonTransaction.swift
+//  ButtonTransactions.swift
 //  GDF-app
 //
-//  Created by Godefroy REYNAUD on 14/10/2024.
+//  Created by Godefroy REYNAUD on 16/10/2024.
 //
 
-import Foundation
 import SwiftUI
 
 struct TransactionButton: View {

@@ -10,11 +10,12 @@ import SwiftUI
 // Vue pour chaque mois avec gestion des transactions
 struct MonthView: View {
 	@Binding var month: Month
-	@State private var showingTransactionAlert = false  // Gérer l'affichage de l'alerte
 	@State private var showingErrorAlert = false  // Gérer l'affichage de l'alerte d'erreur
 	@State private var transactionAmount: Double? // Montant de la transaction
 	@State private var transactionComment = ""  // Commentaire de la transaction
 	@State private var transactionType = ""  // "+" ou "-"
+	@State private var showingAddTransactionSheet = false
+
 	
 	// Création d'un NumberFormatter personnalisé
 	private var decimalFormatter: NumberFormatter {
@@ -39,15 +40,24 @@ struct MonthView: View {
 					transactionType = "+"
 					transactionAmount = nil
 					transactionComment = ""
-					showingTransactionAlert = true
+					showingAddTransactionSheet = true  // Afficher la feuille
 				}, title: "+", color: .green)
 				
 				TransactionButton(action: {
 					transactionType = "-"
 					transactionAmount = nil
 					transactionComment = ""
-					showingTransactionAlert = true
+					showingAddTransactionSheet = true  // Afficher la feuille
 				}, title: "-", color: .red)
+			}
+			.sheet(isPresented: $showingAddTransactionSheet) {
+				AddTransactionView(
+					transactionAmount: $transactionAmount,
+					transactionComment: $transactionComment,
+					transactionType: $transactionType,
+					month: $month,
+					showingAddTransactionSheet: $showingAddTransactionSheet
+				)
 			}
 
 			
@@ -78,34 +88,6 @@ struct MonthView: View {
 				.onDelete(perform: deleteTransaction) // Ajoute le support pour supprimer
 			}
 			Spacer()  // Pousse le contenu vers le haut
-		}
-		.alert("Nouvelle Transaction", isPresented: $showingTransactionAlert) {
-			TextField("Montant", value: $transactionAmount, formatter: decimalFormatter)
-				.keyboardType(.decimalPad) // Clavier numérique
-			TextField("Commentaire", text: $transactionComment)
-			Button("Ajouter") {
-				if let amountValue = transactionAmount {
-					let amount = transactionType == "+" ? amountValue : -amountValue
-					let transaction = Transaction(amount: amount, date: Date(), comment: transactionComment)
-					month.solde += amount
-					month.transactions.append(transaction)  // Ajouter la transaction
-				} else {
-					showingErrorAlert = true // Affiche l'alerte d'erreur si le montant est vide
-				}
-			}
-			Button("Annuler", role: .cancel) {}
-		} message: {
-			Text("Ajoutez un montant et un commentaire")
-		}
-		
-		.alert("Le montant est vide", isPresented: $showingErrorAlert) {
-			Button("OK") {
-				// Réinitialise les champs pour recommencer
-				transactionAmount = nil
-				showingTransactionAlert = true // Rouvrir l'alerte d'ajout de transaction
-			}
-		} message: {
-			Text("Veuillez entrer un montant valide.")
 		}
 	}
 	

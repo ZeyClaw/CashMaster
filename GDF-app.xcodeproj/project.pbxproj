@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F83D42D12CBFB563003C51D2 /* ButtonTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */; };
+		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8C82CBD3AF2007D1A54 /* Month.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C72CBD3AF2007D1A54 /* Month.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
@@ -19,7 +21,6 @@
 		F8B79A802CAEC5EE002D88AE /* GDF_appTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A7F2CAEC5EE002D88AE /* GDF_appTests.swift */; };
 		F8B79A8A2CAEC5EF002D88AE /* GDF_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A892CAEC5EF002D88AE /* GDF_appUITests.swift */; };
 		F8B79A8C2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift */; };
-		F8E6C6192CBD8E9A0079DB23 /* ButtonTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C6182CBD8E9A0079DB23 /* ButtonTransaction.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTransaction.swift; sourceTree = "<group>"; };
+		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C72CBD3AF2007D1A54 /* Month.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Month.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -55,7 +58,6 @@
 		F8B79A852CAEC5EE002D88AE /* GDF-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GDF-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8B79A892CAEC5EF002D88AE /* GDF_appUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDF_appUITests.swift; sourceTree = "<group>"; };
 		F8B79A8B2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDF_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		F8E6C6182CBD8E9A0079DB23 /* ButtonTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTransaction.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,11 +110,12 @@
 			children = (
 				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
 				F842F8C72CBD3AF2007D1A54 /* Month.swift */,
-				F8E6C6182CBD8E9A0079DB23 /* ButtonTransaction.swift */,
+				F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */,
 				F8B79A6E2CAEC5E4002D88AE /* GDF_appApp.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
 				F842F8CD2CBD3C71007D1A54 /* MonthView.swift */,
 				F842F8CB2CBD3B6F007D1A54 /* AllTransactionsView.swift */,
+				F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */,
 				F842F8CF2CBD3CA0007D1A54 /* PotentialTransactionsView.swift */,
 				F8B79A722CAEC5EE002D88AE /* Assets.xcassets */,
 				F8B79A742CAEC5EE002D88AE /* Preview Content */,
@@ -275,11 +278,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */,
 				F842F8CC2CBD3B6F007D1A54 /* AllTransactionsView.swift in Sources */,
 				F842F8CE2CBD3C71007D1A54 /* MonthView.swift in Sources */,
 				F842F8C82CBD3AF2007D1A54 /* Month.swift in Sources */,
 				F8B79A6F2CAEC5E4002D88AE /* GDF_appApp.swift in Sources */,
-				F8E6C6192CBD8E9A0079DB23 /* ButtonTransaction.swift in Sources */,
+				F83D42D12CBFB563003C51D2 /* ButtonTransaction.swift in Sources */,
 				F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */,
 				F842F8D02CBD3CA0007D1A54 /* PotentialTransactionsView.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
