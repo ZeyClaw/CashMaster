@@ -13,6 +13,11 @@ struct ContentView: View {
 	
 	@State private var months: [Month] = []  // Liste des mois avec leur solde et transactions
 	@State private var showingResetAlert = false  // Pour gérer l'affichage de l'alerte de confirmation du reset
+	@State private var showingAddTransactionSheet = false  // Pour ouvrir la sheet d'ajout
+	@State private var transactionAmount: Double?  // Montant de la transaction
+	@State private var transactionComment = ""  // Commentaire de la transaction
+	@State private var transactionDate = Date()  // Date de la transaction
+	@State private var transactionType = ""  // "+" ou "-"
 	
 	// Initialisation : Charger les données enregistrées ou initialiser à 0
 	init() {
@@ -95,6 +100,27 @@ struct ContentView: View {
 							.blur(radius: 20)     // Application du flou SwiftUI
 							.frame(height: 60)    // Hauteur de la bande
 						HStack {
+							// Bouton d'ajout global en bas de l'écran
+							Button(action: {
+								transactionAmount = nil
+								transactionComment = ""
+								transactionDate = Date()  // Réinitialise à la date actuelle
+								transactionType = ""
+								showingAddTransactionSheet = true
+							}) {
+								HStack {
+									Image(systemName: "plus.circle.fill")
+										.foregroundColor(.blue)
+									Text("Ajouter une Transaction")
+										.foregroundColor(.blue)
+										.font(.headline)
+								}
+							}
+							
+							.padding()
+							
+							Spacer()// Sépare les deux boutons
+							
 							Button(action: {
 								showingResetAlert = true  // Affiche l'alerte de confirmation
 							}) {
@@ -105,7 +131,16 @@ struct ContentView: View {
 								}
 							}
 							.padding()
-							Spacer()
+						}
+						.sheet(isPresented: $showingAddTransactionSheet) {
+							AddTransactionView(
+								transactionAmount: $transactionAmount,
+								transactionComment: $transactionComment,
+								transactionType: $transactionType,
+								transactionDate: $transactionDate,  // Passer la date
+								months: $months,
+								showingAddTransactionSheet: $showingAddTransactionSheet  // Liaison pour gérer la fermeture
+							)
 						}
 					}
 					
@@ -141,18 +176,18 @@ struct ContentView: View {
 		}
 		// Si aucune donnée sauvegardée, initialiser les mois
 		return [
-			Month(name: "Janvier", solde: 0),
-			Month(name: "Février", solde: 0),
-			Month(name: "Mars", solde: 0),
-			Month(name: "Avril", solde: 0),
-			Month(name: "Mai", solde: 0),
-			Month(name: "Juin", solde: 0),
-			Month(name: "Juillet", solde: 0),
-			Month(name: "Août", solde: 0),
-			Month(name: "Septembre", solde: 0),
-			Month(name: "Octobre", solde: 0),
-			Month(name: "Novembre", solde: 0),
-			Month(name: "Décembre", solde: 0)
+			Month(name: "Janvier", solde: 0, monthNumber: 1),
+			Month(name: "Février", solde: 0, monthNumber: 2),
+			Month(name: "Mars", solde: 0, monthNumber: 3),
+			Month(name: "Avril", solde: 0, monthNumber: 4),
+			Month(name: "Mai", solde: 0, monthNumber: 5),
+			Month(name: "Juin", solde: 0, monthNumber: 6),
+			Month(name: "Juillet", solde: 0, monthNumber: 7),
+			Month(name: "Août", solde: 0, monthNumber: 8),
+			Month(name: "Septembre", solde: 0, monthNumber: 9),
+			Month(name: "Octobre", solde: 0, monthNumber: 10),
+			Month(name: "Novembre", solde: 0, monthNumber: 11),
+			Month(name: "Décembre", solde: 0, monthNumber: 12)
 		]
 	}
 	

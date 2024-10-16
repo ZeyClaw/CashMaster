@@ -11,7 +11,8 @@ struct AddTransactionView: View {
 	@Binding var transactionAmount: Double?
 	@Binding var transactionComment: String
 	@Binding var transactionType: String
-	@Binding var month: Month
+	@Binding var transactionDate: Date  // Ajouter la date ici
+	@Binding var months: [Month]
 	@Binding var showingAddTransactionSheet: Bool  // Ajoute cette liaison pour rouvrir la sheet
 	@State private var showingErrorAlert = false  // Gérer l'affichage de l'alerte d'erreur
 	
@@ -36,6 +37,11 @@ struct AddTransactionView: View {
 				Section(header: Text("Commentaire")) {
 					TextField("Commentaire", text: $transactionComment)
 				}
+				// Sélecteur de date pour la transaction
+				Section(header: Text("Date")) {
+					DatePicker("Date de la Transaction", selection: $transactionDate, displayedComponents: [.date])
+						.datePickerStyle(GraphicalDatePickerStyle())
+				}
 			}
 			.navigationTitle("Ajouter une transaction")
 			.toolbar {
@@ -43,13 +49,18 @@ struct AddTransactionView: View {
 					Button("Ajouter") {
 						if let amountValue = transactionAmount {
 							let amount = transactionType == "+" ? amountValue : -amountValue
-							let transaction = Transaction(amount: amount, date: Date(), comment: transactionComment)
-							month.solde += amount
-							month.transactions.append(transaction)
-							dismiss() // Ferme la feuille
-						}
-						else {
-							showingErrorAlert = true // Affiche l'alerte d'erreur si le montant est vide
+							let transaction = Transaction(amount: amount, date: transactionDate, comment: transactionComment)
+							
+							// Ajouter la transaction dans le bon mois
+							if let monthIndex = findMonthIndex(for: transactionDate) {
+								months[monthIndex].solde += amount
+								months[monthIndex].transactions.append(transaction)
+								dismiss()  // Ferme la feuille
+							} else {
+								showingErrorAlert = true  // Si le mois n'est pas trouvé, afficher une erreur
+							}
+						} else {
+							showingErrorAlert = true
 						}
 					}
 				}
@@ -69,5 +80,13 @@ struct AddTransactionView: View {
 		} message: {
 			Text("Veuillez entrer un montant valide.")
 		}
+	}
+	// Trouver l'indice du mois correspondant à la date de la transaction
+	func findMonthIndex(for date: Date) -> Int? {
+		let calendar = Calendar.current
+		let transactionMonth = calendar.component(.month, from: date)  // Obtenir le numéro du mois de la date
+		
+		// Chercher le mois correspondant par son numéro
+		return months.firstIndex(where: { $0.monthNumber == transactionMonth })
 	}
 }

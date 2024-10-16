@@ -14,6 +14,7 @@ struct Month: Identifiable, Codable, Equatable {
 	var name: String
 	var solde: Double
 	var transactions: [Transaction] = []  // Liste des transactions pour chaque mois
+	var monthNumber: Int  // Numéro du mois de 1 à 12
 	
 	// Conformité à Equatable
 	static func == (lhs: Month, rhs: Month) -> Bool {

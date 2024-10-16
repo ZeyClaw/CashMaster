@@ -34,31 +34,7 @@ struct MonthView: View {
 				.padding()
 				.foregroundColor(month.solde >= 0 ? .green : .red)
 			
-			// Boutons pour ajouter ou soustraire un montant
-			HStack {
-				TransactionButton(action: {
-					transactionType = "+"
-					transactionAmount = nil
-					transactionComment = ""
-					showingAddTransactionSheet = true  // Afficher la feuille
-				}, title: "+", color: .green)
-				
-				TransactionButton(action: {
-					transactionType = "-"
-					transactionAmount = nil
-					transactionComment = ""
-					showingAddTransactionSheet = true  // Afficher la feuille
-				}, title: "-", color: .red)
-			}
-			.sheet(isPresented: $showingAddTransactionSheet) {
-				AddTransactionView(
-					transactionAmount: $transactionAmount,
-					transactionComment: $transactionComment,
-					transactionType: $transactionType,
-					month: $month,
-					showingAddTransactionSheet: $showingAddTransactionSheet
-				)
-			}
+			
 
 			
 			// Liste des transactions avec la fonctionnalité de suppression
