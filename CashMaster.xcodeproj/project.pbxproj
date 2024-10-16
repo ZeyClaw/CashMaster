@@ -15,12 +15,12 @@
 		F842F8CC2CBD3B6F007D1A54 /* AllTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8CB2CBD3B6F007D1A54 /* AllTransactionsView.swift */; };
 		F842F8CE2CBD3C71007D1A54 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8CD2CBD3C71007D1A54 /* MonthView.swift */; };
 		F842F8D02CBD3CA0007D1A54 /* PotentialTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8CF2CBD3CA0007D1A54 /* PotentialTransactionsView.swift */; };
-		F8B79A6F2CAEC5E4002D88AE /* GDF_appApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* GDF_appApp.swift */; };
+		F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */; };
 		F8B79A732CAEC5EE002D88AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A722CAEC5EE002D88AE /* Assets.xcassets */; };
 		F8B79A762CAEC5EE002D88AE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A752CAEC5EE002D88AE /* Preview Assets.xcassets */; };
-		F8B79A802CAEC5EE002D88AE /* GDF_appTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A7F2CAEC5EE002D88AE /* GDF_appTests.swift */; };
-		F8B79A8A2CAEC5EF002D88AE /* GDF_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A892CAEC5EF002D88AE /* GDF_appUITests.swift */; };
-		F8B79A8C2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift */; };
+		F8B79A802CAEC5EE002D88AE /* CashMaster_appTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A7F2CAEC5EE002D88AE /* CashMaster_appTests.swift */; };
+		F8B79A8A2CAEC5EF002D88AE /* CashMaster_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */; };
+		F8B79A8C2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,15 +49,15 @@
 		F842F8CB2CBD3B6F007D1A54 /* AllTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllTransactionsView.swift; sourceTree = "<group>"; };
 		F842F8CD2CBD3C71007D1A54 /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthView.swift; sourceTree = "<group>"; };
 		F842F8CF2CBD3CA0007D1A54 /* PotentialTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PotentialTransactionsView.swift; sourceTree = "<group>"; };
-		F8B79A6B2CAEC5E4002D88AE /* GDF-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GDF-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F8B79A6E2CAEC5E4002D88AE /* GDF_appApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDF_appApp.swift; sourceTree = "<group>"; };
+		F8B79A6B2CAEC5E4002D88AE /* CashMaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CashMaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMasterApp.swift; sourceTree = "<group>"; };
 		F8B79A722CAEC5EE002D88AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F8B79A752CAEC5EE002D88AE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		F8B79A7B2CAEC5EE002D88AE /* GDF-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GDF-appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F8B79A7F2CAEC5EE002D88AE /* GDF_appTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDF_appTests.swift; sourceTree = "<group>"; };
-		F8B79A852CAEC5EE002D88AE /* GDF-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GDF-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F8B79A892CAEC5EF002D88AE /* GDF_appUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDF_appUITests.swift; sourceTree = "<group>"; };
-		F8B79A8B2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDF_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F8B79A7B2CAEC5EE002D88AE /* CashMasterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CashMasterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F8B79A7F2CAEC5EE002D88AE /* CashMaster_appTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appTests.swift; sourceTree = "<group>"; };
+		F8B79A852CAEC5EE002D88AE /* CashMasterUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CashMasterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appUITests.swift; sourceTree = "<group>"; };
+		F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,9 +88,9 @@
 		F8B79A622CAEC5E4002D88AE = {
 			isa = PBXGroup;
 			children = (
-				F8B79A6D2CAEC5E4002D88AE /* GDF-app */,
-				F8B79A7E2CAEC5EE002D88AE /* GDF-appTests */,
-				F8B79A882CAEC5EF002D88AE /* GDF-appUITests */,
+				F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */,
+				F8B79A7E2CAEC5EE002D88AE /* CashMaster-appTests */,
+				F8B79A882CAEC5EF002D88AE /* CashMaster-appUITests */,
 				F8B79A6C2CAEC5E4002D88AE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -98,20 +98,20 @@
 		F8B79A6C2CAEC5E4002D88AE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F8B79A6B2CAEC5E4002D88AE /* GDF-app.app */,
-				F8B79A7B2CAEC5EE002D88AE /* GDF-appTests.xctest */,
-				F8B79A852CAEC5EE002D88AE /* GDF-appUITests.xctest */,
+				F8B79A6B2CAEC5E4002D88AE /* CashMaster.app */,
+				F8B79A7B2CAEC5EE002D88AE /* CashMasterTests.xctest */,
+				F8B79A852CAEC5EE002D88AE /* CashMasterUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F8B79A6D2CAEC5E4002D88AE /* GDF-app */ = {
+		F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */ = {
 			isa = PBXGroup;
 			children = (
 				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
 				F842F8C72CBD3AF2007D1A54 /* Month.swift */,
 				F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */,
-				F8B79A6E2CAEC5E4002D88AE /* GDF_appApp.swift */,
+				F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
 				F842F8CD2CBD3C71007D1A54 /* MonthView.swift */,
 				F842F8CB2CBD3B6F007D1A54 /* AllTransactionsView.swift */,
@@ -120,7 +120,7 @@
 				F8B79A722CAEC5EE002D88AE /* Assets.xcassets */,
 				F8B79A742CAEC5EE002D88AE /* Preview Content */,
 			);
-			path = "GDF-app";
+			path = "CashMaster-app";
 			sourceTree = "<group>";
 		};
 		F8B79A742CAEC5EE002D88AE /* Preview Content */ = {
@@ -131,29 +131,29 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		F8B79A7E2CAEC5EE002D88AE /* GDF-appTests */ = {
+		F8B79A7E2CAEC5EE002D88AE /* CashMaster-appTests */ = {
 			isa = PBXGroup;
 			children = (
-				F8B79A7F2CAEC5EE002D88AE /* GDF_appTests.swift */,
+				F8B79A7F2CAEC5EE002D88AE /* CashMaster_appTests.swift */,
 			);
-			path = "GDF-appTests";
+			path = "CashMaster-appTests";
 			sourceTree = "<group>";
 		};
-		F8B79A882CAEC5EF002D88AE /* GDF-appUITests */ = {
+		F8B79A882CAEC5EF002D88AE /* CashMaster-appUITests */ = {
 			isa = PBXGroup;
 			children = (
-				F8B79A892CAEC5EF002D88AE /* GDF_appUITests.swift */,
-				F8B79A8B2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift */,
+				F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */,
+				F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */,
 			);
-			path = "GDF-appUITests";
+			path = "CashMaster-appUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F8B79A6A2CAEC5E4002D88AE /* GDF-app */ = {
+		F8B79A6A2CAEC5E4002D88AE /* CashMaster */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F8B79A8F2CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "GDF-app" */;
+			buildConfigurationList = F8B79A8F2CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "CashMaster" */;
 			buildPhases = (
 				F8B79A672CAEC5E4002D88AE /* Sources */,
 				F8B79A682CAEC5E4002D88AE /* Frameworks */,
@@ -163,14 +163,14 @@
 			);
 			dependencies = (
 			);
-			name = "GDF-app";
+			name = CashMaster;
 			productName = "GDF-app";
-			productReference = F8B79A6B2CAEC5E4002D88AE /* GDF-app.app */;
+			productReference = F8B79A6B2CAEC5E4002D88AE /* CashMaster.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F8B79A7A2CAEC5EE002D88AE /* GDF-appTests */ = {
+		F8B79A7A2CAEC5EE002D88AE /* CashMasterTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F8B79A922CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "GDF-appTests" */;
+			buildConfigurationList = F8B79A922CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "CashMasterTests" */;
 			buildPhases = (
 				F8B79A772CAEC5EE002D88AE /* Sources */,
 				F8B79A782CAEC5EE002D88AE /* Frameworks */,
@@ -181,14 +181,14 @@
 			dependencies = (
 				F8B79A7D2CAEC5EE002D88AE /* PBXTargetDependency */,
 			);
-			name = "GDF-appTests";
+			name = CashMasterTests;
 			productName = "GDF-appTests";
-			productReference = F8B79A7B2CAEC5EE002D88AE /* GDF-appTests.xctest */;
+			productReference = F8B79A7B2CAEC5EE002D88AE /* CashMasterTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		F8B79A842CAEC5EE002D88AE /* GDF-appUITests */ = {
+		F8B79A842CAEC5EE002D88AE /* CashMasterUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F8B79A952CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "GDF-appUITests" */;
+			buildConfigurationList = F8B79A952CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "CashMasterUITests" */;
 			buildPhases = (
 				F8B79A812CAEC5EE002D88AE /* Sources */,
 				F8B79A822CAEC5EE002D88AE /* Frameworks */,
@@ -199,9 +199,9 @@
 			dependencies = (
 				F8B79A872CAEC5EF002D88AE /* PBXTargetDependency */,
 			);
-			name = "GDF-appUITests";
+			name = CashMasterUITests;
 			productName = "GDF-appUITests";
-			productReference = F8B79A852CAEC5EE002D88AE /* GDF-appUITests.xctest */;
+			productReference = F8B79A852CAEC5EE002D88AE /* CashMasterUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -227,7 +227,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F8B79A662CAEC5E4002D88AE /* Build configuration list for PBXProject "GDF-app" */;
+			buildConfigurationList = F8B79A662CAEC5E4002D88AE /* Build configuration list for PBXProject "CashMaster" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -240,9 +240,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F8B79A6A2CAEC5E4002D88AE /* GDF-app */,
-				F8B79A7A2CAEC5EE002D88AE /* GDF-appTests */,
-				F8B79A842CAEC5EE002D88AE /* GDF-appUITests */,
+				F8B79A6A2CAEC5E4002D88AE /* CashMaster */,
+				F8B79A7A2CAEC5EE002D88AE /* CashMasterTests */,
+				F8B79A842CAEC5EE002D88AE /* CashMasterUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -282,7 +282,7 @@
 				F842F8CC2CBD3B6F007D1A54 /* AllTransactionsView.swift in Sources */,
 				F842F8CE2CBD3C71007D1A54 /* MonthView.swift in Sources */,
 				F842F8C82CBD3AF2007D1A54 /* Month.swift in Sources */,
-				F8B79A6F2CAEC5E4002D88AE /* GDF_appApp.swift in Sources */,
+				F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */,
 				F83D42D12CBFB563003C51D2 /* ButtonTransaction.swift in Sources */,
 				F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */,
 				F842F8D02CBD3CA0007D1A54 /* PotentialTransactionsView.swift in Sources */,
@@ -294,7 +294,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F8B79A802CAEC5EE002D88AE /* GDF_appTests.swift in Sources */,
+				F8B79A802CAEC5EE002D88AE /* CashMaster_appTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,8 +302,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F8B79A8C2CAEC5EF002D88AE /* GDF_appUITestsLaunchTests.swift in Sources */,
-				F8B79A8A2CAEC5EF002D88AE /* GDF_appUITests.swift in Sources */,
+				F8B79A8C2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift in Sources */,
+				F8B79A8A2CAEC5EF002D88AE /* CashMaster_appUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,12 +312,12 @@
 /* Begin PBXTargetDependency section */
 		F8B79A7D2CAEC5EE002D88AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F8B79A6A2CAEC5E4002D88AE /* GDF-app */;
+			target = F8B79A6A2CAEC5E4002D88AE /* CashMaster */;
 			targetProxy = F8B79A7C2CAEC5EE002D88AE /* PBXContainerItemProxy */;
 		};
 		F8B79A872CAEC5EF002D88AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F8B79A6A2CAEC5E4002D88AE /* GDF-app */;
+			target = F8B79A6A2CAEC5E4002D88AE /* CashMaster */;
 			targetProxy = F8B79A862CAEC5EF002D88AE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -449,7 +449,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"GDF-app/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
 				DEVELOPMENT_TEAM = K9559SXCGV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -478,7 +478,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"GDF-app/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
 				DEVELOPMENT_TEAM = K9559SXCGV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -516,7 +516,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GDF-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GDF-app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CashMaster.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CashMaster";
 			};
 			name = Debug;
 		};
@@ -536,7 +536,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GDF-app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GDF-app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CashMaster.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CashMaster";
 			};
 			name = Release;
 		};
@@ -579,7 +579,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F8B79A662CAEC5E4002D88AE /* Build configuration list for PBXProject "GDF-app" */ = {
+		F8B79A662CAEC5E4002D88AE /* Build configuration list for PBXProject "CashMaster" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F8B79A8D2CAEC5EF002D88AE /* Debug */,
@@ -588,7 +588,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F8B79A8F2CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "GDF-app" */ = {
+		F8B79A8F2CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "CashMaster" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F8B79A902CAEC5EF002D88AE /* Debug */,
@@ -597,7 +597,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F8B79A922CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "GDF-appTests" */ = {
+		F8B79A922CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "CashMasterTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F8B79A932CAEC5EF002D88AE /* Debug */,
@@ -606,7 +606,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F8B79A952CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "GDF-appUITests" */ = {
+		F8B79A952CAEC5EF002D88AE /* Build configuration list for PBXNativeTarget "CashMasterUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F8B79A962CAEC5EF002D88AE /* Debug */,

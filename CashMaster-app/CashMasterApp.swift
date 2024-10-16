@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct GDF_appApp: App {
+struct CashMasterApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
