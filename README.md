@@ -1,1 +1,1 @@
-Voici le code d'une petite app iOS pour apprendre le swift. Tout le code est dans le fichier ContentView.swift qui est dans le dossier GDF-app
+Voici le code d'une petite app iOS pour apprendre le swift. Cette app a pour objectif de vous aider à gérer votre budget.
