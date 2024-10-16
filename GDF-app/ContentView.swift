@@ -17,7 +17,7 @@ struct ContentView: View {
 	@State private var transactionAmount: Double?  // Montant de la transaction
 	@State private var transactionComment = ""  // Commentaire de la transaction
 	@State private var transactionDate = Date()  // Date de la transaction
-	@State private var transactionType = ""  // "+" ou "-"
+	@State private var transactionType = "-"  // Initialiser à "-" par défaut
 	
 	// Initialisation : Charger les données enregistrées ou initialiser à 0
 	init() {
@@ -105,7 +105,7 @@ struct ContentView: View {
 								transactionAmount = nil
 								transactionComment = ""
 								transactionDate = Date()  // Réinitialise à la date actuelle
-								transactionType = ""
+								transactionType = "-"
 								showingAddTransactionSheet = true
 							}) {
 								HStack {
