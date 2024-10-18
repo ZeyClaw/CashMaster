@@ -9,50 +9,33 @@
 import SwiftUI
 
 struct PotentialTransactionsView: View {
-	@State private var potentialTransactions: [Transaction] = []  // Liste des transactions potentielles
-	@State private var showingTransactionAlert = false  // Gérer l'affichage de l'alerte
-	@State private var transactionAmount: Double?  // Montant de la transaction potentielle
-	@State private var transactionComment = ""  // Commentaire de la transaction
-	@State private var transactionType = ""  // "+" ou "-"
+	@State private var totalPotentialTransactions = loadPotentialTransactions()
+	@State private var showingTransactionAlert = false
+	@State private var showingErrorAlert = false
+	@State private var potentialTransactionAmount: Double?  // Montant de la transaction potentielle
+	@State private var potentialTransactionComment = ""      // Commentaire de la transaction potentielle
+	@State private var potentialTransactionType: String = "+"  // Par défaut "+"
 	
-	var totalPotential: Double {
-		// Calcule le solde total des transactions potentielles
-		potentialTransactions.map { $0.amount }.reduce(0, +)
+	// Calcul du solde total des transactions potentielles
+	var totalPotentialBalance: Double {
+		totalPotentialTransactions.totalBalance
 	}
 	
 	var body: some View {
 		VStack {
-			Text("Transactions Potentielles")
-				.font(.largeTitle)
-				.padding()
-			
-			// Affichage du solde total des transactions potentielles
-			Text("Solde Potentiel: \(totalPotential, specifier: "%.2f") €")
-				.font(.title)
-				.foregroundColor(totalPotential >= 0 ? .green : .red)
-			
-			// Boutons pour ajouter ou soustraire un montant potentiel
-			HStack {
-				TransactionButton(action: {
-					transactionType = "+"
-					transactionAmount = nil
-					transactionComment = ""
-					showingTransactionAlert = true
-				}, title: "+", color: .green)
-				
-				TransactionButton(action: {
-					transactionType = "-"
-					transactionAmount = nil
-					transactionComment = ""
-					showingTransactionAlert = true
-				}, title: "-", color: .red)
+			Button("Tester Chargement") {
+				totalPotentialTransactions = PotentialTransactionsView.loadPotentialTransactions()
+				print("Transactions chargées : \(totalPotentialTransactions.transactions)")
 			}
-
-			.padding()
+			// Affichage du solde total potentiel
+			Text("Solde Potentiel : \(totalPotentialBalance, specifier: "%.2f") €")
+				.font(.largeTitle)
+				.foregroundColor(totalPotentialBalance >= 0 ? .green : .red)
+				.padding()
 			
 			// Liste des transactions potentielles
 			List {
-				ForEach(potentialTransactions) { transaction in
+				ForEach(totalPotentialTransactions.transactions) { transaction in
 					HStack {
 						Text("\(transaction.amount, specifier: "%.2f") €")
 							.foregroundColor(transaction.amount >= 0 ? .green : .red)
@@ -61,55 +44,108 @@ struct PotentialTransactionsView: View {
 					}
 					.swipeActions {
 						Button {
-							// Action de suppression
-							if let index = potentialTransactions.firstIndex(where: { $0.id == transaction.id }) {
-								potentialTransactions.remove(at: index)  // Supprimer la transaction
-								savePotentialTransactions()  // Sauvegarder les transactions mises à jour
+							if let index = totalPotentialTransactions.transactions.firstIndex(where: { $0.id == transaction.id }) {
+								deletePotentialTransaction(at: index)
 							}
 						} label: {
 							Label("Supprimer", systemImage: "trash")
 						}
-						.tint(.red) // Change la couleur de la zone de swipe
+						.tint(.red)
 					}
 				}
 			}
-		}
-		.alert("Nouvelle Transaction Potentielle", isPresented: $showingTransactionAlert) {
-			TextField("Montant", value: $transactionAmount, formatter: NumberFormatter())
-				.keyboardType(.decimalPad) // Clavier numérique
-			TextField("Commentaire", text: $transactionComment)
-			Button("Ajouter") {
-				if let amountValue = transactionAmount {
-					let amount = transactionType == "+" ? amountValue : -amountValue
-					let transaction = Transaction(amount: amount, date: Date(), comment: transactionComment)
-					potentialTransactions.append(transaction)  // Ajouter la transaction potentielle
-					savePotentialTransactions()  // Sauvegarder les transactions mises à jour
+			.navigationTitle("Transactions Potentielles")
+			
+			// Boutons pour ajouter une nouvelle transaction potentielle (positive ou négative)
+			HStack {
+				Button(action: {
+					potentialTransactionAmount = nil
+					potentialTransactionComment = ""
+					potentialTransactionType = "+"  // Pour les transactions positives
+					showingTransactionAlert = true
+				}) {
+					HStack {
+						Image(systemName: "plus.circle.fill")
+							.foregroundColor(.white)
+						Text("Ajouter")
+							.foregroundColor(.white)
+							.font(.headline)
+					}
+					.padding()
+					.background(Color.green)
+					.cornerRadius(10)
+				}
+				
+				Button(action: {
+					potentialTransactionAmount = nil
+					potentialTransactionComment = ""
+					potentialTransactionType = "-"  // Pour les transactions négatives
+					showingTransactionAlert = true
+				}) {
+					HStack {
+						Image(systemName: "minus.circle.fill")
+							.foregroundColor(.white)
+						Text("Ajouter")
+							.foregroundColor(.white)
+							.font(.headline)
+					}
+					.padding()
+					.background(Color.red)
+					.cornerRadius(10)
 				}
 			}
-			Button("Annuler", role: .cancel) {}
-		} message: {
-			Text("Ajoutez un montant et un commentaire")
+			.padding()
 		}
-		.onAppear {
-			loadPotentialTransactions()  // Charger les transactions potentielles au démarrage de la vue
+		.alert("Nouvelle Transaction Potentielle", isPresented: $showingTransactionAlert) {
+			// Alerte pour entrer les informations de la nouvelle transaction
+			VStack {
+				TextField("Montant", value: $potentialTransactionAmount, format: .number)
+					.keyboardType(.decimalPad)
+				TextField("Commentaire", text: $potentialTransactionComment)
+			}
+			
+			Button("Ajouter") {
+				if let amountValue = potentialTransactionAmount {
+					let amount = potentialTransactionType == "+" ? amountValue : -amountValue
+					let transaction = PotentialTransaction(amount: amount, comment: potentialTransactionComment)
+					totalPotentialTransactions.addTransaction(transaction)
+					savePotentialTransactions()
+				} else {
+					showingErrorAlert = true  // Si le montant est vide ou incorrect, afficher une erreur
+				}
+			}
+			
+			Button("Annuler", role: .cancel) {}
+		}
+		.alert("Le montant est invalide", isPresented: $showingErrorAlert) {
+			Button("OK") {
+				showingTransactionAlert = true  // Réouvrir l'alerte si l'utilisateur veut corriger son erreur
+			}
+		} message: {
+			Text("Veuillez entrer un montant valide.")
 		}
 	}
 	
-	// Fonction pour charger les transactions potentielles
-	private func loadPotentialTransactions() {
-		if let data = UserDefaults.standard.data(forKey: "potentialTransactions") {
-			let decoder = JSONDecoder()
-			if let decoded = try? decoder.decode([Transaction].self, from: data) {
-				potentialTransactions = decoded
-			}
-		}
+	// Fonction pour supprimer une transaction potentielle
+	func deletePotentialTransaction(at index: Int) {
+		totalPotentialTransactions.removeTransaction(at: index)
+		savePotentialTransactions()
 	}
 	
 	// Fonction pour sauvegarder les transactions potentielles
-	private func savePotentialTransactions() {
-		let encoder = JSONEncoder()
-		if let encoded = try? encoder.encode(potentialTransactions) {
+	func savePotentialTransactions() {
+		if let encoded = try? JSONEncoder().encode(totalPotentialTransactions) {
 			UserDefaults.standard.set(encoded, forKey: "potentialTransactions")
 		}
+	}
+	
+	// Fonction pour charger les transactions potentielles depuis UserDefaults
+	static func loadPotentialTransactions() -> TotalPotentialTransactions {
+		if let data = UserDefaults.standard.data(forKey: "potentialTransactions") {
+			if let decoded = try? JSONDecoder().decode(TotalPotentialTransactions.self, from: data) {
+				return decoded
+			}
+		}
+		return TotalPotentialTransactions(transactions: [])  // Si aucune transaction n'est trouvée, retourner une liste vide
 	}
 }
