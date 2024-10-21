@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F807613D2CC6E31B00C34EDD /* Notifications.swift */; };
 		F83D42D12CBFB563003C51D2 /* ButtonTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */; };
 		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F807613D2CC6E31B00C34EDD /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTransaction.swift; sourceTree = "<group>"; };
 		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 		F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */ = {
 			isa = PBXGroup;
 			children = (
+				F807613D2CC6E31B00C34EDD /* Notifications.swift */,
 				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
 				F8EA0EA12CC2E49D0071875C /* PotentialTransaction.swift */,
 				F842F8C72CBD3AF2007D1A54 /* Month.swift */,
@@ -283,6 +286,7 @@
 			files = (
 				F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */,
 				F8EA0EA22CC2E49D0071875C /* PotentialTransaction.swift in Sources */,
+				F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */,
 				F842F8CC2CBD3B6F007D1A54 /* AllTransactionsView.swift in Sources */,
 				F842F8CE2CBD3C71007D1A54 /* MonthView.swift in Sources */,
 				F842F8C82CBD3AF2007D1A54 /* Month.swift in Sources */,
