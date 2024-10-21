@@ -42,3 +42,19 @@ struct TotalPotentialTransactions: Codable {
 		transactions.remove(at: index)
 	}
 }
+
+// Fonction pour charger les transactions potentielles depuis UserDefaults
+func loadPotentialTransactions() -> TotalPotentialTransactions {
+	if let data = UserDefaults.standard.data(forKey: "potentialTransactions") {
+		if let decoded = try? JSONDecoder().decode(TotalPotentialTransactions.self, from: data) {
+			return decoded
+		}
+	}
+	return TotalPotentialTransactions(transactions: [])
+}
+
+// Fonction pour obtenir le solde total des transactions potentielles
+func getTotalPotentialBalance() -> Double {
+	let totalPotentialTransactions = loadPotentialTransactions()
+	return totalPotentialTransactions.totalBalance
+}

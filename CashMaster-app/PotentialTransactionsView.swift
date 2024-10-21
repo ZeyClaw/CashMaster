@@ -23,10 +23,6 @@ struct PotentialTransactionsView: View {
 	
 	var body: some View {
 		VStack {
-			Button("Tester Chargement") {
-				totalPotentialTransactions = PotentialTransactionsView.loadPotentialTransactions()
-				print("Transactions chargées : \(totalPotentialTransactions.transactions)")
-			}
 			// Affichage du solde total potentiel
 			Text("Solde Potentiel : \(totalPotentialBalance, specifier: "%.2f") €")
 				.font(.largeTitle)
@@ -96,6 +92,10 @@ struct PotentialTransactionsView: View {
 			}
 			.padding()
 		}
+		.onAppear {
+			totalPotentialTransactions = loadPotentialTransactions()
+			print("Transactions rechargées à l'ouverture de la vue : \(totalPotentialTransactions.transactions)")
+		}
 		.alert("Nouvelle Transaction Potentielle", isPresented: $showingTransactionAlert) {
 			// Alerte pour entrer les informations de la nouvelle transaction
 			VStack {
@@ -137,15 +137,5 @@ struct PotentialTransactionsView: View {
 		if let encoded = try? JSONEncoder().encode(totalPotentialTransactions) {
 			UserDefaults.standard.set(encoded, forKey: "potentialTransactions")
 		}
-	}
-	
-	// Fonction pour charger les transactions potentielles depuis UserDefaults
-	static func loadPotentialTransactions() -> TotalPotentialTransactions {
-		if let data = UserDefaults.standard.data(forKey: "potentialTransactions") {
-			if let decoded = try? JSONDecoder().decode(TotalPotentialTransactions.self, from: data) {
-				return decoded
-			}
-		}
-		return TotalPotentialTransactions(transactions: [])  // Si aucune transaction n'est trouvée, retourner une liste vide
 	}
 }

@@ -10,7 +10,7 @@ import SwiftUI
 
 // Vue principale représentant la liste des mois
 struct ContentView: View {
-	
+	@State private var totalPotentialBalance = getTotalPotentialBalance()
 	@State private var months: [Month] = []  // Liste des mois avec leur solde et transactions
 	@State private var showingResetAlert = false  // Pour gérer l'affichage de l'alerte de confirmation du reset
 	@State private var showingAddTransactionSheet = false  // Pour ouvrir la sheet d'ajout
@@ -64,9 +64,15 @@ struct ContentView: View {
 								.fill(Color(UIColor.secondarySystemGroupedBackground))
 								.cornerRadius(15)
 								.overlay(
+									VStack {
 									Text("Futur")
 										.font(.headline)
 										.foregroundStyle(Color(UIColor { $0.userInterfaceStyle == .dark ? .white : .black }))
+									// Affichage du solde total
+									Text("\(totalPotentialBalance, specifier: "%.2f") €")
+										.font(.title)
+										.foregroundStyle(totalPotentialBalance >= 0 ? .green : .red)  // Vert si positif, rouge si négatif
+									}
 								)
 								.frame(height: 100)
 						}
@@ -143,7 +149,11 @@ struct ContentView: View {
 							)
 						}
 					}
-					
+					.onAppear {
+						// Charger le solde total des transactions potentielles lorsque la vue apparaît
+						totalPotentialBalance = getTotalPotentialBalance()
+						print("Solde Potentiel Total : \(totalPotentialBalance)")
+					}
 					
 					.alert("Confirmer Réinitialisation", isPresented: $showingResetAlert) {
 						Button("Reset", role: .destructive) {
