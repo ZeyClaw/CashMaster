@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F807613D2CC6E31B00C34EDD /* Notifications.swift */; };
 		F812E1FA2CC7BCFF00619857 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */; };
-		F83D42D12CBFB563003C51D2 /* ButtonTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */; };
 		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8C82CBD3AF2007D1A54 /* Month.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C72CBD3AF2007D1A54 /* Month.swift */; };
@@ -46,7 +45,7 @@
 /* Begin PBXFileReference section */
 		F807613D2CC6E31B00C34EDD /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTransaction.swift; sourceTree = "<group>"; };
+		F812E1FB2CC828DF00619857 /* CashMaster-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CashMaster-Info.plist"; sourceTree = "<group>"; };
 		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C72CBD3AF2007D1A54 /* Month.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Month.swift; sourceTree = "<group>"; };
@@ -94,6 +93,7 @@
 		F8B79A622CAEC5E4002D88AE = {
 			isa = PBXGroup;
 			children = (
+				F812E1FB2CC828DF00619857 /* CashMaster-Info.plist */,
 				F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */,
 				F8B79A7E2CAEC5EE002D88AE /* CashMaster-appTests */,
 				F8B79A882CAEC5EF002D88AE /* CashMaster-appUITests */,
@@ -119,7 +119,6 @@
 				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
 				F8EA0EA12CC2E49D0071875C /* PotentialTransaction.swift */,
 				F842F8C72CBD3AF2007D1A54 /* Month.swift */,
-				F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */,
 				F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
 				F842F8CD2CBD3C71007D1A54 /* MonthView.swift */,
@@ -238,10 +237,11 @@
 			};
 			buildConfigurationList = F8B79A662CAEC5E4002D88AE /* Build configuration list for PBXProject "CashMaster" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = fr;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				fr,
 				Base,
 			);
 			mainGroup = F8B79A622CAEC5E4002D88AE;
@@ -295,7 +295,6 @@
 				F842F8CE2CBD3C71007D1A54 /* MonthView.swift in Sources */,
 				F842F8C82CBD3AF2007D1A54 /* Month.swift in Sources */,
 				F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */,
-				F83D42D12CBFB563003C51D2 /* ButtonTransaction.swift in Sources */,
 				F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */,
 				F842F8D02CBD3CA0007D1A54 /* PotentialTransactionsView.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
@@ -460,11 +459,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2001;
 				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
 				DEVELOPMENT_TEAM = K9559SXCGV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CashMaster-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -475,7 +475,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "fr.godefroyinformatique.GDF-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -490,11 +490,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2001;
 				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
 				DEVELOPMENT_TEAM = K9559SXCGV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CashMaster-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -505,7 +506,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "fr.godefroyinformatique.GDF-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
