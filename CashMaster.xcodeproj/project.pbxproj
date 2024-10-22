@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F807613D2CC6E31B00C34EDD /* Notifications.swift */; };
+		F812E1FA2CC7BCFF00619857 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */; };
 		F83D42D12CBFB563003C51D2 /* ButtonTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */; };
 		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
@@ -44,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		F807613D2CC6E31B00C34EDD /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTransaction.swift; sourceTree = "<group>"; };
 		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */,
 				F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
+				F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */,
 				F842F8CD2CBD3C71007D1A54 /* MonthView.swift */,
 				F842F8CB2CBD3B6F007D1A54 /* AllTransactionsView.swift */,
 				F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */,
@@ -258,6 +261,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F812E1FA2CC7BCFF00619857 /* LaunchScreen.storyboard in Resources */,
 				F8B79A762CAEC5EE002D88AE /* Preview Assets.xcassets in Resources */,
 				F8B79A732CAEC5EE002D88AE /* Assets.xcassets in Resources */,
 			);
@@ -464,6 +468,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -493,6 +498,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
