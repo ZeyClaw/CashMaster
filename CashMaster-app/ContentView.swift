@@ -153,9 +153,6 @@ struct ContentView: View {
 						// Charger le solde total des transactions potentielles lorsque la vue apparaît
 						totalPotentialBalance = getTotalPotentialBalance()
 						print("Solde Potentiel Total : \(totalPotentialBalance)")
-						// Vérifie si la permission a déjà été donnée avant de la demander
-						NotificationManager.shared.requestNotificationPermission()
-						NotificationManager.shared.scheduleWeeklyNotification()
 					}
 					
 					.alert("Confirmer Réinitialisation", isPresented: $showingResetAlert) {

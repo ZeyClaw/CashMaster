@@ -114,6 +114,7 @@
 		F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */ = {
 			isa = PBXGroup;
 			children = (
+				F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */,
 				F807613D2CC6E31B00C34EDD /* Notifications.swift */,
 				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
 				F8EA0EA12CC2E49D0071875C /* PotentialTransaction.swift */,
@@ -121,7 +122,6 @@
 				F83D42D02CBFB563003C51D2 /* ButtonTransaction.swift */,
 				F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
-				F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */,
 				F842F8CD2CBD3C71007D1A54 /* MonthView.swift */,
 				F842F8CB2CBD3B6F007D1A54 /* AllTransactionsView.swift */,
 				F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */,
