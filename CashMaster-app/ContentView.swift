@@ -78,8 +78,11 @@ struct ContentView: View {
 							}
 						}
 						.padding(.horizontal, 20)  // Réduire l'espace à gauche et à droite
-						.padding(.top, 10)  // Ajouter un peu d'espace en haut
-							
+						.padding(.top, 10)  // Ajouter un peu d'espace en hau
+					
+					// Ajout du graphique des soldes
+					SoldeChartView(months: months)
+					
 							// list pour afficher les mois sous forme de liste
 							List {
 								ForEach(months) { month in
