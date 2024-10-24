@@ -34,7 +34,8 @@ struct ContentView: View {
 			ZStack {
 				// Utilisation du fond par défaut des listes, qui s'adapte automatiquement au mode sombre/clair
 				Color(UIColor.systemGroupedBackground).edgesIgnoringSafeArea(.all)
-				VStack {
+				ScrollView {
+					VStack {
 						// Ajouter une grille avec deux rectangles blancs côte à côte
 						LazyVGrid(columns: [
 							GridItem(.flexible()),  // Première colonne flexible
@@ -79,62 +80,74 @@ struct ContentView: View {
 						}
 						.padding(.horizontal, 20)  // Réduire l'espace à gauche et à droite
 						.padding(.top, 10)  // Ajouter un peu d'espace en hau
-					
-					// Ajout du graphique des soldes
-					SoldeChartView(months: months)
-					
-							// list pour afficher les mois sous forme de liste
-							List {
-								ForEach(months) { month in
-									NavigationLink(destination: MonthView(month: $months[months.firstIndex(where: { $0.id == month.id })!])) {
-										// Affichage du nom du mois à gauche et du solde à droite
-										HStack {
-											Text(month.name)  // Nom du mois
-												.font(.title2)
-											Spacer()  // Espace flexible entre le nom et le solde
-											Text("\(month.solde, specifier: "%.2f") €")  // Solde du mois
-												.font(.title3)
-												.foregroundColor(month.solde >= 0 ? .green : .red)  // Vert si positif, rouge si négatif
-										}
+						
+						// Graphique d'évolution du solde sur l'année
+						Rectangle()
+							.fill(Color(UIColor.secondarySystemGroupedBackground))
+							.cornerRadius(15)
+							.overlay(
+								// Ajout du graphique des soldes
+								SoldeChartView(months: months)
+							)
+							.frame(height: 150)
+							.padding(.horizontal, 20)
+						
+						// list pour afficher les mois sous forme de liste
+						List {
+							ForEach(months) { month in
+								NavigationLink(destination: MonthView(month: $months[months.firstIndex(where: { $0.id == month.id })!])) {
+									// Affichage du nom du mois à gauche et du solde à droite
+									HStack {
+										Text(month.name)  // Nom du mois
+											.font(.title2)
+										Spacer()  // Espace flexible entre le nom et le solde
+										Text("\(month.solde, specifier: "%.2f") €")  // Solde du mois
+											.font(.title3)
+											.foregroundColor(month.solde >= 0 ? .green : .red)  // Vert si positif, rouge si négatif
 									}
 								}
 							}
-							.toolbar {
-								// Toolbar en bas de la page
-								ToolbarItemGroup(placement: .bottomBar) {
-									// Bouton d'ajout global en bas de l'écran
-									Button(action: {
-										transactionAmount = nil
-										transactionComment = ""
-										transactionDate = Date()  // Réinitialise à la date actuelle
-										transactionType = "-"
-										showingAddTransactionSheet = true
-									}) {
-										HStack {
-											Image(systemName: "plus.circle.fill")
-												.foregroundColor(.blue)
-											Text("Transaction")
-												.foregroundColor(.blue)
-												.font(.headline)
-										}
+						}
+						.contentMargins(.top, 1)
+						
+						
+						.frame(height: 590, alignment: .top)
+						.toolbar {
+							// Toolbar en bas de la page
+							ToolbarItemGroup(placement: .bottomBar) {
+								// Bouton d'ajout global en bas de l'écran
+								Button(action: {
+									transactionAmount = nil
+									transactionComment = ""
+									transactionDate = Date()  // Réinitialise à la date actuelle
+									transactionType = "-"
+									showingAddTransactionSheet = true
+								}) {
+									HStack {
+										Image(systemName: "plus.circle.fill")
+											.foregroundColor(.blue)
+										Text("Transaction")
+											.foregroundColor(.blue)
+											.font(.headline)
 									}
-									
-									.padding()
-									
-									Spacer()// Sépare les deux boutons
-									
-									Button(action: {
-										showingResetAlert = true  // Affiche l'alerte de confirmation
-									}) {
-										HStack {
-											Image(systemName: "trash")  // Icône poubelle
-											Text("Reset")
-												.font(.headline)
-										}
-									}
-									.padding()
 								}
+								
+								.padding()
+								
+								Spacer()// Sépare les deux boutons
+								
+								Button(action: {
+									showingResetAlert = true  // Affiche l'alerte de confirmation
+								}) {
+									HStack {
+										Image(systemName: "trash")  // Icône poubelle
+										Text("Reset")
+											.font(.headline)
+									}
+								}
+								.padding()
 							}
+						}
 						.sheet(isPresented: $showingAddTransactionSheet) {
 							AddTransactionView(
 								transactionAmount: $transactionAmount,
@@ -145,27 +158,28 @@ struct ContentView: View {
 								showingAddTransactionSheet: $showingAddTransactionSheet  // Liaison pour gérer la fermeture
 							)
 						}
-					
-					.onAppear {
-						// Charger le solde total des transactions potentielles lorsque la vue apparaît
-						totalPotentialBalance = getTotalPotentialBalance()
-						print("Solde Potentiel Total : \(totalPotentialBalance)")
-					}
-					
-					.alert("Confirmer Réinitialisation", isPresented: $showingResetAlert) {
-						Button("Reset", role: .destructive) {
-							// Remettre tous les soldes des mois à 0
-							for i in 0..<months.count {
-								months[i].solde = 0
-								months[i].transactions.removeAll()  // Effacer toutes les transactions
-							}
+						
+						.onAppear {
+							// Charger le solde total des transactions potentielles lorsque la vue apparaît
+							totalPotentialBalance = getTotalPotentialBalance()
+							print("Solde Potentiel Total : \(totalPotentialBalance)")
 						}
-						Button("Cancel", role: .cancel) {}
-					} message: {
-						Text("Êtes-vous sûr de vouloir remettre à zéro tous les soldes ?")
+						
+						.alert("Confirmer Réinitialisation", isPresented: $showingResetAlert) {
+							Button("Reset", role: .destructive) {
+								// Remettre tous les soldes des mois à 0
+								for i in 0..<months.count {
+									months[i].solde = 0
+									months[i].transactions.removeAll()  // Effacer toutes les transactions
+								}
+							}
+							Button("Cancel", role: .cancel) {}
+						} message: {
+							Text("Êtes-vous sûr de vouloir remettre à zéro tous les soldes ?")
+						}
 					}
+					.navigationTitle("CashMaster")
 				}
-				.navigationTitle("Les Mois")
 			}
 			.onChange(of: months) {
 				Self.saveMonths(months)  // Sauvegarder les soldes à chaque modification
