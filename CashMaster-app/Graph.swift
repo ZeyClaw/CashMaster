@@ -34,7 +34,23 @@ struct SoldeChartView: View {
 	var body: some View {
 		ZStack {
 			Chart {
-				// Ajoute la courbe reliant les points (LineMark)
+				// Ajoute le dégradé de couleur sous la courbe (AreaMark) avec interpolation
+				ForEach(months) { month in
+					AreaMark(
+						x: .value("Mois", abbreviatedMonthName(month.name)),
+						y: .value("Solde", month.solde)
+					)
+					.interpolationMethod(.catmullRom)  // Appliquer la même méthode d'interpolation que pour la courbe
+					.foregroundStyle(
+						LinearGradient(
+							gradient: Gradient(colors: [totalSolde >= 0 ? Color.green.opacity(0.3) : Color.red.opacity(0.3), Color.clear]),
+							startPoint: .top,
+							endPoint: .bottom
+						)
+					)
+				}
+				
+				// Ajoute la courbe reliant les points (LineMark) avec interpolation
 				ForEach(months) { month in
 					LineMark(
 						x: .value("Mois", abbreviatedMonthName(month.name)),
@@ -77,9 +93,10 @@ struct SoldeChartView: View {
 					Spacer()
 					HStack {
 						Spacer()
-						Text("Mois: \(abbreviatedMonthName(months[monthIndex].name))\nSolde: \(months[monthIndex].solde, specifier: "%.2f")")
+						Text("Mois: \(months[monthIndex].name)\nSolde: \(months[monthIndex].solde, specifier: "%.2f")")
 							.padding(5)
-							.background(Color.white)
+							.background(Color(uiColor: .secondarySystemGroupedBackground))
+							.foregroundColor(Color(uiColor: .label))
 							.cornerRadius(5)
 							.shadow(radius: 3)
 						Spacer()
@@ -102,7 +119,11 @@ struct SoldeChartView: View {
 	// Fonction pour obtenir l'index du mois en fonction de la position X
 	private func monthIndexForLocation(_ x: CGFloat) -> Int? {
 		// Récupérer les valeurs X du graphique
-		let xValues = months.indices.map { CGFloat($0) * (UIScreen.main.bounds.width / CGFloat(months.count)) }
+		let xValues = months.indices.map { index -> CGFloat in
+			let width = UIScreen.main.bounds.width
+			let totalWidth = width - 40 // Ajuste pour tenir compte des marges ou paddings
+			return CGFloat(index) * (totalWidth / CGFloat(months.count))
+		}
 		
 		// Trouver l'index le plus proche
 		for (index, value) in xValues.enumerated() {

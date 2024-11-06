@@ -12,7 +12,7 @@ struct CashMasterApp: App {
 	init() {
 		// Vérifie si la permission a déjà été donnée avant de la demander
 		NotificationManager.shared.requestNotificationPermission()
-		NotificationManager.shared.scheduleWeeklyNotification()
+		NotificationManager.shared.scheduleWeeklyNotificationIfNeeded()
 	}
 	
     var body: some Scene {

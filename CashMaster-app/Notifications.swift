@@ -10,6 +10,7 @@ import UserNotifications
 
 struct NotificationManager {
 	static let shared = NotificationManager()
+	private let notificationIdentifier = "WeeklyNotification"  // Identifiant fixe pour éviter les duplications
 	
 	func requestNotificationPermission() {
 		let center = UNUserNotificationCenter.current()
@@ -22,8 +23,22 @@ struct NotificationManager {
 		}
 	}
 	
+	// Fonction pour programmer une notification hebdomadaire si elle n'existe pas déjà
+	func scheduleWeeklyNotificationIfNeeded() {
+		UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+			// Vérifie si une notification avec cet identifiant existe déjà
+			let notificationExists = requests.contains { $0.identifier == self.notificationIdentifier }
+			
+			if !notificationExists {
+				self.scheduleWeeklyNotification()
+			} else {
+				print("La notification hebdomadaire est déjà programmée.")
+			}
+		}
+	}
+	
 	// Fonction pour envoyer une notification hebdomadaire
-	func scheduleWeeklyNotification() {
+	private func scheduleWeeklyNotification() {
 		let content = UNMutableNotificationContent()
 		content.title = "Rappel - CashMaster"
 		content.body = "As-tu acheté quelque chose cette semaine ?"
@@ -36,8 +51,8 @@ struct NotificationManager {
 		
 		let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
 		
-		// Créer la requête de notification avec un identifiant unique
-		let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+		// Utiliser un identifiant fixe pour cette requête
+		let request = UNNotificationRequest(identifier: notificationIdentifier, content: content, trigger: trigger)
 		
 		// Ajouter la requête au centre de notifications
 		UNUserNotificationCenter.current().add(request) { error in
