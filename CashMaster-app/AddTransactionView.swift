@@ -18,6 +18,17 @@ struct AddTransactionView: View {
 	
 	@Environment(\.dismiss) var dismiss
 	
+	// Propriété pour configurer un NumberFormatter pour les décimales
+	private var decimalNumberFormatter: NumberFormatter {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.minimumFractionDigits = 2  // Minimum de 2 décimales
+		formatter.maximumFractionDigits = 2  // Maximum de 2 décimales (ajuster selon le besoin)
+		formatter.locale = Locale.current    // Utilise la locale courante pour les paramètres régionaux
+		return formatter
+	}
+
+	
 	var body: some View {
 		NavigationView {
 			Form {
@@ -30,7 +41,7 @@ struct AddTransactionView: View {
 				}
 				
 				Section(header: Text("Montant")) {
-					TextField("Montant", value: $transactionAmount, formatter: NumberFormatter())
+					TextField("Montant", value: $transactionAmount, formatter: decimalNumberFormatter)
 						.keyboardType(.decimalPad)
 				}
 				
