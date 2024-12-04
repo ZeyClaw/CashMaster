@@ -23,6 +23,48 @@ struct NotificationManager {
 		}
 	}
 	
+	func listScheduledNotifications() {
+		let notificationCenter = UNUserNotificationCenter.current()
+		
+		notificationCenter.getPendingNotificationRequests { requests in
+			if requests.isEmpty {
+				print("Aucune notification programmée.")
+			} else {
+				print("Notifications programmées actuellement :")
+				for request in requests {
+					print("----------------------------")
+					print("ID : \(request.identifier)")
+					print("Titre : \(request.content.title)")
+					print("Corps : \(request.content.body)")
+					
+					if let trigger = request.trigger as? UNCalendarNotificationTrigger {
+						if let nextTriggerDate = trigger.nextTriggerDate() {
+							let formatter = DateFormatter()
+							formatter.dateStyle = .medium
+							formatter.timeStyle = .short
+							let dateString = formatter.string(from: nextTriggerDate)
+							print("Prochaine date de déclenchement : \(dateString)")
+						} else {
+							print("Prochaine date de déclenchement : Inconnue")
+						}
+					} else if let trigger = request.trigger as? UNTimeIntervalNotificationTrigger {
+						print("Intervalle en secondes : \(trigger.timeInterval)")
+						print("Répète : \(trigger.repeats ? "Oui" : "Non")")
+					} else {
+						print("Type de déclencheur : Inconnu")
+					}
+				}
+			}
+		}
+	}
+
+	
+	// Réinitialiser les notifications
+	func resetNotifications() {
+		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+		print("Toutes les notifications ont été réinitialisées.")
+	}
+	
 	// Fonction pour programmer une notification hebdomadaire si elle n'existe pas déjà
 	func scheduleWeeklyNotificationIfNeeded() {
 		UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
