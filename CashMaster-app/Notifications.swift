@@ -59,12 +59,6 @@ struct NotificationManager {
 	}
 
 	
-	// Réinitialiser les notifications
-	func resetNotifications() {
-		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-		print("Toutes les notifications ont été réinitialisées.")
-	}
-	
 	// Fonction pour programmer une notification hebdomadaire si elle n'existe pas déjà
 	func scheduleWeeklyNotificationIfNeeded() {
 		UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
@@ -105,4 +99,11 @@ struct NotificationManager {
 			}
 		}
 	}
+	
+	// Réinitialiser les notifications
+	func resetNotifications() {
+		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+		print("Toutes les notifications ont été réinitialisées.")
+	}
+	
 }
