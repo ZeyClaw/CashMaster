@@ -8,37 +8,66 @@
 // AccountsManager.swift
 import Foundation
 
-/// Une classe pour gérer plusieurs comptes et leurs transactions.
-class AccountsManager {
+//  Classe centrale de gestion des comptes et transactions.
+//
+//  Très important : toutes les modifications de comptes/transactions DOIVENT passer
+//  par cette classe.
+//  Pourquoi ?
+//  - C’est elle qui appelle `objectWillChange.send()` après chaque mise à jour
+//    afin que SwiftUI rafraîchisse automatiquement l’interface.
+//  - Si tu modifies directement un `Transaction` ou un `TransactionManager` sans passer par ici,
+//    l’UI ne sera pas informée et l’affichage ne se mettra pas à jour.
+class AccountsManager: ObservableObject {
 	/// Dictionnaire des gestionnaires de transactions, où les clés sont des noms de comptes et les valeurs sont des instances de TransactionManager correspondant à chaque compte (liste des transactions pour un compte).
-	private var managers: [String: TransactionManager] = [:]
+	@Published private(set) var managers: [String: TransactionManager] = [:]
+	private let saveKey = "accounts_data"
+	
+	init() { load() }
 	
 	// MARK: - Gestion des comptes
-	/// Crée un nouveau compte avec un nom donné, s'il n'existe pas déjà.
-	/// - Parameter nom: Le nom du compte à créer.
 	private func creerCompte(nom: String) {
 		guard managers[nom] == nil else { return }
 		managers[nom] = TransactionManager(accountName: nom)
+		save()
+		objectWillChange.send()
+	}
+	
+	func ajouterCompte(_ nom: String) {
+		creerCompte(nom: nom)
+	}
+	
+	func deleteAccount(_ nom: String) {
+		managers.removeValue(forKey: nom)
+		save()
+		objectWillChange.send()
+	}
+	
+	func getAllAccounts() -> [String] {
+		Array(managers.keys).sorted()
 	}
 	
 	// MARK: - Gestion des transactions
-	/// Ajoute une transaction à un compte spécifié.
-	/// - Parameters:
-	///   - transaction: La transaction à ajouter.
-	///   - account: Le nom du compte auquel ajouter la transaction.
 	func ajouterTransaction(_ transaction: Transaction, to account: String) {
-		if managers[account] == nil {
-			creerCompte(nom: account)
-		}
+		if managers[account] == nil { creerCompte(nom: account) }
 		managers[account]?.ajouter(transaction)
+		save()
+		objectWillChange.send()
 	}
 	
-	/// Supprime une transaction d'un compte spécifié.
-	/// - Parameters:
-	///   - transaction: La transaction à supprimer.
-	///   - account: Le nom du compte duquel supprimer la transaction.
 	func supprimerTransaction(_ transaction: Transaction, from account: String) {
 		managers[account]?.supprimer(transaction)
+		save()
+		objectWillChange.send()
+	}
+	
+	func validerTransaction(_ transaction: Transaction, in account: String) {
+		transaction.valider(date: Date())
+		save()
+		objectWillChange.send()
+	}
+	
+	func transactions(for account: String) -> [Transaction] {
+		managers[account]?.transactions ?? []
 	}
 	
 	// MARK: - Totaux
@@ -50,13 +79,35 @@ class AccountsManager {
 		managers[account]?.totalPotentiel() ?? 0
 	}
 	
-	/// Calcule le total des transactions pour un mois et une année donnés pour un compte spécifié.
-	/// - Parameters:
-	///   - month: Le mois pour lequel calculer le total (1-12).
-	///   - year: L'année pour laquelle calculer le total.
-	///   - account: Le nom du compte pour lequel calculer le total.
-	/// - Returns: Le montant total des transactions pour le mois et l'année spécifiés pour le compte donné.
-	func totalPourMois(_ month: Int, year: Int, account: String) -> Double {
-		managers[account]?.totalPourMois(month, year: year) ?? 0
+	// MARK: - Reset
+	func resetAll() {
+		managers.removeAll()
+		save()
+		objectWillChange.send()
+	}
+	
+	func resetAccount(_ account: String) {
+		managers[account]?.transactions.removeAll()
+		save()
+		objectWillChange.send()
+	}
+	
+	// MARK: - Persistance
+	private func save() {
+		if let data = try? JSONEncoder().encode(managers.mapValues { $0.transactions }) {
+			UserDefaults.standard.set(data, forKey: saveKey)
+		}
+	}
+	
+	private func load() {
+		if let data = UserDefaults.standard.data(forKey: saveKey),
+		   let decoded = try? JSONDecoder().decode([String: [Transaction]].self, from: data) {
+			managers = decoded.mapValues { txs in
+				let manager = TransactionManager(accountName: "Compte")
+				manager.transactions = txs
+				return manager
+			}
+		}
 	}
 }
+

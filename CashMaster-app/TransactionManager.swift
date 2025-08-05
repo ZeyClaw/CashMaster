@@ -10,14 +10,16 @@
 import Foundation
 
 /// Une classe pour gérer les transactions d'un compte spécifique. (liste des transactions pour un compte)
+//  Cette classe gère uniquement les transactions d’un compte précis.
+//  Elle N’EST PAS observable directement par SwiftUI.
+//  Toute modification doit passer par AccountsManager,
+//  qui lui seul envoie les notifications de mise à jour.
 class TransactionManager {
 	/// Nom du compte associé à ce gestionnaire de transactions.
 	let accountName: String
 	/// Liste des transactions gérées par ce gestionnaire.
-	private(set) var transactions: [Transaction] = []
+	var transactions: [Transaction] = []
 	
-	/// Initialise un nouveau gestionnaire de transactions pour un compte donné.
-	/// - Parameter accountName: Le nom du compte.
 	init(accountName: String) {
 		self.accountName = accountName
 	}
@@ -40,18 +42,13 @@ class TransactionManager {
 		sommeTransactions(filtre: { $0.potentiel })
 	}
 	
-	/// Calcule le total des transactions pour un mois et une année donnés.
-	/// - Parameters:
-	///   - month: Le mois pour lequel calculer le total (1-12).
-	///   - year: L'année pour laquelle calculer le total.
-	/// - Returns: Le montant total des transactions pour le mois et l'année spécifiés.
 	func totalPourMois(_ month: Int, year: Int) -> Double {
 		let calendar = Calendar.current
-		return sommeTransactions(filtre: { transaction in
-			guard !transaction.potentiel, let date = transaction.date else { return false }
+		return sommeTransactions { tx in
+			guard !tx.potentiel, let date = tx.date else { return false }
 			let comp = calendar.dateComponents([.year, .month], from: date)
 			return comp.year == year && comp.month == month
-		})
+		}
 	}
 	
 	// MARK: - Privé
@@ -59,3 +56,4 @@ class TransactionManager {
 		transactions.filter(filtre).map { $0.amount }.reduce(0, +)
 	}
 }
+
