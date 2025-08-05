@@ -8,27 +8,42 @@
 // Transaction.swift
 import Foundation
 
-// Structure représentant une transaction
-struct Transaction: Identifiable, Codable, Equatable {
-	var id = UUID()  // Identifiant unique pour chaque transaction
-	var amount: Double  // Montant ajouté ou soustrait
-	var date: Date   // Date de la transaction
-	var comment: String  // Commentaire lié à la transaction
-}
-
-
-// Fonction pour supprimer une transaction d'un mois donné
-func deleteTransaction(from month: inout Month, at offsets: IndexSet) {
-	for index in offsets {
-		let transaction = month.transactions[index]
-		month.solde -= transaction.amount  // Ajuste le solde en retirant le montant de la transaction
-		month.transactions.remove(at: index)  // Supprime la transaction
+/// Une classe représentant une transaction financière.
+/// Il existe deux types de transactions : potentielles et non potentielles.
+/// Les transactions potentielles sont indiquées par l'attribut `potentiel`.
+/// Une transaction potentielle n'a pas de date, alors qu'une transaction non potentielle devrait en avoir une.
+/// Cependant, il est techniquement possible de créer une transaction non potentielle sans date, donc soyez prudent.
+/// Si vous créez directement une transaction non potentielle, assurez-vous de donner une valeur à l'attribut `date`.
+/// Pour valider une transaction potentielle, utilisez la méthode `valider` plutôt que de le faire manuellement.
+class Transaction: Identifiable, Codable, Equatable {
+	var id: UUID
+	var amount: Double
+	var comment: String
+	var potentiel: Bool
+	var date: Date?  // nil si transaction potentielle
+	
+	/// Initialise une nouvelle transaction.
+	/// - Parameters:
+	///   - amount: Le montant de la transaction.
+	///   - comment: Un commentaire associé à la transaction.
+	///   - potentiel: Indique si la transaction est potentielle (par défaut, `true`).
+	///   - date: Date de la transaction, `nil` si la transaction est potentielle.
+	init(amount: Double, comment: String, potentiel: Bool = true, date: Date? = nil) {
+		self.id = UUID()
+		self.amount = amount
+		self.comment = comment
+		self.potentiel = potentiel
+		self.date = date
 	}
-}
-
-// Fonction pour supprimer une transaction d'un tableau de mois donné
-func deleteTransaction(from months: inout [Month], in monthIndex: Int, at transactionIndex: Int) {
-	let transaction = months[monthIndex].transactions[transactionIndex]
-	months[monthIndex].solde -= transaction.amount  // Ajuste le solde du mois en retirant le montant de la transaction
-	months[monthIndex].transactions.remove(at: transactionIndex)  // Supprime la transaction
+	
+	/// Valider une transaction potentielle
+	func valider(date: Date) {
+		self.potentiel = false
+		self.date = date
+	}
+	
+	// MARK: - Equatable
+	static func == (lhs: Transaction, rhs: Transaction) -> Bool {
+		lhs.id == rhs.id
+	}
 }
