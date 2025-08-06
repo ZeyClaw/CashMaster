@@ -12,6 +12,11 @@
 		F810E2F12E428FFB00C2DFA9 /* AccountCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */; };
 		F810E2F32E42901B00C2DFA9 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2F22E42901B00C2DFA9 /* AccountView.swift */; };
 		F810E2F52E42903300C2DFA9 /* TransactionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2F42E42903300C2DFA9 /* TransactionRow.swift */; };
+		F810E2F92E43D2B100C2DFA9 /* YearsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2F82E43D2B100C2DFA9 /* YearsView.swift */; };
+		F810E2FB2E43D2CB00C2DFA9 /* MonthsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2FA2E43D2CB00C2DFA9 /* MonthsView.swift */; };
+		F810E2FF2E43DFC300C2DFA9 /* PotentialTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2FE2E43DFC300C2DFA9 /* PotentialTransactionsView.swift */; };
+		F810E3012E43E42800C2DFA9 /* TransactionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E3002E43E42800C2DFA9 /* TransactionsListView.swift */; };
+		F810E3032E43E67F00C2DFA9 /* AccountToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E3022E43E67F00C2DFA9 /* AccountToolbar.swift */; };
 		F812E1FA2CC7BCFF00619857 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */; };
 		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
@@ -48,6 +53,11 @@
 		F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCardView.swift; sourceTree = "<group>"; };
 		F810E2F22E42901B00C2DFA9 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		F810E2F42E42903300C2DFA9 /* TransactionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionRow.swift; sourceTree = "<group>"; };
+		F810E2F82E43D2B100C2DFA9 /* YearsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearsView.swift; sourceTree = "<group>"; };
+		F810E2FA2E43D2CB00C2DFA9 /* MonthsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthsView.swift; sourceTree = "<group>"; };
+		F810E2FE2E43DFC300C2DFA9 /* PotentialTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PotentialTransactionsView.swift; sourceTree = "<group>"; };
+		F810E3002E43E42800C2DFA9 /* TransactionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListView.swift; sourceTree = "<group>"; };
+		F810E3022E43E67F00C2DFA9 /* AccountToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountToolbar.swift; sourceTree = "<group>"; };
 		F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F812E1FB2CC828DF00619857 /* CashMaster-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CashMaster-Info.plist"; sourceTree = "<group>"; };
 		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
@@ -90,6 +100,41 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F810E3042E43EA7B00C2DFA9 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
+				F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */,
+				F810E2EE2E422F1E00C2DFA9 /* AccountsManager.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F810E3072E43EAC800C2DFA9 /* AccountViews */ = {
+			isa = PBXGroup;
+			children = (
+				F810E2F22E42901B00C2DFA9 /* AccountView.swift */,
+				F810E2F82E43D2B100C2DFA9 /* YearsView.swift */,
+				F810E2FA2E43D2CB00C2DFA9 /* MonthsView.swift */,
+				F810E3002E43E42800C2DFA9 /* TransactionsListView.swift */,
+				F810E3022E43E67F00C2DFA9 /* AccountToolbar.swift */,
+				F810E2FE2E43DFC300C2DFA9 /* PotentialTransactionsView.swift */,
+				F810E2F42E42903300C2DFA9 /* TransactionRow.swift */,
+			);
+			path = AccountViews;
+			sourceTree = "<group>";
+		};
+		F810E3082E43EADA00C2DFA9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
+				F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */,
+				F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */,
+				F810E3072E43EAC800C2DFA9 /* AccountViews */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		F8B79A622CAEC5E4002D88AE = {
 			isa = PBXGroup;
 			children = (
@@ -115,16 +160,10 @@
 			isa = PBXGroup;
 			children = (
 				F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */,
-				F807613D2CC6E31B00C34EDD /* Notifications.swift */,
-				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
-				F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */,
-				F810E2EE2E422F1E00C2DFA9 /* AccountsManager.swift */,
 				F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */,
-				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
-				F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */,
-				F810E2F22E42901B00C2DFA9 /* AccountView.swift */,
-				F810E2F42E42903300C2DFA9 /* TransactionRow.swift */,
-				F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */,
+				F807613D2CC6E31B00C34EDD /* Notifications.swift */,
+				F810E3042E43EA7B00C2DFA9 /* Models */,
+				F810E3082E43EADA00C2DFA9 /* Views */,
 				F8B79A722CAEC5EE002D88AE /* Assets.xcassets */,
 				F8B79A742CAEC5EE002D88AE /* Preview Content */,
 			);
@@ -292,11 +331,16 @@
 				F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */,
 				F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */,
 				F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */,
+				F810E3032E43E67F00C2DFA9 /* AccountToolbar.swift in Sources */,
+				F810E2F92E43D2B100C2DFA9 /* YearsView.swift in Sources */,
 				F810E2F32E42901B00C2DFA9 /* AccountView.swift in Sources */,
 				F810E2F12E428FFB00C2DFA9 /* AccountCardView.swift in Sources */,
+				F810E2FB2E43D2CB00C2DFA9 /* MonthsView.swift in Sources */,
+				F810E3012E43E42800C2DFA9 /* TransactionsListView.swift in Sources */,
 				F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */,
 				F810E2EF2E422F1E00C2DFA9 /* AccountsManager.swift in Sources */,
 				F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */,
+				F810E2FF2E43DFC300C2DFA9 /* PotentialTransactionsView.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

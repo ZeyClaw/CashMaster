@@ -42,14 +42,6 @@ class TransactionManager {
 		sommeTransactions(filtre: { $0.potentiel })
 	}
 	
-	func totalPourMois(_ month: Int, year: Int) -> Double {
-		let calendar = Calendar.current
-		return sommeTransactions { tx in
-			guard !tx.potentiel, let date = tx.date else { return false }
-			let comp = calendar.dateComponents([.year, .month], from: date)
-			return comp.year == year && comp.month == month
-		}
-	}
 	
 	// MARK: - Privé
 	private func sommeTransactions(filtre: (Transaction) -> Bool) -> Double {

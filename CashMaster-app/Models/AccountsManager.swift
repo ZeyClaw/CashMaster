@@ -109,5 +109,59 @@ class AccountsManager: ObservableObject {
 			}
 		}
 	}
+	
+	// MARK: - Regroupements
+	func anneesDisponibles(for account: String) -> [Int] {
+		let txs = transactions(for: account).filter { !$0.potentiel }
+		let years = txs.compactMap { tx -> Int? in
+			guard let d = tx.date else { return nil }
+			return Calendar.current.component(.year, from: d)
+		}
+		return Array(Set(years)).sorted()
+	}
+	
+	func totalPourAnnee(_ year: Int, account: String) -> Double {
+		transactions(for: account)
+			.filter { !$0.potentiel && Calendar.current.component(.year, from: $0.date ?? Date()) == year }
+			.map { $0.amount }
+			.reduce(0, +)
+	}
+	
+	func totalPourMois(_ month: Int, year: Int, account: String) -> Double {
+		transactions(for: account)
+			.filter {
+				guard !$0.potentiel, let date = $0.date else { return false }
+				let comp = Calendar.current.dateComponents([.year, .month], from: date)
+				return comp.year == year && comp.month == month
+			}
+			.map { $0.amount }
+			.reduce(0, +)
+	}
+	
+	// MARK: - Sélections utiles
+	
+	/// Retourne toutes les transactions validées (non potentielles)
+	func validatedTransactions(for account: String) -> [Transaction] {
+		transactions(for: account).filter { !$0.potentiel }
+	}
+	
+	/// Retourne toutes les transactions potentielles
+	func potentialTransactions(for account: String) -> [Transaction] {
+		transactions(for: account).filter { $0.potentiel }
+	}
+	
+	/// Retourne toutes les transactions validées d'une année et/ou d'un mois
+	func validatedTransactions(for account: String, year: Int? = nil, month: Int? = nil) -> [Transaction] {
+		var txs = validatedTransactions(for: account)
+		if let year = year {
+			txs = txs.filter { Calendar.current.component(.year, from: $0.date ?? Date()) == year }
+		}
+		if let month = month {
+			txs = txs.filter { Calendar.current.component(.month, from: $0.date ?? Date()) == month }
+		}
+		return txs
+	}
+
+
 }
 

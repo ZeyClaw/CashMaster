@@ -49,7 +49,6 @@ struct ContentView: View {
 					}
 					.frame(maxWidth: .infinity)
 					.padding()
-					.background(Color(UIColor.secondarySystemGroupedBackground))
 					.cornerRadius(12)
 				}
 			}

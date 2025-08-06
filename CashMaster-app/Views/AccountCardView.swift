@@ -39,7 +39,6 @@ struct AccountCardView: View {
 		}
 		.padding()
 		.frame(maxWidth: .infinity)
-		.background(Color(UIColor.secondarySystemGroupedBackground))
 		.cornerRadius(12)
 	}
 }
