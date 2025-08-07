@@ -10,93 +10,86 @@ import SwiftUI
 
 struct ContentView: View {
 	@StateObject private var accountsManager = AccountsManager()
-	@State private var path: [String] = []
-	@State private var showingResetAlert = false
-	@State private var showingAddAccountSheet = false
-	@State private var newAccountName: String = ""
+	@State private var selectedAccount: String?
+	@State private var showingAccountPicker = false
+	@State private var tabSelection: Tab = .annees
+	
+	enum Tab: Hashable {
+		case annees, mois, potentielles
+	}
 	
 	var body: some View {
-		NavigationStack(path: $path) {
-			List {
-				ForEach(accountsManager.getAllAccounts(), id: \.self) { account in
-					NavigationLink(value: account) {
-						AccountCardView(
-							account: account,
-							solde: accountsManager.totalNonPotentiel(for: account),
-							futur: accountsManager.totalPotentiel(for: account) + accountsManager.totalNonPotentiel(for: account)
-						)
+		NavigationStack {
+			VStack(spacing: 0) {
+				if let account = selectedAccount {
+					// Affiche la vue selon l'onglet
+					switch tabSelection {
+					case .annees:
+						YearsView(account: account, accountsManager: accountsManager)
+					case .mois:
+						MonthsView(account: account, accountsManager: accountsManager, year: Calendar.current.component(.year, from: Date()))
+					case .potentielles:
+						PotentialTransactionsView(account: account, accountsManager: accountsManager)
 					}
-					.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-						Button(role: .destructive) {
-							accountsManager.deleteAccount(account)
-						} label: {
-							Label("Supprimer", systemImage: "trash")
-						}
+				} else {
+					Text("Aucun compte sélectionné")
+						.foregroundStyle(.secondary)
+						.padding()
+				}
+				
+				Divider()
+				
+				// Bouton menu contextuel juste au-dessus des onglets
+				HStack {
+					Spacer()
+					Menu {
+						Button("Ajouter transaction") { /* show sheet */ }
+						Button("Réinitialiser compte", role: .destructive) { /* reset */ }
+					} label: {
+						Image(systemName: "ellipsis.circle")
+							.font(.title2)
+							.padding(.bottom, 4)
 					}
 				}
 				
-				// Carte spéciale "Ajouter un compte"
-				Button {
-					showingAddAccountSheet = true
-				} label: {
-					VStack {
-						Image(systemName: "plus.circle.fill")
-							.font(.largeTitle)
-							.foregroundStyle(.blue)
-						Text("Ajouter un compte")
-							.font(.headline)
-							.foregroundStyle(.blue)
-					}
-					.frame(maxWidth: .infinity)
-					.padding()
-					.cornerRadius(12)
+				// TabView avec 3 onglets
+				TabView(selection: $tabSelection) {
+					Text("") // Placeholder, remplacement du contenu central
+						.tabItem { Label("Années", systemImage: "calendar") }
+						.tag(Tab.annees)
+					
+					Text("")
+						.tabItem { Label("Mois", systemImage: "calendar.circle") }
+						.tag(Tab.mois)
+					
+					Text("")
+						.tabItem { Label("Potentielles", systemImage: "clock") }
+						.tag(Tab.potentielles)
 				}
 			}
-			.navigationTitle("CashMaster")
-			.navigationDestination(for: String.self) { account in
-				AccountView(accountsManager: accountsManager, account: account)
-			}
+			.navigationTitle(selectedAccount ?? "CashMaster")
+			// Sélecteur de compte en haut à droite
 			.toolbar {
-				ToolbarItemGroup(placement: .bottomBar) {
-					Spacer()
-					Button(role: .destructive) {
-						showingResetAlert = true
+				ToolbarItem(placement: .navigationBarTrailing) {
+					Button {
+						showingAccountPicker = true
 					} label: {
-						Label("Reset Tout", systemImage: "trash")
+						Image(systemName: "person.crop.circle")
+							.font(.title2)
 					}
 				}
 			}
-			.alert("Réinitialiser tous les comptes ?", isPresented: $showingResetAlert) {
-				Button("Reset", role: .destructive) {
-					accountsManager.resetAll()
-				}
-				Button("Annuler", role: .cancel) {}
+			// Sheet pour choisir ou ajouter un compte
+			.sheet(isPresented: $showingAccountPicker) {
+				AccountPickerView(
+					accountsManager: accountsManager,
+					selectedAccount: $selectedAccount
+				)
 			}
-			.sheet(isPresented: $showingAddAccountSheet) {
-				NavigationStack {
-					Form {
-						Section("Nom du compte") {
-							TextField("Ex: Alice", text: $newAccountName)
-						}
-					}
-					.navigationTitle("Nouveau Compte")
-					.toolbar {
-						ToolbarItem(placement: .cancellationAction) {
-							Button("Annuler") {
-								newAccountName = ""
-								showingAddAccountSheet = false
-							}
-						}
-						ToolbarItem(placement: .confirmationAction) {
-							Button("Créer") {
-								if !newAccountName.trimmingCharacters(in: .whitespaces).isEmpty {
-									accountsManager.ajouterCompte(newAccountName)
-									newAccountName = ""
-									showingAddAccountSheet = false
-								}
-							}
-						}
-					}
+			.onAppear {
+				// Sélection auto du dernier compte actif ou premier
+				if selectedAccount == nil {
+					selectedAccount = accountsManager.getAllAccounts().first
 				}
 			}
 		}
