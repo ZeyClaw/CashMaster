@@ -13,10 +13,6 @@ struct TransactionsListView: View {
 	var month: Int? = nil
 	var year: Int? = nil
 	
-	@Binding var mode: AccountMainMode
-	@Binding var showingAddTransactionSheet: Bool
-	@Binding var showingResetAlert: Bool
-	
 	var body: some View {
 		List {
 			ForEach(accountsManager.validatedTransactions(for: account, year: year, month: month)) { transaction in
@@ -31,15 +27,6 @@ struct TransactionsListView: View {
 			}
 		}
 		.navigationTitle(titleText)
-		.toolbar {
-			AccountToolbar(
-				mode: $mode,
-				account: account,
-				accountsManager: accountsManager,
-				showingAddTransactionSheet: $showingAddTransactionSheet,
-				showingResetAlert: $showingResetAlert
-			)
-		}
 	}
 	
 	private var titleText: String {

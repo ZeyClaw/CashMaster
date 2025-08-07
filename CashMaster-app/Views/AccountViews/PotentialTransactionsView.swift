@@ -11,10 +11,6 @@ struct PotentialTransactionsView: View {
 	let account: String
 	@ObservedObject var accountsManager: AccountsManager
 	
-	@Binding var mode: AccountMainMode
-	@Binding var showingAddTransactionSheet: Bool
-	@Binding var showingResetAlert: Bool
-	
 	var body: some View {
 		List {
 			if accountsManager.potentialTransactions(for: account).isEmpty {
@@ -42,8 +38,5 @@ struct PotentialTransactionsView: View {
 			}
 		}
 		.navigationTitle("Futur")
-		.toolbar {
-			AccountToolbar(mode: $mode, account: account, accountsManager: accountsManager, showingAddTransactionSheet: $showingAddTransactionSheet, showingResetAlert: $showingResetAlert)
-		}
 	}
 }

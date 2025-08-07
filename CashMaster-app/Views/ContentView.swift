@@ -54,7 +54,7 @@ struct ContentView: View {
 			}
 			.navigationTitle("CashMaster")
 			.navigationDestination(for: String.self) { account in
-				AccountView(account: account, accountsManager: accountsManager)
+				AccountView(accountsManager: accountsManager, account: account)
 			}
 			.toolbar {
 				ToolbarItemGroup(placement: .bottomBar) {

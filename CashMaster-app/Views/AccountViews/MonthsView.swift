@@ -12,10 +12,6 @@ struct MonthsView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	var year: Int
 	
-	@Binding var mode: AccountMainMode
-	@Binding var showingAddTransactionSheet: Bool
-	@Binding var showingResetAlert: Bool
-	
 	var body: some View {
 		List {
 			ForEach(1...12, id: \.self) { month in
@@ -25,10 +21,7 @@ struct MonthsView: View {
 						account: account,
 						accountsManager: accountsManager,
 						month: month,
-						year: year,
-						mode: $mode,
-						showingAddTransactionSheet: $showingAddTransactionSheet,
-						showingResetAlert: $showingResetAlert
+						year: year
 					)) {
 						HStack {
 							Text(nomDuMois(month))
@@ -42,9 +35,6 @@ struct MonthsView: View {
 
 		}
 		.navigationTitle("\(year)")
-		.toolbar {
-			AccountToolbar(mode: $mode, account: account, accountsManager: accountsManager, showingAddTransactionSheet: $showingAddTransactionSheet, showingResetAlert: $showingResetAlert)
-		}
 	}
 	
 	private func nomDuMois(_ mois: Int) -> String {

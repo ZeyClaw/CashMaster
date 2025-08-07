@@ -11,14 +11,10 @@ struct YearsView: View {
 	let account: String
 	@ObservedObject var accountsManager: AccountsManager
 	
-	@Binding var mode: AccountMainMode
-	@Binding var showingAddTransactionSheet: Bool
-	@Binding var showingResetAlert: Bool
-	
 	var body: some View {
 		List {
 			ForEach(accountsManager.anneesDisponibles(for: account), id: \.self) { year in
-				NavigationLink(destination: MonthsView(account: account, accountsManager: accountsManager, year: year, mode: $mode, showingAddTransactionSheet: $showingAddTransactionSheet, showingResetAlert: $showingResetAlert)) {
+				NavigationLink(destination: MonthsView(account: account, accountsManager: accountsManager, year: year)) {
 					HStack {
 						Text("\(year)")
 						Spacer()
@@ -27,9 +23,6 @@ struct YearsView: View {
 					}
 				}
 			}
-		}
-		.toolbar {
-			AccountToolbar(mode: $mode, account: account, accountsManager: accountsManager, showingAddTransactionSheet: $showingAddTransactionSheet, showingResetAlert: $showingResetAlert)
 		}
 	}
 }
