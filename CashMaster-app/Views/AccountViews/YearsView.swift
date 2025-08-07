@@ -8,18 +8,17 @@
 import SwiftUI
 
 struct YearsView: View {
-	let account: String
 	@ObservedObject var accountsManager: AccountsManager
 	
 	var body: some View {
 		List {
-			ForEach(accountsManager.anneesDisponibles(for: account), id: \.self) { year in
-				NavigationLink(destination: MonthsView(account: account, accountsManager: accountsManager, year: year)) {
+			ForEach(accountsManager.anneesDisponibles(), id: \.self) { year in
+				NavigationLink(destination: MonthsView(accountsManager: accountsManager, year: year)) {
 					HStack {
 						Text("\(year)")
 						Spacer()
-						Text("\(accountsManager.totalPourAnnee(year, account: account), specifier: "%.2f") €")
-							.foregroundStyle(accountsManager.totalPourAnnee(year, account: account) >= 0 ? .green : .red)
+						Text("\(accountsManager.totalPourAnnee(year), specifier: "%.2f") €")
+							.foregroundStyle(accountsManager.totalPourAnnee(year) >= 0 ? .green : .red)
 					}
 				}
 			}

@@ -58,27 +58,30 @@ class AccountsManager: ObservableObject {
 	}
 	
 	// MARK: - Gestion des transactions
-	func ajouterTransaction(_ transaction: Transaction, to account: String) {
+	func ajouterTransaction(_ transaction: Transaction) {
+		guard let account = selectedAccount else { return }
 		if managers[account] == nil { creerCompte(nom: account) }
 		managers[account]?.ajouter(transaction)
 		save()
 		objectWillChange.send()
 	}
 	
-	func supprimerTransaction(_ transaction: Transaction, from account: String) {
+	func supprimerTransaction(_ transaction: Transaction) {
+		guard let account = selectedAccount else { return }
 		managers[account]?.supprimer(transaction)
 		save()
 		objectWillChange.send()
 	}
 	
-	func validerTransaction(_ transaction: Transaction, in account: String) {
+	func validerTransaction(_ transaction: Transaction) {
 		transaction.valider(date: Date())
 		save()
 		objectWillChange.send()
 	}
 	
-	func transactions(for account: String) -> [Transaction] {
-		managers[account]?.transactions ?? []
+	func transactions() -> [Transaction] {
+		guard let account = selectedAccount else { return [] }
+		return managers[account]?.transactions ?? []
 	}
 	
 	// MARK: - Totaux
@@ -110,8 +113,8 @@ class AccountsManager: ObservableObject {
 	}
 	
 	// MARK: - Regroupements
-	func anneesDisponibles(for account: String) -> [Int] {
-		let txs = transactions(for: account).filter { !$0.potentiel }
+	func anneesDisponibles() -> [Int] {
+		let txs = transactions().filter { !$0.potentiel }
 		let years = txs.compactMap { tx -> Int? in
 			guard let d = tx.date else { return nil }
 			return Calendar.current.component(.year, from: d)
@@ -119,15 +122,15 @@ class AccountsManager: ObservableObject {
 		return Array(Set(years)).sorted()
 	}
 	
-	func totalPourAnnee(_ year: Int, account: String) -> Double {
-		transactions(for: account)
+	func totalPourAnnee(_ year: Int) -> Double {
+		transactions()
 			.filter { !$0.potentiel && Calendar.current.component(.year, from: $0.date ?? Date()) == year }
 			.map { $0.amount }
 			.reduce(0, +)
 	}
 	
-	func totalPourMois(_ month: Int, year: Int, account: String) -> Double {
-		transactions(for: account)
+	func totalPourMois(_ month: Int, year: Int) -> Double {
+		transactions()
 			.filter {
 				guard !$0.potentiel, let date = $0.date else { return false }
 				let comp = Calendar.current.dateComponents([.year, .month], from: date)
@@ -140,18 +143,18 @@ class AccountsManager: ObservableObject {
 	// MARK: - Sélections utiles
 	
 	/// Retourne toutes les transactions validées (non potentielles)
-	func validatedTransactions(for account: String) -> [Transaction] {
-		transactions(for: account).filter { !$0.potentiel }
+	private func totalValidatedTransactions() -> [Transaction] {
+		transactions().filter { !$0.potentiel }
 	}
 	
 	/// Retourne toutes les transactions potentielles
-	func potentialTransactions(for account: String) -> [Transaction] {
-		transactions(for: account).filter { $0.potentiel }
+	func potentialTransactions() -> [Transaction] {
+		transactions().filter { $0.potentiel }
 	}
 	
 	/// Retourne toutes les transactions validées d'une année et/ou d'un mois
-	func validatedTransactions(for account: String, year: Int? = nil, month: Int? = nil) -> [Transaction] {
-		var txs = validatedTransactions(for: account)
+	func validatedTransactions(year: Int? = nil, month: Int? = nil) -> [Transaction] {
+		var txs = totalValidatedTransactions()
 		if let year = year {
 			txs = txs.filter { Calendar.current.component(.year, from: $0.date ?? Date()) == year }
 		}

@@ -8,18 +8,17 @@
 import SwiftUI
 
 struct TransactionsListView: View {
-	let account: String
 	@ObservedObject var accountsManager: AccountsManager
 	var month: Int? = nil
 	var year: Int? = nil
 	
 	var body: some View {
 		List {
-			ForEach(accountsManager.validatedTransactions(for: account, year: year, month: month)) { transaction in
+			ForEach(accountsManager.validatedTransactions(year: year, month: month)) { transaction in
 				TransactionRow(transaction: transaction)
 					.swipeActions(edge: .trailing, allowsFullSwipe: true) {
 						Button(role: .destructive) {
-							accountsManager.supprimerTransaction(transaction, from: account)
+							accountsManager.supprimerTransaction(transaction)
 						} label: {
 							Label("Supprimer", systemImage: "trash")
 						}

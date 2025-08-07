@@ -8,17 +8,15 @@
 import SwiftUI
 
 struct MonthsView: View {
-	let account: String
 	@ObservedObject var accountsManager: AccountsManager
 	var year: Int
 	
 	var body: some View {
 		List {
 			ForEach(1...12, id: \.self) { month in
-				let total = accountsManager.totalPourMois(month, year: year, account: account)
+				let total = accountsManager.totalPourMois(month, year: year)
 				if total != 0 {
 					NavigationLink(destination: TransactionsListView(
-						account: account,
 						accountsManager: accountsManager,
 						month: month,
 						year: year

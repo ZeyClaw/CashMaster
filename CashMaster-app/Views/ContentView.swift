@@ -43,6 +43,7 @@ struct ContentView: View {
 							.tabItem { Label("Potentielles", systemImage: "clock.arrow.circlepath") }
 							.tag(Tab.potentielles)
 					}
+					.frame(height: 60)
 				}
 				
 				// Bouton flottant + en bas à droite
@@ -52,7 +53,7 @@ struct ContentView: View {
 					Image(systemName: "plus.circle.fill")
 						.font(.system(size: 50))
 						.symbolRenderingMode(.palette)
-						.foregroundStyle(.blue, .white)
+						.foregroundStyle(.white, .blue)
 						.shadow(radius: 4)
 				}
 				.padding(.bottom, 70)
@@ -75,8 +76,8 @@ struct ContentView: View {
 				)
 			}
 			.sheet(isPresented: $showingAddTransactionSheet) {
-				if let account = accountsManager.selectedAccount {
-					AddTransactionView(accountsManager: accountsManager, accountName: account)
+				if accountsManager.selectedAccount != nil {
+					AddTransactionView(accountsManager: accountsManager)
 				}
 			}
 			.onAppear {
@@ -91,11 +92,11 @@ struct ContentView: View {
 	func content(for account: String) -> some View {
 		switch tabSelection {
 		case .home:
-			YearsView(account: account, accountsManager: accountsManager)
+			HomeView(accountsManager: accountsManager)
 		case .calendrier:
-			MonthsView(account: account, accountsManager: accountsManager, year: Calendar.current.component(.year, from: Date()))
+			YearsView(accountsManager: accountsManager)
 		case .potentielles:
-			PotentialTransactionsView(account: account, accountsManager: accountsManager)
+			PotentialTransactionsView(accountsManager: accountsManager)
 		}
 	}
 }

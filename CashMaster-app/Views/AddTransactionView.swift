@@ -18,7 +18,6 @@ struct AddTransactionView: View {
 	@State private var isPotentiel: Bool = true
 	@State private var showingErrorAlert = false
 	
-	let accountName: String
 	
 	var body: some View {
 		NavigationView {
@@ -78,7 +77,7 @@ struct AddTransactionView: View {
 			potentiel: isPotentiel,
 			date: isPotentiel ? nil : transactionDate
 		)
-		accountsManager.ajouterTransaction(transaction, to: accountName)
+		accountsManager.ajouterTransaction(transaction)
 		dismiss()
 	}
 }
