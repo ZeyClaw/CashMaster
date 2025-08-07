@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ContentView: View {
 	@StateObject private var accountsManager = AccountsManager()
-	@State private var selectedAccount: String?
 	@State private var showingAccountPicker = false
 	@State private var showingAddTransactionSheet = false
 	@State private var tabSelection: Tab = .home
@@ -23,7 +22,7 @@ struct ContentView: View {
 		NavigationStack {
 			ZStack(alignment: .bottomTrailing) {
 				VStack(spacing: 0) {
-					if let account = selectedAccount {
+					if let account = accountsManager.selectedAccount {
 						content(for: account)
 					} else {
 						Text("Aucun compte sélectionné")
@@ -59,7 +58,7 @@ struct ContentView: View {
 				.padding(.bottom, 70)
 				.padding(.trailing, 20)
 			}
-			.navigationTitle(selectedAccount ?? "CashMaster")
+			.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
 			.toolbar {
 				ToolbarItem(placement: .navigationBarTrailing) {
 					Button {
@@ -72,18 +71,17 @@ struct ContentView: View {
 			}
 			.sheet(isPresented: $showingAccountPicker) {
 				AccountPickerView(
-					accountsManager: accountsManager,
-					selectedAccount: $selectedAccount
+					accountsManager: accountsManager
 				)
 			}
 			.sheet(isPresented: $showingAddTransactionSheet) {
-				if let account = selectedAccount {
+				if let account = accountsManager.selectedAccount {
 					AddTransactionView(accountsManager: accountsManager, accountName: account)
 				}
 			}
 			.onAppear {
-				if selectedAccount == nil {
-					selectedAccount = accountsManager.getAllAccounts().first
+				if accountsManager.selectedAccount == nil {
+					accountsManager.selectedAccount = accountsManager.getAllAccounts().first
 				}
 			}
 		}

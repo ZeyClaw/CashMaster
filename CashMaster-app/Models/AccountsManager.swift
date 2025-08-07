@@ -20,9 +20,17 @@ import Foundation
 class AccountsManager: ObservableObject {
 	/// Dictionnaire des gestionnaires de transactions, où les clés sont des noms de comptes et les valeurs sont des instances de TransactionManager correspondant à chaque compte (liste des transactions pour un compte).
 	@Published private(set) var managers: [String: TransactionManager] = [:]
+	@Published var selectedAccount: String? {
+		didSet {
+			UserDefaults.standard.set(selectedAccount, forKey: "lastSelectedAccount")
+		}
+	}
 	private let saveKey = "accounts_data"
 	
-	init() { load() }
+	init() { 
+		load()
+		selectedAccount = UserDefaults.standard.string(forKey: "lastSelectedAccount")
+	}
 	
 	// MARK: - Gestion des comptes
 	private func creerCompte(nom: String) {
@@ -36,9 +44,12 @@ class AccountsManager: ObservableObject {
 		creerCompte(nom: nom)
 	}
 	
-	func deleteAccount(_ nom: String) {
-		managers.removeValue(forKey: nom)
+	func deleteAccount(_ account: String) {
+		managers.removeValue(forKey: account)
 		save()
+		if selectedAccount == account {
+			selectedAccount = getAllAccounts().first
+		}
 		objectWillChange.send()
 	}
 	

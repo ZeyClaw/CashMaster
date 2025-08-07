@@ -10,7 +10,6 @@ import SwiftUI
 struct AccountPickerView: View {
 	@Environment(\.dismiss) var dismiss
 	@ObservedObject var accountsManager: AccountsManager
-	@Binding var selectedAccount: String?
 	
 	@State private var showingAddAccount = false
 	@State private var newAccountName = ""
@@ -20,7 +19,7 @@ struct AccountPickerView: View {
 			List {
 				ForEach(accountsManager.getAllAccounts(), id: \.self) { account in
 					Button {
-						selectedAccount = account
+						accountsManager.selectedAccount = account
 						dismiss()
 					} label: {
 						AccountCardView(
@@ -81,7 +80,7 @@ struct AccountPickerView: View {
 								let trimmed = newAccountName.trimmingCharacters(in: .whitespacesAndNewlines)
 								if !trimmed.isEmpty {
 									accountsManager.ajouterCompte(trimmed)
-									selectedAccount = trimmed
+									accountsManager.selectedAccount = trimmed
 									newAccountName = ""
 									showingAddAccount = false
 									dismiss() // ferme tout
