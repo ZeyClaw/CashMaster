@@ -17,7 +17,6 @@ struct AccountView: View {
 	
 	@State private var mode: AccountMainMode = .annees
 	@State private var showingAddSheet = false
-	@State private var showingResetAlert = false
 	
 	var body: some View {
 		VStack {
@@ -34,24 +33,9 @@ struct AccountView: View {
 					Label("Vue", systemImage: "line.3.horizontal.decrease.circle")
 				}
 			}
-			ToolbarItemGroup(placement: .bottomBar) {
-				Button { showingAddSheet = true } label: {
-					Label("Ajouter", systemImage: "plus.circle.fill")
-				}
-				Spacer()
-				Button(role: .destructive) { showingResetAlert = true } label: {
-					Label("Reset", systemImage: "trash")
-				}
-			}
 		}
 		.sheet(isPresented: $showingAddSheet) {
 			AddTransactionView(accountsManager: accountsManager, accountName: account)
-		}
-		.alert("Réinitialiser ce compte ?", isPresented: $showingResetAlert) {
-			Button("Reset", role: .destructive) {
-				accountsManager.resetAccount(account)
-			}
-			Button("Annuler", role: .cancel) {}
 		}
 	}
 	

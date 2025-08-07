@@ -12,6 +12,9 @@ struct AccountPickerView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	@Binding var selectedAccount: String?
 	
+	@State private var showingAddAccount = false
+	@State private var newAccountName = ""
+	
 	var body: some View {
 		NavigationStack {
 			List {
@@ -20,26 +23,34 @@ struct AccountPickerView: View {
 						selectedAccount = account
 						dismiss()
 					} label: {
-						HStack {
-							Text(account)
-							Spacer()
-							Text("\(accountsManager.totalNonPotentiel(for: account), specifier: "%.2f") €")
-								.foregroundStyle(.green)
-							Text("+\(accountsManager.totalPotentiel(for: account), specifier: "%.2f") €")
-								.foregroundStyle(.blue)
+						AccountCardView(
+							account: account,
+							solde: accountsManager.totalNonPotentiel(for: account),
+							futur: accountsManager.totalNonPotentiel(for: account) + accountsManager.totalPotentiel(for: account)
+						)
+					}
+					.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+						Button(role: .destructive) {
+							accountsManager.deleteAccount(account)
+						} label: {
+							Label("Supprimer", systemImage: "trash")
 						}
-						.padding(.vertical, 8)
 					}
 				}
 				
-				Button {
-					// Ajouter un compte
-					// Utiliser sheet ou autre si souhaité
-				} label: {
-					Label("Ajouter un compte", systemImage: "plus.circle.fill")
-						.font(.headline)
-						.foregroundStyle(.blue)
-						.padding(.vertical, 8)
+				Section {
+					Button {
+						showingAddAccount = true
+					} label: {
+						HStack {
+							Spacer()
+							Label("Ajouter un compte", systemImage: "plus.circle.fill")
+								.font(.headline)
+								.foregroundStyle(.blue)
+							Spacer()
+						}
+					}
+					.padding(.vertical, 8)
 				}
 			}
 			.navigationTitle("Choisir un compte")
@@ -47,6 +58,36 @@ struct AccountPickerView: View {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Annuler") {
 						dismiss()
+					}
+				}
+			}
+			.sheet(isPresented: $showingAddAccount) {
+				NavigationStack {
+					Form {
+						Section("Nom du compte") {
+							TextField("Ex: Alice", text: $newAccountName)
+						}
+					}
+					.navigationTitle("Nouveau Compte")
+					.toolbar {
+						ToolbarItem(placement: .cancellationAction) {
+							Button("Annuler") {
+								newAccountName = ""
+								showingAddAccount = false
+							}
+						}
+						ToolbarItem(placement: .confirmationAction) {
+							Button("Créer") {
+								let trimmed = newAccountName.trimmingCharacters(in: .whitespacesAndNewlines)
+								if !trimmed.isEmpty {
+									accountsManager.ajouterCompte(trimmed)
+									selectedAccount = trimmed
+									newAccountName = ""
+									showingAddAccount = false
+									dismiss() // ferme tout
+								}
+							}
+						}
 					}
 				}
 			}

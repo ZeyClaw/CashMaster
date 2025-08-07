@@ -79,18 +79,6 @@ class AccountsManager: ObservableObject {
 		managers[account]?.totalPotentiel() ?? 0
 	}
 	
-	// MARK: - Reset
-	func resetAll() {
-		managers.removeAll()
-		save()
-		objectWillChange.send()
-	}
-	
-	func resetAccount(_ account: String) {
-		managers[account]?.transactions.removeAll()
-		save()
-		objectWillChange.send()
-	}
 	
 	// MARK: - Persistance
 	private func save() {
