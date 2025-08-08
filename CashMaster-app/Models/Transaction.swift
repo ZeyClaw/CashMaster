@@ -8,6 +8,23 @@
 // Transaction.swift
 import Foundation
 
+
+enum TransactionType: String, CaseIterable, Codable, Identifiable {
+	case income = "+"
+	case expense = "-"
+	
+	var id: String { self.rawValue }
+	
+	var label: String {
+		switch self {
+		case .income: return "Revenu"
+		case .expense: return "Dépense"
+		}
+	}
+}
+
+
+
 /// Une classe représentant une transaction financière.
 /// Il existe deux types de transactions : potentielles et non potentielles.
 /// Les transactions potentielles sont indiquées par l'attribut `potentiel`.

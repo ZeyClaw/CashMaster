@@ -8,20 +8,6 @@
 import SwiftUI
 
 
-enum TransactionType: String, CaseIterable, Identifiable {
-	case income = "+"
-	case expense = "-"
-	
-	var id: String { self.rawValue }
-	var label: String {
-		switch self {
-		case .income: return "+"
-		case .expense: return "−"
-		}
-	}
-}
-
-
 struct AddTransactionView: View {
 	@Environment(\.dismiss) var dismiss
 	@ObservedObject var accountsManager: AccountsManager

@@ -20,6 +20,8 @@ class TransactionManager {
 	/// Liste des transactions gérées par ce gestionnaire.
 	var transactions: [Transaction] = []
 	
+	var widgetShortcuts: [WidgetShortcut] = []
+	
 	init(accountName: String) {
 		self.accountName = accountName
 	}
@@ -40,6 +42,31 @@ class TransactionManager {
 	
 	func totalPotentiel() -> Double {
 		sommeTransactions(filtre: { $0.potentiel })
+	}
+	
+	// MARK: - Widgets
+	
+	private let widgetKey = "widget_shortcuts"
+	
+	func addWidgetShortcut(_ shortcut: WidgetShortcut) {
+		widgetShortcuts.append(shortcut)
+	}
+	
+	func removeWidgetShortcut(_ shortcut: WidgetShortcut) {
+		widgetShortcuts.removeAll { $0 == shortcut }
+	}
+	
+	private func saveWidgets() {
+		if let data = try? JSONEncoder().encode(widgetShortcuts) {
+			UserDefaults.standard.set(data, forKey: widgetKey)
+		}
+	}
+	
+	private func loadWidgets() {
+		if let data = UserDefaults.standard.data(forKey: widgetKey),
+		   let decoded = try? JSONDecoder().decode([WidgetShortcut].self, from: data) {
+			widgetShortcuts = decoded
+		}
 	}
 	
 	

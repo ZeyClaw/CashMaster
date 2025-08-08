@@ -25,12 +25,19 @@ class AccountsManager: ObservableObject {
 			UserDefaults.standard.set(selectedAccount, forKey: "lastSelectedAccount")
 		}
 	}
+
 	private let saveKey = "accounts_data"
 	
 	init() { 
 		load()
 		selectedAccount = UserDefaults.standard.string(forKey: "lastSelectedAccount")
 	}
+	
+	private struct AccountData: Codable {
+		var transactions: [Transaction]
+		var widgetShortcuts: [WidgetShortcut]
+	}
+
 	
 	// MARK: - Gestion des comptes
 	private func creerCompte(nom: String) {
@@ -96,17 +103,26 @@ class AccountsManager: ObservableObject {
 	
 	// MARK: - Persistance
 	private func save() {
-		if let data = try? JSONEncoder().encode(managers.mapValues { $0.transactions }) {
+		if let data = try? JSONEncoder().encode(
+			managers.mapValues { manager in
+				AccountData(
+					transactions: manager.transactions,
+					widgetShortcuts: manager.widgetShortcuts
+				)
+			}
+		)
+ {
 			UserDefaults.standard.set(data, forKey: saveKey)
 		}
 	}
 	
 	private func load() {
 		if let data = UserDefaults.standard.data(forKey: saveKey),
-		   let decoded = try? JSONDecoder().decode([String: [Transaction]].self, from: data) {
-			managers = decoded.mapValues { txs in
+		   let decoded = try? JSONDecoder().decode([String: AccountData].self, from: data) {
+			managers = decoded.mapValues { entry in
 				let manager = TransactionManager(accountName: "Compte")
-				manager.transactions = txs
+				manager.transactions = entry.transactions
+				manager.widgetShortcuts = entry.widgetShortcuts
 				return manager
 			}
 		}
@@ -162,6 +178,27 @@ class AccountsManager: ObservableObject {
 			txs = txs.filter { Calendar.current.component(.month, from: $0.date ?? Date()) == month }
 		}
 		return txs
+	}
+	
+	
+	// MARK: - Widgets
+	func getWidgetShortcuts() -> [WidgetShortcut] {
+		guard let account = selectedAccount else { return [] }
+		return managers[account]?.widgetShortcuts ?? []
+	}
+	
+	func addWidgetShortcut(_ shortcut: WidgetShortcut) {
+		guard let account = selectedAccount else { return }
+		managers[account]?.widgetShortcuts.append(shortcut)
+		save()
+		objectWillChange.send()
+	}
+	
+	func deleteWidgetShortcut(_ shortcut: WidgetShortcut) {
+		guard let account = selectedAccount else { return }
+		managers[account]?.widgetShortcuts.removeAll { $0.id == shortcut.id }
+		save()
+		objectWillChange.send()
 	}
 
 
