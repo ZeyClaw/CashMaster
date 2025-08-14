@@ -11,6 +11,7 @@ struct TransactionsListView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	var month: Int? = nil
 	var year: Int? = nil
+	@State private var showingAccountPicker = false
 	
 	var body: some View {
 		List {
@@ -26,6 +27,19 @@ struct TransactionsListView: View {
 			}
 		}
 		.navigationTitle(titleText)
+		.toolbar {
+			ToolbarItem(placement: .navigationBarTrailing) {
+				Button {
+					showingAccountPicker = true
+				} label: {
+					Image(systemName: "person.crop.circle")
+						.font(.title2)
+				}
+			}
+		}
+		.sheet(isPresented: $showingAccountPicker) {
+			AccountPickerView(accountsManager: accountsManager)
+		}
 	}
 	
 	private var titleText: String {

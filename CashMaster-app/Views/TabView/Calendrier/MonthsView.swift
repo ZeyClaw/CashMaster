@@ -10,6 +10,7 @@ import SwiftUI
 struct MonthsView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	var year: Int
+	@State private var showingAccountPicker = false
 	
 	var body: some View {
 		if accountsManager.transactions().isEmpty {
@@ -32,6 +33,19 @@ struct MonthsView: View {
 				
 			}
 			.navigationTitle("\(year)")
+			.toolbar {
+				ToolbarItem(placement: .navigationBarTrailing) {
+					Button {
+						showingAccountPicker = true
+					} label: {
+						Image(systemName: "person.crop.circle")
+							.font(.title2)
+					}
+				}
+			}
+			.sheet(isPresented: $showingAccountPicker) {
+				AccountPickerView(accountsManager: accountsManager)
+			}
 		}
 	}
 	
