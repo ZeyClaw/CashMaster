@@ -16,16 +16,26 @@ struct HomeView: View {
 	@State private var showToast = false
 
 	
-	private var totalCurrent: Double {
-		accountsManager.totalNonPotentiel(for: accountsManager.selectedAccount!)
+	private var totalCurrent: Double? {
+		guard let selectedAccount = accountsManager.selectedAccount else {
+			return nil
+		}
+		return accountsManager.totalNonPotentiel(for: selectedAccount)
 	}
 	
-	private var totalPotentiel: Double {
-		accountsManager.totalPotentiel(for: accountsManager.selectedAccount!)
+	private var totalPotentiel: Double? {
+		guard let selectedAccount = accountsManager.selectedAccount else {
+			return nil
+		}
+		return accountsManager.totalPotentiel(for: selectedAccount)
 	}
-	
-	private var totalFuture: Double {
-		totalCurrent + totalPotentiel
+
+	private var totalFuture: Double? {
+		guard let totalCurrent = totalCurrent,
+			  let totalPotentiel = totalPotentiel else {
+			return nil
+		}
+		return totalCurrent + totalPotentiel
 	}
 	
 	private var currentMonthName: String {
@@ -55,17 +65,21 @@ struct HomeView: View {
 							VStack(alignment: .leading) {
 								Text("Actuel")
 									.font(.caption)
-								Text("\(totalCurrent, specifier: "%.2f") €")
-									.font(.title3)
-									.foregroundStyle(totalCurrent >= 0 ? .green : .red)
+								if let totalCurrent = totalCurrent {
+									Text("\(totalCurrent, specifier: "%.2f") €")
+										.font(.title3)
+										.foregroundStyle(totalCurrent >= 0 ? .green : .red)
+								}
 							}
 							Spacer()
 							VStack(alignment: .leading) {
 								Text("Futur")
 									.font(.caption)
-								Text("\(totalFuture, specifier: "%.2f") €")
-									.font(.title3)
-									.foregroundStyle(totalFuture >= 0 ? .green : .red)
+								if let totalFuture = totalFuture {
+									Text("\(totalFuture, specifier: "%.2f") €")
+										.font(.title3)
+										.foregroundStyle(totalFuture >= 0 ? .green : .red)
+								}
 							}
 						}
 					}

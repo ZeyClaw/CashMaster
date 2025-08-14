@@ -19,84 +19,132 @@ struct ContentView: View {
 	}
 	
 	var body: some View {
-		NavigationStack {
-			ZStack(alignment: .bottomTrailing) {
-				VStack(spacing: 0) {
-					if let account = accountsManager.selectedAccount {
-						content(for: account)
-					} else {
-						Text("Aucun compte sélectionné")
-							.foregroundStyle(.secondary)
-							.padding()
-					}
-					
-					TabView(selection: $tabSelection) {
-						Text("") // placeholder
-							.tabItem { Label("Home", systemImage: "house") }
-							.tag(Tab.home)
-						
-						Text("")
-							.tabItem { Label("Calendrier", systemImage: "calendar") }
-							.tag(Tab.calendrier)
-						
-						Text("")
-							.tabItem { Label("Potentielles", systemImage: "clock.arrow.circlepath") }
-							.tag(Tab.potentielles)
-					}
-					.frame(height: 60)
-				}
-				
-				// Bouton flottant + en bas à droite
-				Button {
-					showingAddTransactionSheet = true
-				} label: {
-					Image(systemName: "plus.circle.fill")
-						.font(.system(size: 50))
-						.symbolRenderingMode(.palette)
-						.foregroundStyle(.white, .blue)
-						.shadow(radius: 4)
-				}
-				.padding(.bottom, 70)
-				.padding(.trailing, 20)
-			}
-			.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
-			.toolbar {
-				ToolbarItem(placement: .navigationBarTrailing) {
-					Button {
-						showingAccountPicker = true
-					} label: {
-						Image(systemName: "person.crop.circle")
-							.font(.title2)
+		TabView(selection: $tabSelection) {
+			
+			// Home
+			NavigationStack {
+				if let _ = accountsManager.selectedAccount {
+					HomeView(accountsManager: accountsManager)
+						.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
+						.toolbar {
+							ToolbarItem(placement: .navigationBarTrailing) {
+								Button {
+									showingAccountPicker = true
+								} label: {
+									Image(systemName: "person.crop.circle")
+										.font(.title2)
+								}
+							}
+						}
+				} else {
+					NoAccountView(accountsManager: accountsManager)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarTrailing) {
+							Button {
+								showingAccountPicker = true
+							} label: {
+								Image(systemName: "person.crop.circle")
+									.font(.title2)
+							}
+						}
 					}
 				}
 			}
-			.sheet(isPresented: $showingAccountPicker) {
-				AccountPickerView(
-					accountsManager: accountsManager
-				)
-			}
-			.sheet(isPresented: $showingAddTransactionSheet) {
-				if accountsManager.selectedAccount != nil {
-					AddTransactionView(accountsManager: accountsManager)
+			.tabItem { Label("Home", systemImage: "house") }
+			.tag(Tab.home)
+			
+			// Calendrier
+			NavigationStack {
+				if let _ = accountsManager.selectedAccount {
+					CalendrierTabView(accountsManager: accountsManager)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarTrailing) {
+								Button {
+									showingAccountPicker = true
+								} label: {
+									Image(systemName: "person.crop.circle")
+										.font(.title2)
+								}
+							}
+						}
+				} else {
+					NoAccountView(accountsManager: accountsManager)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarTrailing) {
+							Button {
+								showingAccountPicker = true
+							} label: {
+								Image(systemName: "person.crop.circle")
+									.font(.title2)
+							}
+						}
+					}
 				}
 			}
-			.onAppear {
-				if accountsManager.selectedAccount == nil {
-					accountsManager.selectedAccount = accountsManager.getAllAccounts().first
+			.tabItem { Label("Calendrier", systemImage: "calendar") }
+			.tag(Tab.calendrier)
+			
+			// Potentielles
+			NavigationStack {
+				if let _ = accountsManager.selectedAccount {
+					PotentialTransactionsView(accountsManager: accountsManager)
+						.navigationTitle("Potentielles")
+						.toolbar {
+							ToolbarItem(placement: .navigationBarTrailing) {
+								Button {
+									showingAccountPicker = true
+								} label: {
+									Image(systemName: "person.crop.circle")
+										.font(.title2)
+								}
+							}
+						}
+				} else {
+					NoAccountView(accountsManager: accountsManager)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarTrailing) {
+							Button {
+								showingAccountPicker = true
+							} label: {
+								Image(systemName: "person.crop.circle")
+									.font(.title2)
+							}
+						}
+					}
 				}
+			}
+			.tabItem { Label("Potentielles", systemImage: "clock.arrow.circlepath") }
+			.tag(Tab.potentielles)
+		}
+		.sheet(isPresented: $showingAccountPicker) {
+			AccountPickerView(accountsManager: accountsManager)
+		}
+		.sheet(isPresented: $showingAddTransactionSheet) {
+			if accountsManager.selectedAccount != nil {
+				AddTransactionView(accountsManager: accountsManager)
 			}
 		}
-	}
-	
-	@ViewBuilder
-	func content(for account: String) -> some View {
-		switch tabSelection {
-		case .home:
-			HomeView(accountsManager: accountsManager)
-		case .calendrier:
-			YearsView(accountsManager: accountsManager)
-		case .potentielles:
-			PotentialTransactionsView(accountsManager: accountsManager)
+		// Bouton flottant global
+		.overlay(
+			accountsManager.selectedAccount != nil ?
+			Button {
+				showingAddTransactionSheet = true
+			} label: {
+				Image(systemName: "plus.circle.fill")
+					.font(.system(size: 50))
+					.symbolRenderingMode(.palette)
+					.foregroundStyle(.white, .blue)
+					.shadow(radius: 4)
+			}
+				.padding(.bottom, 20)
+				.padding(.trailing, 20)
+			: nil,
+			alignment: .bottomTrailing
+		)
+		.onAppear {
+			if accountsManager.selectedAccount == nil {
+				accountsManager.selectedAccount = accountsManager.getAllAccounts().first
+			}
 		}
 	}
 }

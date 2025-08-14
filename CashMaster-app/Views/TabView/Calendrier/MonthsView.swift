@@ -16,11 +16,7 @@ struct MonthsView: View {
 			ForEach(1...12, id: \.self) { month in
 				let total = accountsManager.totalPourMois(month, year: year)
 				if total != 0 {
-					NavigationLink(destination: TransactionsListView(
-						accountsManager: accountsManager,
-						month: month,
-						year: year
-					)) {
+					NavigationLink(value: CalendrierRoute.transactions(month: month, year: year)) {
 						HStack {
 							Text(nomDuMois(month))
 							Spacer()

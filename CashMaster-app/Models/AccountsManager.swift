@@ -54,7 +54,9 @@ class AccountsManager: ObservableObject {
 	func deleteAccount(_ account: String) {
 		managers.removeValue(forKey: account)
 		save()
-		if selectedAccount == account {
+		if managers.isEmpty {
+			selectedAccount = nil
+		} else if selectedAccount == account {
 			selectedAccount = getAllAccounts().first
 		}
 		objectWillChange.send()

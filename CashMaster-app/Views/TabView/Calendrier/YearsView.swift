@@ -13,7 +13,7 @@ struct YearsView: View {
 	var body: some View {
 		List {
 			ForEach(accountsManager.anneesDisponibles(), id: \.self) { year in
-				NavigationLink(destination: MonthsView(accountsManager: accountsManager, year: year)) {
+				NavigationLink(value: CalendrierRoute.months(year: year)) {
 					HStack {
 						Text("\(year)")
 						Spacer()
