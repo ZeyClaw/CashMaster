@@ -136,8 +136,8 @@ struct ContentView: View {
 					.foregroundStyle(.white, .blue)
 					.shadow(radius: 4)
 			}
-				.padding(.bottom, 20)
-				.padding(.trailing, 20)
+				.padding(.bottom, 60)
+				.padding(.trailing, 15)
 			: nil,
 			alignment: .bottomTrailing
 		)

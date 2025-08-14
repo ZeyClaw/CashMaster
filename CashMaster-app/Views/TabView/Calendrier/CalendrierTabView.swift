@@ -13,16 +13,24 @@ struct CalendrierTabView: View {
 	
 	var body: some View {
 		NavigationStack(path: $path) {
-			YearsView(accountsManager: accountsManager)
-				.navigationTitle("Calendrier")
-				.navigationDestination(for: CalendrierRoute.self) { route in
-					switch route {
-					case .months(let year):
-						MonthsView(accountsManager: accountsManager, year: year)
-					case .transactions(let month, let year):
-						TransactionsListView(accountsManager: accountsManager, month: month, year: year)
-					}
+			if accountsManager.transactions().isEmpty {
+				List {
+					Text("Aucune transaction")
+						.foregroundStyle(.secondary)
 				}
+				.navigationTitle("Calendrier")
+			} else {
+				YearsView(accountsManager: accountsManager)
+					.navigationTitle("Calendrier")
+					.navigationDestination(for: CalendrierRoute.self) { route in
+						switch route {
+						case .months(let year):
+							MonthsView(accountsManager: accountsManager, year: year)
+						case .transactions(let month, let year):
+							TransactionsListView(accountsManager: accountsManager, month: month, year: year)
+						}
+					}
+			}
 		}
 	}
 }

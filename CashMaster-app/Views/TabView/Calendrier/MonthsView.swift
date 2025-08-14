@@ -12,23 +12,27 @@ struct MonthsView: View {
 	var year: Int
 	
 	var body: some View {
-		List {
-			ForEach(1...12, id: \.self) { month in
-				let total = accountsManager.totalPourMois(month, year: year)
-				if total != 0 {
-					NavigationLink(value: CalendrierRoute.transactions(month: month, year: year)) {
-						HStack {
-							Text(nomDuMois(month))
-							Spacer()
-							Text("\(total, specifier: "%.2f") €")
-								.foregroundStyle(total >= 0 ? .green : .red)
+		if accountsManager.transactions().isEmpty {
+			CalendrierTabView(accountsManager: accountsManager)
+		} else {
+			List {
+				ForEach(1...12, id: \.self) { month in
+					let total = accountsManager.totalPourMois(month, year: year)
+					if total != 0 {
+						NavigationLink(value: CalendrierRoute.transactions(month: month, year: year)) {
+							HStack {
+								Text(nomDuMois(month))
+								Spacer()
+								Text("\(total, specifier: "%.2f") €")
+									.foregroundStyle(total >= 0 ? .green : .red)
+							}
 						}
 					}
 				}
+				
 			}
-
+			.navigationTitle("\(year)")
 		}
-		.navigationTitle("\(year)")
 	}
 	
 	private func nomDuMois(_ mois: Int) -> String {
