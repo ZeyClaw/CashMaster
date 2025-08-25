@@ -13,7 +13,7 @@ struct HomeView: View {
 	@State private var showingAddWidgetSheet = false
 	@State private var shortcutToDelete: WidgetShortcut? = nil
 	@State private var showingDeleteConfirmation = false
-	@State private var showToast = false
+	@State private var toasts: [ToastData] = []
 
 	
 	private var totalCurrent: Double? {
@@ -50,6 +50,25 @@ struct HomeView: View {
 		let month = Calendar.current.component(.month, from: Date())
 		let year = Calendar.current.component(.year, from: Date())
 		return accountsManager.totalPourMois(month, year: year)
+	}
+	
+	// Ajouter un toast
+	private func addToast(message: String) {
+		let toast = ToastData(message: message)
+		withAnimation(.spring()) {               // animation locale
+			toasts.append(toast)
+		}
+		// Disparition automatique après 2,5s
+		DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+			removeToast(id: toast.id)
+		}
+	}
+	
+	// Supprimer un toast
+	private func removeToast(id: UUID) {
+		withAnimation(.spring()) {               // animation locale
+			toasts.removeAll { $0.id == id }
+		}
 	}
 	
 	var body: some View {
@@ -143,14 +162,7 @@ struct HomeView: View {
 									accountsManager.ajouterTransaction(tx)
 									
 									// Affiche le toast
-									withAnimation {
-										showToast = true
-									}
-									DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-										withAnimation {
-											showToast = false
-										}
-									}
+									addToast(message: "Transaction ajoutée 💸")
 									
 								} label: {
 									VStack(spacing: 4) {
@@ -193,17 +205,17 @@ struct HomeView: View {
 			}
 			.background(Color(UIColor.systemGroupedBackground))
 			
-			if showToast {
-				Text("Transaction ajoutée 💸")
-					.font(.subheadline)
-					.padding(.horizontal, 16)
-					.padding(.vertical, 10)
-					.background(.ultraThinMaterial)
-					.cornerRadius(10)
-					.transition(.move(edge: .bottom).combined(with: .opacity))
-					.padding(.bottom, 40)
+			// Zone des toasts
+			VStack(spacing: -30) { // chevauchement léger
+				ForEach(toasts) { toast in
+					ToastView(message: toast.message)
+						.transition(.move(edge: .bottom).combined(with: .opacity)) // entrée/sortie par le bas
+						.onTapGesture {
+							removeToast(id: toast.id)
+						}
+				}
 			}
-			
+			.padding(.bottom, 30)
 		}
 	}
 }
