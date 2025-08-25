@@ -12,6 +12,7 @@
 		F800A3EE2E4E01F700918507 /* NoAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F800A3ED2E4E01F700918507 /* NoAccountView.swift */; };
 		F800A3F12E4F6D1E00918507 /* ToastData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F800A3F02E4F6D1E00918507 /* ToastData.swift */; };
 		F800A3F32E4F6D3400918507 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F800A3F22E4F6D3400918507 /* ToastView.swift */; };
+		F800A3F72E5C72F200918507 /* ToastCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F800A3F62E5C72F200918507 /* ToastCard.swift */; };
 		F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F807613D2CC6E31B00C34EDD /* Notifications.swift */; };
 		F810E2EF2E422F1E00C2DFA9 /* AccountsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2EE2E422F1E00C2DFA9 /* AccountsManager.swift */; };
 		F810E2F12E428FFB00C2DFA9 /* AccountCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */; };
@@ -61,6 +62,7 @@
 		F800A3ED2E4E01F700918507 /* NoAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAccountView.swift; sourceTree = "<group>"; };
 		F800A3F02E4F6D1E00918507 /* ToastData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastData.swift; sourceTree = "<group>"; };
 		F800A3F22E4F6D3400918507 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		F800A3F62E5C72F200918507 /* ToastCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastCard.swift; sourceTree = "<group>"; };
 		F807613D2CC6E31B00C34EDD /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		F810E2EE2E422F1E00C2DFA9 /* AccountsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsManager.swift; sourceTree = "<group>"; };
 		F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCardView.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 			children = (
 				F800A3F02E4F6D1E00918507 /* ToastData.swift */,
 				F800A3F22E4F6D3400918507 /* ToastView.swift */,
+				F800A3F62E5C72F200918507 /* ToastCard.swift */,
 			);
 			path = Toast;
 			sourceTree = "<group>";
@@ -406,6 +409,7 @@
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
 				F810E30C2E44D4F100C2DFA9 /* AccountPickerView.swift in Sources */,
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
+				F800A3F72E5C72F200918507 /* ToastCard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

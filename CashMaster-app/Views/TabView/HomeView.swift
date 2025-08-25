@@ -205,17 +205,16 @@ struct HomeView: View {
 			}
 			.background(Color(UIColor.systemGroupedBackground))
 			
-			// Zone des toasts
+			// MARK: - Zone des toasts
 			VStack(spacing: -30) { // chevauchement léger
-				ForEach(toasts) { toast in
-					ToastView(message: toast.message)
-						.transition(.move(edge: .bottom).combined(with: .opacity)) // entrée/sortie par le bas
-						.onTapGesture {
-							removeToast(id: toast.id)
-						}
+				ForEach(Array(toasts.enumerated()), id: \.element.id) { idx, toast in
+					// depth = distance depuis l’avant (0 = devant)
+					let depth = toasts.count - 1 - idx
+					ToastCard(toast: toast, depth: depth, onDismiss: removeToast)
+						.transition(.move(edge: .bottom).combined(with: .opacity))
 				}
 			}
-			.padding(.bottom, 30)
+			.padding(.bottom, 20)
 		}
 	}
 }
