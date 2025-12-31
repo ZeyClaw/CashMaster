@@ -14,6 +14,9 @@ struct CashMasterApp: App {
 		NotificationManager.shared.requestNotificationPermission()
 		NotificationManager.shared.scheduleWeeklyNotificationIfNeeded()
 		NotificationManager.shared.listScheduledNotifications()
+		// Sync UserDefaults vers iCloud
+		UserDefaults.standard.synchronize()
+		NSUbiquitousKeyValueStore.default.synchronize()
 	}
 	
     var body: some Scene {

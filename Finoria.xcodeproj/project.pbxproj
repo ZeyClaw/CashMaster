@@ -90,6 +90,7 @@
 		F8B79A852CAEC5EE002D88AE /* FinoriaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinoriaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appUITests.swift; sourceTree = "<group>"; };
 		F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F8B818F52F059289002D02F2 /* Finoria.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Finoria.entitlements; sourceTree = "<group>"; };
 		F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -197,6 +198,7 @@
 		F8B79A622CAEC5E4002D88AE = {
 			isa = PBXGroup;
 			children = (
+				F8B818F52F059289002D02F2 /* Finoria.entitlements */,
 				F812E1FB2CC828DF00619857 /* Finoria-Info.plist */,
 				F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */,
 				F8B79A7E2CAEC5EE002D88AE /* CashMaster-appTests */,
@@ -570,6 +572,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Finoria.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2001;
 				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
@@ -603,6 +606,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Finoria.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2001;
 				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
