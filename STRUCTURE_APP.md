@@ -2,6 +2,14 @@
 
 ## 📑 Changelog
 
+### Version 1.8 - 1er janvier 2026
+**Refactoring Architecture : Sous-composants pour performances**:
+- ✅ **Extraction des Tab Contents**: Création de `HomeTabContent`, `CalendrierTabContent`, `PotentiellesTabContent`
+- ✅ **Fix erreur compilation**: Résolution de "unable to type-check this expression in reasonable time"
+- ✅ **Performances améliorées**: Réduction de la complexité du body de ContentView
+- ✅ **Code plus maintenable**: Séparation claire des responsabilités par onglet
+- ✅ **Utilisation de `Tab(value:role:)`**: Syntaxe moderne iOS 16+ avec `role: .search`
+
 ### Version 1.7 - 1er janvier 2026
 **Amélioration TabBar style GitHub (liquid glass)**:
 - ✅ **4ème onglet "fantôme"**: Ajout d'un onglet "Ajouter" qui sert uniquement de bouton (pas de contenu)
@@ -226,37 +234,74 @@ ContentView (TabView)
 
 #### Structure
 - `TabView` avec **4 onglets** (3 navigables + 1 bouton action)
-- Enum `Tab`: `.home`, `.calendrier`, `.potentielles`, `.add`
+- Enum `Tab: Hashable`: `.home`, `.calendrier`, `.potentielles`, `.add`
 - `@StateObject` pour `AccountsManager` (créé ici, propagé partout)
+- **Sous-composants extraits** pour performances:
+  - `HomeTabContent`: Contenu de l'onglet Home
+  - `CalendrierTabContent`: Contenu de l'onglet Calendrier
+  - `PotentiellesTabContent`: Contenu de l'onglet Potentielles
 - Gestion des sheets (modales):
   - `AccountPickerView`: Sélection/création de compte
   - `AddTransactionView`: Ajout de transaction
   - `ActivityViewController`: Partage du fichier CSV exporté
   - `DocumentPicker`: Sélection d'un fichier CSV à importer
-- **Onglet "Ajouter" fantôme** qui déclenche le sheet via `.onChange(of: tabSelection)`
+- **Onglet "Ajouter"** avec `Tab(value:role: .search)` pour séparation visuelle
 - **Boutons d'import/export CSV** (en haut à gauche sur Home) pour gérer les données
-- Logique de fallback si aucun compte sélectionné → `NoAccountView`
 
-#### Onglets
-1. **Home** (`HomeView`)
-2. **Calendrier** (`CalendrierTabView`)
-3. **Potentielles** (`PotentialTransactionsView`)
-4. **Ajouter** (onglet fantôme → ouvre `AddTransactionView`)
+#### Sous-composants Tab
+
+##### `HomeTabContent`
+```swift
+struct HomeTabContent: View {
+    @ObservedObject var accountsManager: AccountsManager
+    @Binding var showingAccountPicker: Bool
+    @Binding var csvFileURL: URL?
+    @Binding var showingShareSheet: Bool
+    @Binding var showingExportErrorAlert: Bool
+    @Binding var showingDocumentPicker: Bool
+    // ...
+}
+```
+
+##### `CalendrierTabContent`
+```swift
+struct CalendrierTabContent: View {
+    @ObservedObject var accountsManager: AccountsManager
+    @Binding var showingAccountPicker: Bool
+    // ...
+}
+```
+
+##### `PotentiellesTabContent`
+```swift
+struct PotentiellesTabContent: View {
+    @ObservedObject var accountsManager: AccountsManager
+    @Binding var showingAccountPicker: Bool
+    // ...
+}
+```
+
+**Avantages de cette architecture**:
+- ✅ **Performances**: Compilation plus rapide, type-checking simplifié
+- ✅ **Maintenabilité**: Code séparé par onglet, plus facile à modifier
+- ✅ **Réutilisabilité**: Chaque Tab Content est autonome
+- ✅ **Testabilité**: Possibilité de tester chaque onglet indépendamment
 
 #### Mécanisme Onglet "Ajouter"
 ```swift
-// Onglet fantôme (ne contient que Color.clear)
-Color.clear
-    .tabItem {
-        Label("Ajouter", systemImage: "plus.circle.fill")
-    }
-    .tag(Tab.add)
+// Onglet avec role .search (séparé visuellement à droite)
+Tab(value: Tab.add, role: .search) {
+    Color.clear
+} label: {
+    Label("", systemImage: "plus.circle.fill")
+}
 
 // Détection du tap
 .onChange(of: tabSelection) { oldValue, newValue in
     if newValue == .add {
-        showingAddTransactionSheet = true
-        // Retour immédiat à l'onglet précédent
+        if accountsManager.selectedAccount != nil {
+            showingAddTransactionSheet = true
+        }
         DispatchQueue.main.async {
             tabSelection = oldValue
         }
@@ -264,17 +309,10 @@ Color.clear
 }
 ```
 
-**Avantages**:
-- ✅ Effet liquid glass automatique (iOS 18)
-- ✅ Taille et espacement identiques aux autres onglets
-- ✅ TabBar se gère automatiquement (pas besoin de calcul manuel)
-- ✅ Style natif iOS recommandé par Apple
-- ✅ Exactement comme l'app GitHub
-
 **Rendu selon iOS**:
-- **iOS 18+**: Effet glass/liquid moderne sur les 4 onglets
-- **iOS 16-17**: TabBar standard avec 4 onglets fonctionnels
-- **iOS 15**: Compatible avec `.onChange` modifier
+- **iOS 18+**: Effet liquid glass avec bouton séparé à droite (style GitHub)
+- **iOS 16-17**: TabBar standard avec bouton fonctionnel à droite
+- **iOS 15 ou moins**: Non compatible (nécessite iOS 16+ pour `Tab(value:role:)`)
 
 ---
 
@@ -728,10 +766,10 @@ Utilisé lors du tap sur un widget shortcut
 ---
 
 ## 📌 Version et Date
-- **Version du document**: 1.7
+- **Version du document**: 1.8
 - **Date de création**: 1er janvier 2026
 - **Dernière mise à jour**: 1er janvier 2026
-- **État de l'app**: Production - Bouton d'ajout style GitHub avec liquid glass
+- **État de l'app**: Production - Architecture refactorisée avec sous-composants
 
 ---
 
