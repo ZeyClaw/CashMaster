@@ -6,7 +6,8 @@
 **Améliorations Navigation et UX**:
 - ✅ **Fix export CSV première fois**: Génération du CSV avant affichage du share sheet (plus de sheet vide)
 - ✅ **Navigation mois actuel**: Tap sur la carte "Mois actuel" dans HomeView ouvre TransactionsListView du mois en cours
-- ✅ **Navigation simple**: Utilisation de `.navigationDestination` pour navigation directe vers le mois actuel
+- ✅ **Carte cliquable**: Toute la carte du mois actuel est cliquable avec chevron indicateur
+- ✅ **Padding boutons CSV amélioré**: Padding de 8 points pour meilleure ergonomie tactile
 - 📝 **UX améliorée**: Accès rapide aux transactions du mois depuis l'écran d'accueil
 
 ### Version 1.9 - 1er janvier 2026
@@ -372,14 +373,14 @@ Tab(value: Tab.add, role: .search) {
 
 **Boutons Toolbar Leading (Import/Export)**:
 ```swift
-HStack(spacing: 10) {
+HStack(spacing: 5) {
     // Bouton Export CSV
     Button {
         exportCSV()
     } label: {
         Image(systemName: "square.and.arrow.up")
             .imageScale(.large)
-            .padding(5)
+            .padding(8)
     }
     
     // Bouton Import CSV
@@ -388,14 +389,15 @@ HStack(spacing: 10) {
     } label: {
         Image(systemName: "square.and.arrow.down")
             .imageScale(.large)
-            .padding(5)
+            .padding(8)
     }
 }
 ```
 - **Style**: Boutons simples avec icônes SF Symbols
 - **Placement**: En haut à gauche de la toolbar
 - **Couleur**: Couleur système par défaut (accent color)
-- **Padding**: 5 points de padding pour zone de touch confortable
+- **Spacing**: 5 points entre les boutons
+- **Padding**: 8 points de padding pour zone de touch confortable et éloignée du bord
 
 **States**:
 ```swift
@@ -419,10 +421,11 @@ HStack(spacing: 10) {
    - Solde futur (actuel + potentielles)
    - Couleur dynamique (vert/rouge selon positif/négatif)
 
-2. **Solde du Mois Actuel** (Cliquable)
+2. **Solde du Mois Actuel** (Carte Cliquable)
    - Nom du mois en français
    - Total des transactions du mois
    - Chevron à droite indiquant la navigation
+   - **Toute la carte est cliquable** via Button avec PlainButtonStyle
    - **Navigation**: Tap ouvre `TransactionsListView` du mois/année actuels
    - Utilise `.navigationDestination(isPresented:)` avec state `navigateToCurrentMonth`
 
@@ -445,12 +448,27 @@ private var currentYear: Int {
     Calendar.current.component(.year, from: Date())
 }
 
-// Dans le body
+// Dans le body - Carte cliquable
 Button {
     navigateToCurrentMonth = true
 } label: {
-    // Carte du mois actuel avec chevron
+    HStack {
+        Text(currentMonthName)
+            .foregroundColor(.primary)
+        Spacer()
+        HStack(spacing: 4) {
+            Text("\(currentMonthSolde, specifier: "%.2f") €")
+                .foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+    }
+    .padding()
+    .background(Color(UIColor.secondarySystemGroupedBackground))
+    .cornerRadius(8)
 }
+.buttonStyle(PlainButtonStyle())
 
 .navigationDestination(isPresented: $navigateToCurrentMonth) {
     TransactionsListView(
@@ -867,14 +885,15 @@ Utilisé lors du tap sur un widget shortcut
 
 ### Navigation vers Mois Actuel depuis Home
 ```
-1. User tap sur la carte "Mois actuel" dans HomeView
-2. navigateToCurrentMonth = true
+1. User tap n'importe où sur la carte "Mois actuel" dans HomeView
+2. Button action: navigateToCurrentMonth = true
 3. SwiftUI déclenche .navigationDestination
 4. Push de TransactionsListView avec:
    - month: currentMonth (mois actuel via Calendar)
    - year: currentYear (année actuelle via Calendar)
 5. Affichage de la liste des transactions du mois
 6. User peut naviguer en arrière via le bouton back natif
+7. Chevron indique visuellement que la carte est interactive
 ```
 
 ---

@@ -121,15 +121,26 @@ struct HomeView: View {
 							.font(.headline)
 							.padding(.horizontal)
 						
-						HStack {
-							Text(currentMonthName)
-							Spacer()
-							Text("\(currentMonthSolde, specifier: "%.2f") €")
-								.foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
+						Button {
+							navigateToCurrentMonth = true
+						} label: {
+							HStack {
+								Text(currentMonthName)
+									.foregroundColor(.primary)
+								Spacer()
+								HStack(spacing: 4) {
+									Text("\(currentMonthSolde, specifier: "%.2f") €")
+										.foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
+									Image(systemName: "chevron.right")
+										.font(.caption)
+										.foregroundColor(.secondary)
+								}
+							}
+							.padding()
+							.background(Color(UIColor.secondarySystemGroupedBackground))
+							.cornerRadius(8)
 						}
-						.padding()
-						.background(Color(UIColor.secondarySystemGroupedBackground))
-						.cornerRadius(8)
+						.buttonStyle(PlainButtonStyle())
 						.padding(.horizontal)
 					}
 					
