@@ -250,6 +250,72 @@ class AccountsManager: ObservableObject {
 			return nil
 		}
 	}
+	
+	/// Importe des transactions depuis un fichier CSV
+	/// - Parameter url: URL du fichier CSV à importer
+	/// - Returns: Nombre de transactions importées avec succès
+	@discardableResult
+	func importCSV(from url: URL) -> Int {
+		guard selectedAccount != nil else { return 0 }
+		
+		var importedCount = 0
+		
+		do {
+			// Lire le contenu du fichier
+			let csvContent = try String(contentsOf: url, encoding: .utf8)
+			let lines = csvContent.components(separatedBy: .newlines)
+			
+			// Ignorer la première ligne (header) et les lignes vides
+			let dataLines = lines.dropFirst().filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+			
+			let dateFormatter = DateFormatter()
+			dateFormatter.dateFormat = "dd/MM/yyyy"
+			dateFormatter.locale = Locale(identifier: "fr_FR")
+			
+			for line in dataLines {
+				let columns = line.components(separatedBy: ",")
+				
+				// Vérifier qu'on a au moins 5 colonnes (Date, Type, Montant, Commentaire, Statut)
+				guard columns.count >= 5 else { continue }
+				
+				let dateString = columns[0].trimmingCharacters(in: .whitespaces)
+				let typeString = columns[1].trimmingCharacters(in: .whitespaces)
+				let amountString = columns[2].trimmingCharacters(in: .whitespaces)
+				let comment = columns[3].trimmingCharacters(in: .whitespaces).replacingOccurrences(of: ";", with: ",")
+				let statusString = columns[4].trimmingCharacters(in: .whitespaces)
+				
+				// Parser le montant
+				guard let amount = Double(amountString) else { continue }
+				
+				// Déterminer si c'est un revenu ou une dépense
+				let finalAmount = typeString.lowercased().contains("revenu") ? amount : -amount
+				
+				// Parser la date
+				let date = dateString != "N/A" ? dateFormatter.date(from: dateString) : nil
+				
+				// Déterminer si c'est potentiel
+				let isPotentiel = statusString.lowercased().contains("potentielle")
+				
+				// Créer la transaction
+				let transaction = Transaction(
+					amount: finalAmount,
+					comment: comment,
+					potentiel: isPotentiel,
+					date: isPotentiel ? nil : (date ?? Date())
+				)
+				
+				ajouterTransaction(transaction)
+				importedCount += 1
+			}
+			
+			print("Import CSV réussi: \(importedCount) transactions importées")
+			return importedCount
+			
+		} catch {
+			print("Erreur lors de l'import du CSV: \(error.localizedDescription)")
+			return 0
+		}
+	}
 
 
 }

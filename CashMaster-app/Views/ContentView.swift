@@ -5,7 +5,6 @@
 //  Created by Godefroy REYNAUD on 03/10/2024.
 //
 
-// ContentView.swift
 import SwiftUI
 
 struct ContentView: View {
@@ -13,7 +12,10 @@ struct ContentView: View {
 	@State private var showingAccountPicker = false
 	@State private var showingAddTransactionSheet = false
 	@State private var showingShareSheet = false
+	@State private var showingDocumentPicker = false
 	@State private var csvFileURL: URL?
+	@State private var importedCount: Int = 0
+	@State private var showingImportAlert = false
 	@State private var tabSelection: Tab = .home
 	
 	enum Tab {
@@ -30,14 +32,25 @@ struct ContentView: View {
 						.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
-								Button {
-									if let url = accountsManager.generateCSV() {
-										csvFileURL = url
-										showingShareSheet = true
+								HStack(spacing: 16) {
+									// Bouton Export CSV
+									Button {
+										if let url = accountsManager.generateCSV() {
+											csvFileURL = url
+											showingShareSheet = true
+										}
+									} label: {
+										Image(systemName: "square.and.arrow.up")
+											.font(.title2)
 									}
-								} label: {
-									Image(systemName: "square.and.arrow.up")
-										.font(.title2)
+									
+									// Bouton Import CSV
+									Button {
+										showingDocumentPicker = true
+									} label: {
+										Image(systemName: "square.and.arrow.down")
+											.font(.title2)
+									}
 								}
 							}
 							ToolbarItem(placement: .navigationBarTrailing) {
@@ -141,6 +154,19 @@ struct ContentView: View {
 			if let url = csvFileURL {
 				ShareSheet(items: [url])
 			}
+		}
+		.sheet(isPresented: $showingDocumentPicker) {
+			DocumentPicker { url in
+				importedCount = accountsManager.importCSV(from: url)
+				if importedCount > 0 {
+					showingImportAlert = true
+				}
+			}
+		}
+		.alert("Import réussi", isPresented: $showingImportAlert) {
+			Button("OK", role: .cancel) {}
+		} message: {
+			Text("\(importedCount) transaction(s) importée(s) avec succès.")
 		}
 		// Bouton flottant global
 		.overlay(

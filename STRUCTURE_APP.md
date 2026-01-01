@@ -2,6 +2,14 @@
 
 ## 📑 Changelog
 
+### Version 1.3 - 1er janvier 2026
+**Nouvelle Fonctionnalité : Import CSV**:
+- ✅ **Import CSV**: Ajout d'un bouton d'import à côté du bouton d'export permettant d'importer des transactions depuis un fichier CSV
+- ✅ **DocumentPicker natif**: Utilisation de `UIDocumentPickerViewController` pour sélectionner un fichier
+- ✅ **Méthode `importCSV()`**: Ajoutée dans `AccountsManager` pour parser et importer les transactions
+- ✅ **Validation robuste**: Parser CSV avec gestion d'erreurs et conversion automatique des types
+- 📝 **Alerte de confirmation**: Affichage du nombre de transactions importées
+
 ### Version 1.2 - 1er janvier 2026
 **Nouvelle Fonctionnalité : Export CSV**:
 - ✅ **Export CSV**: Ajout d'un bouton d'export en haut à gauche permettant d'exporter toutes les transactions du compte actuel au format CSV
@@ -83,6 +91,7 @@ CashMaster-app/
 - **Filtres**: `potentialTransactions()`, `validatedTransactions()`, `anneesDisponibles()`
 - **Widgets**: `getWidgetShortcuts()`, `addWidgetShortcut()`, `deleteWidgetShortcut()`
 - **Export**: `generateCSV()` - Génère un fichier CSV des transactions
+- **Import**: `importCSV(from:)` - Importe des transactions depuis un CSV
 - **Persistence**: `save()`, `load()` (privées)
 
 #### Pattern de Persistance
@@ -189,8 +198,9 @@ ContentView (TabView)
   - `AccountPickerView`: Sélection/création de compte
   - `AddTransactionView`: Ajout de transaction
   - `ShareSheet`: Partage du fichier CSV exporté
+  - `DocumentPicker`: Sélection d'un fichier CSV à importer
 - **Bouton flottant global** (`overlay`) pour ajouter une transaction
-- **Bouton d'export CSV** (en haut à gauche) pour exporter les données du compte
+- **Boutons d'import/export CSV** (en haut à gauche) pour gérer les données
 - Logique de fallback si aucun compte sélectionné → `NoAccountView`
 
 #### Onglets
@@ -430,6 +440,24 @@ ShareSheet(items: [url])
 - Envoi par Mail/Messages
 - Copie vers d'autres apps
 
+#### `DocumentPicker.swift` 📂
+Wrapper SwiftUI pour `UIDocumentPickerViewController`
+
+**Rôle**: Permet de sélectionner des fichiers (CSV) de manière native iOS
+
+**Usage**:
+```swift
+DocumentPicker { url in
+    // Traiter le fichier sélectionné
+}
+```
+
+**Caractéristiques**:
+- Types de fichiers acceptés: CSV (.csv), texte (.txt)
+- Sélection unique (pas de multi-sélection)
+- Delegate pattern avec Coordinator
+- Callback `onPick` pour traiter l'URL sélectionnée
+
 ---
 
 ## 🔔 Services
@@ -573,6 +601,26 @@ Utilisé lors du tap sur un widget shortcut
    → Retourne URL du fichier
 3. Present ShareSheet (UIActivityViewController)
 4. User choisit: Sauvegarder, Partager, AirDrop, etc.
+```
+
+### Import CSV
+```
+1. User tap bouton "square.and.arrow.down" (en haut à gauche)
+2. Present DocumentPicker (UIDocumentPickerViewController)
+3. User sélectionne un fichier CSV
+4. accountsManager.importCSV(from: url)
+   → Lit le contenu du fichier CSV
+   → Parse chaque ligne (ignore header)
+   → Pour chaque ligne valide:
+      - Parse Date (dd/MM/yyyy) ou N/A
+      - Parse Type (Revenu/Dépense)
+      - Parse Montant (converti en négatif si dépense)
+      - Parse Commentaire (; remplacés par ,)
+      - Parse Statut (Potentielle/Validée)
+      - Crée Transaction et appelle ajouterTransaction()
+   → Retourne nombre de transactions importées
+5. Affiche alerte: "{count} transaction(s) importée(s)"
+6. SwiftUI rafraîchit automatiquement l'UI
 ```
 
 ---
@@ -743,6 +791,7 @@ HomeView.body (re-render triggers)
 
 3. **Export de Données**
    - ✅ CSV export (implémenté)
+   - ✅ CSV import (implémenté)
    - PDF reports
    - iCloud Drive integration
 
@@ -860,10 +909,10 @@ Lorsque vous générez du code pour cette app:
 ---
 
 ## 📌 Version et Date
-- **Version du document**: 1.2
+- **Version du document**: 1.3
 - **Date de création**: 1er janvier 2026
 - **Dernière mise à jour**: 1er janvier 2026
-- **État de l'app**: Production - Optimisé + Export CSV
+- **État de l'app**: Production - Optimisé + Import/Export CSV
 
 ---
 
