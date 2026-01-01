@@ -2,6 +2,14 @@
 
 ## 📑 Changelog
 
+### Version 1.6 - 1er janvier 2026
+**Amélioration UI : Bouton d'ajout dans la TabBar**:
+- ✅ **Placement natif iOS**: Utilisation de `.toolbar` avec `placement: .bottomBar` (recommandation Apple)
+- ✅ **Style moderne**: Bouton "+" aligné à droite de la TabBar (comme bouton Search iOS 18)
+- ✅ **Effet glass iOS 18**: Rendu automatique avec effet liquid glass sur iOS 18+
+- ✅ **Compatibilité**: Fonctionne sur iOS 15+ avec dégradation gracieuse du style
+- 🗑️ **Suppression overlay**: Retrait du bouton flottant qui cachait les tabs
+
 ### Version 1.5 - 1er janvier 2026
 **Corrections Export/Import CSV**:
 - ✅ **Boutons distincts visuellement**: Export (bleu) et Import (vert) sont maintenant des bulles circulaires séparées
@@ -213,10 +221,10 @@ ContentView (TabView)
 - Gestion des sheets (modales):
   - `AccountPickerView`: Sélection/création de compte
   - `AddTransactionView`: Ajout de transaction
-  - `ShareSheet`: Partage du fichier CSV exporté
+  - `ActivityViewController`: Partage du fichier CSV exporté
   - `DocumentPicker`: Sélection d'un fichier CSV à importer
-- **Bouton flottant global** (`overlay`) pour ajouter une transaction
-- **Boutons d'import/export CSV** (en haut à gauche) pour gérer les données
+- **Bouton d'ajout dans TabBar** (`.toolbar` avec `.bottomBar`) présent sur chaque tab
+- **Boutons d'import/export CSV** (en haut à gauche sur Home) pour gérer les données
 - Logique de fallback si aucun compte sélectionné → `NoAccountView`
 
 #### Onglets
@@ -224,11 +232,24 @@ ContentView (TabView)
 2. **Calendrier** (`CalendrierTabView`)
 3. **Potentielles** (`PotentialTransactionsView`)
 
-#### Pattern de Propagation
+#### Bouton d'Ajout de Transaction
 ```swift
-@StateObject private var accountsManager = AccountsManager()
-// Puis propagé avec @ObservedObject dans toutes les sous-vues
+ToolbarItem(placement: .bottomBar) {
+    Button {
+        showingAddTransactionSheet = true
+    } label: {
+        Image(systemName: "plus.circle.fill")
+            .font(.title)
+            .symbolRenderingMode(.palette)
+            .foregroundStyle(.white, .blue)
+    }
+}
 ```
+
+**Rendu selon iOS**:
+- **iOS 18+**: Effet glass/liquid moderne, intégré élégamment dans la TabBar
+- **iOS 16-17**: Bouton standard dans la barre inférieure, fonctionnel
+- **iOS 15**: Compatible avec placement `.bottomBar`
 
 ---
 
@@ -534,12 +555,18 @@ WindowGroup {
 
 ### Composants Natifs Apple Utilisés
 - `Form`, `List`, `NavigationStack`, `TabView`
+- `Toolbar` avec placements: `.navigationBarLeading`, `.navigationBarTrailing`, `.bottomBar`
 - `Picker` (segmented style)
 - `DatePicker` (graphical style)
 - `TextField` (décimal/text keyboards)
 - `swipeActions`, `contextMenu`
 - Couleurs système: `.systemGroupedBackground`, `.secondarySystemGroupedBackground`
 - Symboles SF Symbols
+
+### Placement des Boutons
+- **TopBar Leading**: Import/Export CSV (Home uniquement)
+- **TopBar Trailing**: Sélection de compte (toutes les vues)
+- **BottomBar Trailing**: Ajout de transaction (toutes les vues avec compte)
 
 ### Palette de Couleurs
 - **Positif**: `.green` (revenus, soldes positifs)
@@ -935,10 +962,10 @@ Lorsque vous générez du code pour cette app:
 ---
 
 ## 📌 Version et Date
-- **Version du document**: 1.5
+- **Version du document**: 1.6
 - **Date de création**: 1er janvier 2026
 - **Dernière mise à jour**: 1er janvier 2026
-- **État de l'app**: Production - Export/Import CSV fonctionnels
+- **État de l'app**: Production - Bouton d'ajout intégré dans TabBar (style iOS 18)
 
 ---
 

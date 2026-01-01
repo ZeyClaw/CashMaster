@@ -66,6 +66,22 @@ struct ContentView: View {
 										.font(.title2)
 								}
 							}
+							
+							// Bouton Ajouter Transaction (dans la TabBar)
+							ToolbarItem(placement: .bottomBar) {
+								Spacer()
+							}
+							
+							ToolbarItem(placement: .bottomBar) {
+								Button {
+									showingAddTransactionSheet = true
+								} label: {
+									Image(systemName: "plus.circle.fill")
+										.font(.title)
+										.symbolRenderingMode(.palette)
+										.foregroundStyle(.white, .blue)
+								}
+							}
 						}
 				} else {
 					NoAccountView(accountsManager: accountsManager)
@@ -95,6 +111,22 @@ struct ContentView: View {
 								} label: {
 									Image(systemName: "person.crop.circle")
 										.font(.title2)
+								}
+							}
+							
+							// Bouton Ajouter Transaction (dans la TabBar)
+							ToolbarItem(placement: .bottomBar) {
+								Spacer()
+							}
+							
+							ToolbarItem(placement: .bottomBar) {
+								Button {
+									showingAddTransactionSheet = true
+								} label: {
+									Image(systemName: "plus.circle.fill")
+										.font(.title)
+										.symbolRenderingMode(.palette)
+										.foregroundStyle(.white, .blue)
 								}
 							}
 						}
@@ -127,6 +159,22 @@ struct ContentView: View {
 								} label: {
 									Image(systemName: "person.crop.circle")
 										.font(.title2)
+								}
+							}
+							
+							// Bouton Ajouter Transaction (dans la TabBar)
+							ToolbarItem(placement: .bottomBar) {
+								Spacer()
+							}
+							
+							ToolbarItem(placement: .bottomBar) {
+								Button {
+									showingAddTransactionSheet = true
+								} label: {
+									Image(systemName: "plus.circle.fill")
+										.font(.title)
+										.symbolRenderingMode(.palette)
+										.foregroundStyle(.white, .blue)
 								}
 							}
 						}
@@ -194,23 +242,6 @@ struct ContentView: View {
 		} message: {
 			Text("Aucune transaction n'a pu être importée. Vérifiez le format du fichier CSV.")
 		}
-		// Bouton flottant global
-		.overlay(
-			accountsManager.selectedAccount != nil ?
-			Button {
-				showingAddTransactionSheet = true
-			} label: {
-				Image(systemName: "plus.circle.fill")
-					.font(.system(size: 50))
-					.symbolRenderingMode(.palette)
-					.foregroundStyle(.white, .blue)
-					.shadow(radius: 4)
-			}
-				.padding(.bottom, 60)
-				.padding(.trailing, 15)
-			: nil,
-			alignment: .bottomTrailing
-		)
 		.onAppear {
 			if accountsManager.selectedAccount == nil {
 				accountsManager.selectedAccount = accountsManager.getAllAccounts().first
