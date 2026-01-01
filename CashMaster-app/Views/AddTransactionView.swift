@@ -60,13 +60,13 @@ struct AddTransactionView: View {
 			.alert("Montant invalide", isPresented: $showingErrorAlert) {
 				Button("OK", role: .cancel) {}
 			} message: {
-				Text("Veuillez entrer un montant valide.")
+				Text("Veuillez entrer un montant positif valide.")
 			}
 		}
 	}
 	
 	private func ajouterTransaction() {
-		guard let montant = transactionAmount else {
+		guard let montant = transactionAmount, montant > 0 else {
 			showingErrorAlert = true
 			return
 		}

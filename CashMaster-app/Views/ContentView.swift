@@ -12,6 +12,8 @@ struct ContentView: View {
 	@StateObject private var accountsManager = AccountsManager()
 	@State private var showingAccountPicker = false
 	@State private var showingAddTransactionSheet = false
+	@State private var showingShareSheet = false
+	@State private var csvFileURL: URL?
 	@State private var tabSelection: Tab = .home
 	
 	enum Tab {
@@ -27,6 +29,17 @@ struct ContentView: View {
 					HomeView(accountsManager: accountsManager)
 						.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
 						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								Button {
+									if let url = accountsManager.generateCSV() {
+										csvFileURL = url
+										showingShareSheet = true
+									}
+								} label: {
+									Image(systemName: "square.and.arrow.up")
+										.font(.title2)
+								}
+							}
 							ToolbarItem(placement: .navigationBarTrailing) {
 								Button {
 									showingAccountPicker = true
@@ -122,6 +135,11 @@ struct ContentView: View {
 		.sheet(isPresented: $showingAddTransactionSheet) {
 			if accountsManager.selectedAccount != nil {
 				AddTransactionView(accountsManager: accountsManager)
+			}
+		}
+		.sheet(isPresented: $showingShareSheet) {
+			if let url = csvFileURL {
+				ShareSheet(items: [url])
 			}
 		}
 		// Bouton flottant global

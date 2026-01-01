@@ -202,6 +202,54 @@ class AccountsManager: ObservableObject {
 		save()
 		objectWillChange.send()
 	}
+	
+	// MARK: - Export CSV
+	
+	/// Génère un fichier CSV contenant toutes les transactions du compte sélectionné
+	/// - Returns: URL temporaire du fichier CSV généré, ou nil si erreur
+	func generateCSV() -> URL? {
+		guard let account = selectedAccount else { return nil }
+		
+		let allTransactions = transactions().sorted { tx1, tx2 in
+			// Trier par date (les transactions sans date à la fin)
+			if let date1 = tx1.date, let date2 = tx2.date {
+				return date1 > date2 // Plus récente en premier
+			} else if tx1.date != nil {
+				return true
+			} else {
+				return false
+			}
+		}
+		
+		// Construire le CSV
+		var csvText = "Date,Type,Montant,Commentaire,Statut\n"
+		
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "dd/MM/yyyy"
+		dateFormatter.locale = Locale(identifier: "fr_FR")
+		
+		for transaction in allTransactions {
+			let dateString = transaction.date.map { dateFormatter.string(from: $0) } ?? "N/A"
+			let type = transaction.amount >= 0 ? "Revenu" : "Dépense"
+			let amount = String(format: "%.2f", abs(transaction.amount))
+			let comment = transaction.comment.replacingOccurrences(of: ",", with: ";") // Éviter les conflits CSV
+			let status = transaction.potentiel ? "Potentielle" : "Validée"
+			
+			csvText += "\(dateString),\(type),\(amount),\(comment),\(status)\n"
+		}
+		
+		// Sauvegarder dans un fichier temporaire
+		let fileName = "\(account)_transactions.csv"
+		let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+		
+		do {
+			try csvText.write(to: tempURL, atomically: true, encoding: .utf8)
+			return tempURL
+		} catch {
+			print("Erreur lors de la génération du CSV: \(error.localizedDescription)")
+			return nil
+		}
+	}
 
 
 }

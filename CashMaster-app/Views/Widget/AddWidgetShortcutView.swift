@@ -38,7 +38,7 @@ struct AddWidgetShortcutView: View {
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Ajouter") {
-						guard let amount = amount else {
+						guard let amount = amount, amount > 0 else {
 							showError = true
 							return
 						}
@@ -50,6 +50,8 @@ struct AddWidgetShortcutView: View {
 			}
 			.alert("Montant invalide", isPresented: $showError) {
 				Button("OK", role: .cancel) {}
+			} message: {
+				Text("Veuillez entrer un montant positif valide.")
 			}
 		}
 	}

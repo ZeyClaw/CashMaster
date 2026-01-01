@@ -44,32 +44,6 @@ class TransactionManager {
 		sommeTransactions(filtre: { $0.potentiel })
 	}
 	
-	// MARK: - Widgets
-	
-	private let widgetKey = "widget_shortcuts"
-	
-	func addWidgetShortcut(_ shortcut: WidgetShortcut) {
-		widgetShortcuts.append(shortcut)
-	}
-	
-	func removeWidgetShortcut(_ shortcut: WidgetShortcut) {
-		widgetShortcuts.removeAll { $0 == shortcut }
-	}
-	
-	private func saveWidgets() {
-		if let data = try? JSONEncoder().encode(widgetShortcuts) {
-			UserDefaults.standard.set(data, forKey: widgetKey)
-		}
-	}
-	
-	private func loadWidgets() {
-		if let data = UserDefaults.standard.data(forKey: widgetKey),
-		   let decoded = try? JSONDecoder().decode([WidgetShortcut].self, from: data) {
-			widgetShortcuts = decoded
-		}
-	}
-	
-	
 	// MARK: - Privé
 	private func sommeTransactions(filtre: (Transaction) -> Bool) -> Double {
 		transactions.filter(filtre).map { $0.amount }.reduce(0, +)
