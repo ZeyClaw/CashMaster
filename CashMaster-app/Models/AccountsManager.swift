@@ -253,8 +253,11 @@ class AccountsManager: ObservableObject {
 	
 	// MARK: - Import CSV
 	func importCSV(from url: URL) -> Int {
-		guard let account = selectedAccount else { return 0 }
-	
+		guard let account = selectedAccount else {
+			print("❌ Aucun compte sélectionné")
+			return 0
+		}
+
 		do {
 			// Accès sécurisé au fichier
 			guard url.startAccessingSecurityScopedResource() else {
@@ -262,22 +265,22 @@ class AccountsManager: ObservableObject {
 				return 0
 			}
 			defer { url.stopAccessingSecurityScopedResource() }
-		
+	
 			let content = try String(contentsOf: url, encoding: .utf8)
 			let lines = content.components(separatedBy: .newlines)
 			var importedCount = 0
-		
+	
 			// Ignorer la première ligne (header) et les lignes vides
 			for line in lines.dropFirst() {
 				let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
 				guard !trimmedLine.isEmpty else { continue }
-			
-				let columns = trimmedLine.components(separatedBy: ";")
+		
+				let columns = trimmedLine.components(separatedBy: ",")
 				guard columns.count >= 5 else {
 					print("⚠️ Ligne invalide (colonnes insuffisantes): \(line)")
 					continue
 				}
-			
+		
 				// Parse Date
 				let dateString = columns[0].trimmingCharacters(in: .whitespacesAndNewlines)
 				let date: Date?
@@ -289,33 +292,33 @@ class AccountsManager: ObservableObject {
 					formatter.locale = Locale(identifier: "fr_FR")
 					date = formatter.date(from: dateString)
 				}
-			
+		
 				// Parse Type
 				let typeString = columns[1].trimmingCharacters(in: .whitespacesAndNewlines)
 				let isExpense = (typeString == "Dépense")
-			
+		
 				// Parse Montant
 				let montantString = columns[2].trimmingCharacters(in: .whitespacesAndNewlines)
 				guard var amount = Double(montantString) else {
 					print("⚠️ Montant invalide: \(montantString)")
 					continue
 				}
-			
+		
 				// Appliquer le signe selon le type
 				if isExpense && amount > 0 {
 					amount = -amount
 				} else if !isExpense && amount < 0 {
 					amount = abs(amount)
 				}
-			
+		
 				// Parse Commentaire
 				let comment = columns[3].trimmingCharacters(in: .whitespacesAndNewlines)
 					.replacingOccurrences(of: ";", with: ",")
-			
+		
 				// Parse Statut
 				let statutString = columns[4].trimmingCharacters(in: .whitespacesAndNewlines)
 				let isPotentielle = (statutString == "Potentielle")
-			
+		
 				// Créer et ajouter la transaction
 				let transaction = Transaction(
 					amount: amount,
@@ -323,15 +326,15 @@ class AccountsManager: ObservableObject {
 					potentiel: isPotentielle,
 					date: isPotentielle ? nil : (date ?? Date())
 				)
-			
-				ajouterTransaction(transaction, to: account)
+		
+				ajouterTransaction(transaction)
 				importedCount += 1
 				print("✅ Transaction importée: \(comment) - \(amount)€")
 			}
-		
+	
 			print("📊 Import terminé: \(importedCount) transactions importées")
 			return importedCount
-		
+	
 		} catch {
 			print("❌ Erreur lors de l'import CSV: \(error.localizedDescription)")
 			return 0
