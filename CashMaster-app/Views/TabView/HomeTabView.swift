@@ -15,10 +15,10 @@ struct HomeTabView: View {
 	@State private var showingDocumentPicker = false
 	@State private var csvFileURL: URL?
 	@State private var importedCount: Int = 0
-	@State private var showingImportAlert = false
-	@State private var showingExportAlert = false
-	@State private var showingImportErrorAlert = false
-	@State private var showingExportErrorAlert = false
+	@State private var showExportSuccessAlert = false
+	@State private var showExportErrorAlert = false
+	@State private var showImportSuccessAlert = false
+	@State private var showImportErrorAlert = false
 	
 	var body: some View {
 		NavigationStack {
@@ -65,9 +65,6 @@ struct HomeTabView: View {
 					.sheet(isPresented: $showingShareSheet) {
 						if let url = csvFileURL {
 							ActivityViewController(activityItems: [url])
-								.onDisappear {
-									showingExportAlert = true
-								}
 						}
 					}
 					.sheet(isPresented: $showingDocumentPicker) {
@@ -75,22 +72,22 @@ struct HomeTabView: View {
 							importCSV(from: url)
 						}
 					}
-					.alert("Export réussi", isPresented: $showingExportAlert) {
+					.alert("Export réussi", isPresented: $showExportSuccessAlert) {
 						Button("OK", role: .cancel) {}
 					} message: {
 						Text("Fichier CSV exporté avec succès.")
 					}
-					.alert("Erreur d'export", isPresented: $showingExportErrorAlert) {
+					.alert("Erreur d'export", isPresented: $showExportErrorAlert) {
 						Button("OK", role: .cancel) {}
 					} message: {
 						Text("Impossible de générer le fichier CSV.")
 					}
-					.alert("Import réussi", isPresented: $showingImportAlert) {
+					.alert("Import réussi", isPresented: $showImportSuccessAlert) {
 						Button("OK", role: .cancel) {}
 					} message: {
 						Text("\(importedCount) transaction(s) importée(s) avec succès.")
 					}
-					.alert("Erreur d'import", isPresented: $showingImportErrorAlert) {
+					.alert("Erreur d'import", isPresented: $showImportErrorAlert) {
 						Button("OK", role: .cancel) {}
 					} message: {
 						Text("Aucune transaction n'a pu être importée. Vérifiez le format du fichier CSV.")
@@ -118,9 +115,12 @@ struct HomeTabView: View {
 	private func exportCSV() {
 		if let url = accountsManager.generateCSV() {
 			csvFileURL = url
-			showingShareSheet = true
+			// Attendre un tick pour que csvFileURL soit mis à jour
+			DispatchQueue.main.async {
+				showingShareSheet = true
+			}
 		} else {
-			showingExportErrorAlert = true
+			showExportErrorAlert = true
 		}
 	}
 	
@@ -129,9 +129,9 @@ struct HomeTabView: View {
 		let count = accountsManager.importCSV(from: url)
 		importedCount = count
 		if count > 0 {
-			showingImportAlert = true
+			showImportSuccessAlert = true
 		} else {
-			showingImportErrorAlert = true
+			showImportErrorAlert = true
 		}
 	}
 }

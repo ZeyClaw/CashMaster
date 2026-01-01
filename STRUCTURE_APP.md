@@ -2,6 +2,10 @@
 
 ## 📑 Changelog
 
+### Version 2.0 - 2 janvier 2026
+**Améliorations Navigation et UX**:
+- ✅ **Fix export CSV première fois**: Génération du CSV avant affichage du share sheet (plus de sheet vide)
+
 ### Version 1.9 - 1er janvier 2026
 **Refactoring Architecture Majeur : Séparation complète des Tabs**:
 - ✅ **Architecture modulaire**: Chaque tab dans son propre fichier (recommandation Apple)
