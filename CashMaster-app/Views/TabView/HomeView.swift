@@ -128,13 +128,8 @@ struct HomeView: View {
 								Text(currentMonthName)
 									.foregroundColor(.primary)
 								Spacer()
-								HStack(spacing: 4) {
-									Text("\(currentMonthSolde, specifier: "%.2f") €")
-										.foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
-									Image(systemName: "chevron.right")
-										.font(.caption)
-										.foregroundColor(.secondary)
-								}
+								Text("\(currentMonthSolde, specifier: "%.2f") €")
+									.foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
 							}
 							.padding()
 							.background(Color(UIColor.secondarySystemGroupedBackground))

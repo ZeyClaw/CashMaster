@@ -6,7 +6,8 @@
 **Améliorations Navigation et UX**:
 - ✅ **Fix export CSV première fois**: Génération du CSV avant affichage du share sheet (plus de sheet vide)
 - ✅ **Navigation mois actuel**: Tap sur la carte "Mois actuel" dans HomeView ouvre TransactionsListView du mois en cours
-- ✅ **Carte cliquable**: Toute la carte du mois actuel est cliquable avec chevron indicateur
+- ✅ **Carte cliquable simplifiée**: Toute la carte du mois actuel est cliquable (sans chevron pour design épuré)
+- ✅ **Spacing boutons CSV optimisé**: Spacing de 3 points pour boutons compacts
 - ✅ **Padding boutons CSV amélioré**: Padding de 8 points pour meilleure ergonomie tactile
 - 📝 **UX améliorée**: Accès rapide aux transactions du mois depuis l'écran d'accueil
 
@@ -373,7 +374,7 @@ Tab(value: Tab.add, role: .search) {
 
 **Boutons Toolbar Leading (Import/Export)**:
 ```swift
-HStack(spacing: 5) {
+HStack(spacing: 3) {
     // Bouton Export CSV
     Button {
         exportCSV()
@@ -396,7 +397,7 @@ HStack(spacing: 5) {
 - **Style**: Boutons simples avec icônes SF Symbols
 - **Placement**: En haut à gauche de la toolbar
 - **Couleur**: Couleur système par défaut (accent color)
-- **Spacing**: 5 points entre les boutons
+- **Spacing**: 3 points entre les boutons (compact)
 - **Padding**: 8 points de padding pour zone de touch confortable et éloignée du bord
 
 **States**:
@@ -424,8 +425,8 @@ HStack(spacing: 5) {
 2. **Solde du Mois Actuel** (Carte Cliquable)
    - Nom du mois en français
    - Total des transactions du mois
-   - Chevron à droite indiquant la navigation
    - **Toute la carte est cliquable** via Button avec PlainButtonStyle
+   - **Design épuré**: Sans chevron pour une interface minimaliste
    - **Navigation**: Tap ouvre `TransactionsListView` du mois/année actuels
    - Utilise `.navigationDestination(isPresented:)` avec state `navigateToCurrentMonth`
 
@@ -456,13 +457,8 @@ Button {
         Text(currentMonthName)
             .foregroundColor(.primary)
         Spacer()
-        HStack(spacing: 4) {
-            Text("\(currentMonthSolde, specifier: "%.2f") €")
-                .foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
+        Text("\(currentMonthSolde, specifier: "%.2f") €")
+            .foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
     }
     .padding()
     .background(Color(UIColor.secondarySystemGroupedBackground))
@@ -893,7 +889,7 @@ Utilisé lors du tap sur un widget shortcut
    - year: currentYear (année actuelle via Calendar)
 5. Affichage de la liste des transactions du mois
 6. User peut naviguer en arrière via le bouton back natif
-7. Chevron indique visuellement que la carte est interactive
+7. Design épuré sans chevron pour interface minimaliste
 ```
 
 ---

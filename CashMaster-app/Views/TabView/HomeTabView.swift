@@ -28,7 +28,7 @@ struct HomeTabView: View {
 					.toolbar {
 						// Boutons Import/Export CSV en haut à gauche
 						ToolbarItem(placement: .navigationBarLeading) {
-							HStack(spacing: 5) {
+							HStack(spacing: 3) {
 								// Bouton Export CSV
 								Button {
 									exportCSV()
