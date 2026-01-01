@@ -16,6 +16,9 @@ struct ContentView: View {
 	@State private var csvFileURL: URL?
 	@State private var importedCount: Int = 0
 	@State private var showingImportAlert = false
+	@State private var showingExportAlert = false
+	@State private var showingImportErrorAlert = false
+	@State private var showingExportErrorAlert = false
 	@State private var tabSelection: Tab = .home
 	
 	enum Tab {
@@ -38,9 +41,12 @@ struct ContentView: View {
 										if let url = accountsManager.generateCSV() {
 											csvFileURL = url
 											showingShareSheet = true
+										} else {
+											showingExportErrorAlert = true
 										}
 									} label: {
-										Image(systemName: "square.and.arrow.up")
+										Label("Exporter", systemImage: "square.and.arrow.up")
+											.labelStyle(.iconOnly)
 											.font(.title2)
 									}
 									
@@ -48,7 +54,8 @@ struct ContentView: View {
 									Button {
 										showingDocumentPicker = true
 									} label: {
-										Image(systemName: "square.and.arrow.down")
+										Label("Importer", systemImage: "square.and.arrow.down")
+											.labelStyle(.iconOnly)
 											.font(.title2)
 									}
 								}
@@ -153,20 +160,41 @@ struct ContentView: View {
 		.sheet(isPresented: $showingShareSheet) {
 			if let url = csvFileURL {
 				ShareSheet(items: [url])
+					.onDisappear {
+						showingExportAlert = true
+					}
 			}
 		}
 		.sheet(isPresented: $showingDocumentPicker) {
 			DocumentPicker { url in
-				importedCount = accountsManager.importCSV(from: url)
-				if importedCount > 0 {
+				let count = accountsManager.importCSV(from: url)
+				importedCount = count
+				if count > 0 {
 					showingImportAlert = true
+				} else {
+					showingImportErrorAlert = true
 				}
 			}
+		}
+		.alert("Export réussi", isPresented: $showingExportAlert) {
+			Button("OK", role: .cancel) {}
+		} message: {
+			Text("Fichier CSV exporté avec succès.")
+		}
+		.alert("Erreur d'export", isPresented: $showingExportErrorAlert) {
+			Button("OK", role: .cancel) {}
+		} message: {
+			Text("Impossible de générer le fichier CSV.")
 		}
 		.alert("Import réussi", isPresented: $showingImportAlert) {
 			Button("OK", role: .cancel) {}
 		} message: {
 			Text("\(importedCount) transaction(s) importée(s) avec succès.")
+		}
+		.alert("Erreur d'import", isPresented: $showingImportErrorAlert) {
+			Button("OK", role: .cancel) {}
+		} message: {
+			Text("Aucune transaction n'a pu être importée. Vérifiez le format du fichier CSV.")
 		}
 		// Bouton flottant global
 		.overlay(
@@ -192,8 +220,6 @@ struct ContentView: View {
 		}
 	}
 }
-
-
 
 
 

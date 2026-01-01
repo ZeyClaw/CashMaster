@@ -2,6 +2,14 @@
 
 ## 📑 Changelog
 
+### Version 1.4 - 1er janvier 2026
+**Améliorations Import/Export CSV**:
+- ✅ **Boutons séparés**: Export et Import sont maintenant deux boutons distincts avec labels accessibles
+- ✅ **Alertes complètes**: 4 alertes différentes (export réussi, export échoué, import réussi, import échoué)
+- ✅ **Fix import CSV**: Correction du parsing avec `startAccessingSecurityScopedResource()` pour accès sécurisé aux fichiers
+- ✅ **Logs détaillés**: Console logs pour débugger les imports (lignes invalides, montants, transactions importées)
+- ✅ **Validation renforcée**: Vérification des colonnes, gestion des lignes vides, parsing robuste des dates
+
 ### Version 1.3 - 1er janvier 2026
 **Nouvelle Fonctionnalité : Import CSV**:
 - ✅ **Import CSV**: Ajout d'un bouton d'import à côté du bouton d'export permettant d'importer des transactions depuis un fichier CSV
@@ -598,9 +606,11 @@ Utilisé lors du tap sur un widget shortcut
    → Trie par date (plus récente en premier)
    → Génère le CSV avec colonnes: Date, Type, Montant, Commentaire, Statut
    → Sauvegarde dans répertoire temporaire
-   → Retourne URL du fichier
-3. Present ShareSheet (UIActivityViewController)
-4. User choisit: Sauvegarder, Partager, AirDrop, etc.
+   → Retourne URL du fichier ou nil si erreur
+3. Si URL != nil: Present ShareSheet (UIActivityViewController)
+   Sinon: Affiche alerte d'erreur "Impossible de générer le fichier CSV"
+4. Quand ShareSheet se ferme: Affiche alerte "Export réussi"
+5. User peut sauvegarder, partager, AirDrop, etc.
 ```
 
 ### Import CSV
@@ -608,19 +618,23 @@ Utilisé lors du tap sur un widget shortcut
 1. User tap bouton "square.and.arrow.down" (en haut à gauche)
 2. Present DocumentPicker (UIDocumentPickerViewController)
 3. User sélectionne un fichier CSV
-4. accountsManager.importCSV(from: url)
+4. DocumentPicker appelle callback avec URL
+5. accountsManager.importCSV(from: url)
+   → Accès sécurisé via startAccessingSecurityScopedResource()
    → Lit le contenu du fichier CSV
-   → Parse chaque ligne (ignore header)
-   → Pour chaque ligne valide:
+   → Parse chaque ligne (ignore header et lignes vides)
+   → Pour chaque ligne valide (≥5 colonnes):
       - Parse Date (dd/MM/yyyy) ou N/A
       - Parse Type (Revenu/Dépense)
       - Parse Montant (converti en négatif si dépense)
-      - Parse Commentaire (; remplacés par ,)
+      - Parse Commentaire (points-virgules remplacés par virgules)
       - Parse Statut (Potentielle/Validée)
       - Crée Transaction et appelle ajouterTransaction()
+      - Log chaque import dans la console
    → Retourne nombre de transactions importées
-5. Affiche alerte: "{count} transaction(s) importée(s)"
-6. SwiftUI rafraîchit automatiquement l'UI
+6. Si count > 0: Affiche alerte "{count} transaction(s) importée(s)"
+   Sinon: Affiche alerte d'erreur "Aucune transaction n'a pu être importée"
+7. SwiftUI rafraîchit automatiquement l'UI
 ```
 
 ---
