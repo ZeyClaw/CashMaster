@@ -11,37 +11,37 @@ import SwiftUI
 struct ContentView: View {
 	@StateObject private var accountsManager = AccountsManager()
 	@State private var showingAddTransactionSheet = false
-	@State private var tabSelection: Tab = .home
+	@State private var tabSelection: TabItem = .home
 	
-	enum Tab: Hashable {
+	enum TabItem: Hashable {
 		case home, calendrier, potentielles, add
 	}
 	
 	var body: some View {
 		TabView(selection: $tabSelection) {
 			// Onglet Home
-			Tab(value: Tab.home) {
+			Tab(value: TabItem.home) {
 				HomeTabView(accountsManager: accountsManager)
 			} label: {
 				Label("Home", systemImage: "house")
 			}
 			
 			// Onglet Calendrier
-			Tab(value: Tab.calendrier) {
+			Tab(value: TabItem.calendrier) {
 				CalendrierMainView(accountsManager: accountsManager)
 			} label: {
 				Label("Calendrier", systemImage: "calendar")
 			}
 			
 			// Onglet Potentielles
-			Tab(value: Tab.potentielles) {
+			Tab(value: TabItem.potentielles) {
 				PotentiellesTabView(accountsManager: accountsManager)
 			} label: {
 				Label("Potentielles", systemImage: "clock.arrow.circlepath")
 			}
 			
 			// Bouton Ajouter avec role search (séparé visuellement à droite)
-			Tab(value: Tab.add, role: .search) {
+			Tab(value: TabItem.add, role: .search) {
 				Color.clear
 			} label: {
 				Label("", systemImage: "plus.circle.fill")
