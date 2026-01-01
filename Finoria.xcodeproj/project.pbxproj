@@ -38,6 +38,9 @@
 		F8B79A8C2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */; };
 		F8B818F72F06A79C002D02F2 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818F62F06A79C002D02F2 /* ShareSheet.swift */; };
 		F8B818F92F06A7A7002D02F2 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */; };
+		F8B818FC2F06D137002D02F2 /* PotentiellesTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FA2F06D137002D02F2 /* PotentiellesTabView.swift */; };
+		F8B818FD2F06D137002D02F2 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FB2F06D137002D02F2 /* HomeTabView.swift */; };
+		F8B818FF2F06D14E002D02F2 /* CalendrierMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */; };
 		F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -95,6 +98,9 @@
 		F8B818F52F059289002D02F2 /* Finoria.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Finoria.entitlements; sourceTree = "<group>"; };
 		F8B818F62F06A79C002D02F2 /* ShareSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
+		F8B818FA2F06D137002D02F2 /* PotentiellesTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PotentiellesTabView.swift; sourceTree = "<group>"; };
+		F8B818FB2F06D137002D02F2 /* HomeTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
+		F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendrierMainView.swift; sourceTree = "<group>"; };
 		F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -147,6 +153,8 @@
 		F810E3072E43EAC800C2DFA9 /* TabView */ = {
 			isa = PBXGroup;
 			children = (
+				F8B818FB2F06D137002D02F2 /* HomeTabView.swift */,
+				F8B818FA2F06D137002D02F2 /* PotentiellesTabView.swift */,
 				F810E30D2E45331900C2DFA9 /* HomeView.swift */,
 				F810E2FE2E43DFC300C2DFA9 /* PotentialTransactionsView.swift */,
 				F810E3172E4608CC00C2DFA9 /* Calendrier */,
@@ -191,6 +199,7 @@
 		F810E3172E4608CC00C2DFA9 /* Calendrier */ = {
 			isa = PBXGroup;
 			children = (
+				F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */,
 				F800A3EB2E4DF82400918507 /* CalendrierTabView.swift */,
 				F810E2F82E43D2B100C2DFA9 /* YearsView.swift */,
 				F810E2FA2E43D2CB00C2DFA9 /* MonthsView.swift */,
@@ -405,6 +414,8 @@
 				F810E2F92E43D2B100C2DFA9 /* YearsView.swift in Sources */,
 				F800A3F12E4F6D1E00918507 /* ToastData.swift in Sources */,
 				F810E3142E46082900C2DFA9 /* AddWidgetShortcutView.swift in Sources */,
+				F8B818FD2F06D137002D02F2 /* HomeTabView.swift in Sources */,
+				F8B818FF2F06D14E002D02F2 /* CalendrierMainView.swift in Sources */,
 				F810E2F12E428FFB00C2DFA9 /* AccountCardView.swift in Sources */,
 				F8B818F72F06A79C002D02F2 /* ShareSheet.swift in Sources */,
 				F810E2FB2E43D2CB00C2DFA9 /* MonthsView.swift in Sources */,
@@ -417,6 +428,7 @@
 				F810E2FF2E43DFC300C2DFA9 /* PotentialTransactionsView.swift in Sources */,
 				F810E3122E46080E00C2DFA9 /* WidgetCardView.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
+				F8B818FC2F06D137002D02F2 /* PotentiellesTabView.swift in Sources */,
 				F810E30C2E44D4F100C2DFA9 /* AccountPickerView.swift in Sources */,
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
 				F800A3F72E5C72F200918507 /* ToastCard.swift in Sources */,
