@@ -5,6 +5,9 @@
 ### Version 2.0 - 2 janvier 2026
 **Améliorations Navigation et UX**:
 - ✅ **Fix export CSV première fois**: Génération du CSV avant affichage du share sheet (plus de sheet vide)
+- ✅ **Navigation mois actuel**: Tap sur la carte "Mois actuel" dans HomeView ouvre TransactionsListView du mois en cours
+- ✅ **Navigation simple**: Utilisation de `.navigationDestination` pour navigation directe vers le mois actuel
+- 📝 **UX améliorée**: Accès rapide aux transactions du mois depuis l'écran d'accueil
 
 ### Version 1.9 - 1er janvier 2026
 **Refactoring Architecture Majeur : Séparation complète des Tabs**:
@@ -252,6 +255,7 @@ Permet de créer instantanément une transaction validée (date = `Date()`) depu
 ```
 ContentView (TabView racine - 80 lignes)
 ├── Tab 1: HomeTabView → NavigationStack → HomeView
+│   └── Navigation vers TransactionsListView (mois actuel)
 ├── Tab 2: CalendrierMainView → NavigationStack → CalendrierTabView
 │   └── YearsView → MonthsView → TransactionsListView
 ├── Tab 3: PotentiellesTabView → NavigationStack → PotentialTransactionsView
@@ -366,6 +370,33 @@ Tab(value: Tab.add, role: .search) {
 - Gestion des alertes: Import/Export succès/erreur
 - Méthodes: `exportCSV()`, `importCSV(from:)`
 
+**Boutons Toolbar Leading (Import/Export)**:
+```swift
+HStack(spacing: 10) {
+    // Bouton Export CSV
+    Button {
+        exportCSV()
+    } label: {
+        Image(systemName: "square.and.arrow.up")
+            .imageScale(.large)
+            .padding(5)
+    }
+    
+    // Bouton Import CSV
+    Button {
+        showingDocumentPicker = true
+    } label: {
+        Image(systemName: "square.and.arrow.down")
+            .imageScale(.large)
+            .padding(5)
+    }
+}
+```
+- **Style**: Boutons simples avec icônes SF Symbols
+- **Placement**: En haut à gauche de la toolbar
+- **Couleur**: Couleur système par défaut (accent color)
+- **Padding**: 5 points de padding pour zone de touch confortable
+
 **States**:
 ```swift
 @State private var showingAccountPicker = false
@@ -373,7 +404,10 @@ Tab(value: Tab.add, role: .search) {
 @State private var showingDocumentPicker = false
 @State private var csvFileURL: URL?
 @State private var importedCount: Int = 0
-// + alertes booléennes
+@State private var showExportSuccessAlert = false
+@State private var showExportErrorAlert = false
+@State private var showImportSuccessAlert = false
+@State private var showImportErrorAlert = false
 ```
 
 #### `HomeView.swift` (Contenu)
@@ -385,9 +419,12 @@ Tab(value: Tab.add, role: .search) {
    - Solde futur (actuel + potentielles)
    - Couleur dynamique (vert/rouge selon positif/négatif)
 
-2. **Solde du Mois Actuel**
+2. **Solde du Mois Actuel** (Cliquable)
    - Nom du mois en français
    - Total des transactions du mois
+   - Chevron à droite indiquant la navigation
+   - **Navigation**: Tap ouvre `TransactionsListView` du mois/année actuels
+   - Utilise `.navigationDestination(isPresented:)` avec state `navigateToCurrentMonth`
 
 3. **Raccourcis Widgets** (LazyVGrid 2 colonnes)
    - Bouton "+" pour ajouter un widget
@@ -395,6 +432,34 @@ Tab(value: Tab.add, role: .search) {
    - Haptic feedback sur tap
    - Context menu pour supprimer
    - **Toast de confirmation** après ajout de transaction
+
+**Navigation vers mois actuel**:
+```swift
+@State private var navigateToCurrentMonth = false
+
+private var currentMonth: Int {
+    Calendar.current.component(.month, from: Date())
+}
+
+private var currentYear: Int {
+    Calendar.current.component(.year, from: Date())
+}
+
+// Dans le body
+Button {
+    navigateToCurrentMonth = true
+} label: {
+    // Carte du mois actuel avec chevron
+}
+
+.navigationDestination(isPresented: $navigateToCurrentMonth) {
+    TransactionsListView(
+        accountsManager: accountsManager,
+        month: currentMonth,
+        year: currentYear
+    )
+}
+```
 
 **Computed Properties**:
 ```swift
@@ -773,19 +838,14 @@ Utilisé lors du tap sur un widget shortcut
 
 ### Export CSV
 ```
-1. User tap bouton bleu circulaire "square.and.arrow.up" (en haut à gauche)
-2. accountsManager.generateCSV()
-   → Vérifie selectedAccount != nil
-   → Vérifie qu'il y a des transactions à exporter
-   → Récupère toutes les transactions du compte
-   → Trie par date (plus récente en premier)
-   → Génère le CSV avec colonnes: Date, Type, Montant, Commentaire, Statut
-   → Ajoute timestamp au nom de fichier pour unicité
-   → Sauvegarde dans répertoire temporaire
-   → Log le path et le nombre de transactions
-   → Retourne URL du fichier ou nil si erreur
-3. Si URL != nil: Present ActivityViewController (UIActivityViewController)
-   Sinon: Affiche alerte d'erreur "Impossible de générer le fichier CSV"
+1. User tap bouton "square.and.arrow.up" (en haut à gauche)
+2. HomeTabView.exportCSV()
+   → accountsManager.generateCSV()
+   → Génère le CSV et retourne l'URL
+   → Met à jour csvFileURL
+   → DispatchQueue.main.async pour garantir la mise à jour
+   → showingShareSheet = true
+3. Present ActivityViewController avec l'URL du CSV
 4. User choisit l'action (Sauvegarder, Partager, AirDrop, etc.)
 5. Quand ActivityViewController se ferme: Affiche alerte "Export réussi"
 ```
@@ -796,54 +856,34 @@ Utilisé lors du tap sur un widget shortcut
 2. Present DocumentPicker (UIDocumentPickerViewController)
 3. User sélectionne un fichier CSV
 4. DocumentPicker appelle callback avec URL
-5. accountsManager.importCSV(from: url)
-   → Accès sécurisé via startAccessingSecurityScopedResource()
-   → Lit le contenu du fichier CSV
-   → Parse chaque ligne (ignore header et lignes vides)
-   → Pour chaque ligne valide (≥5 colonnes):
-      - Parse Date (dd/MM/yyyy) ou N/A
-      - Parse Type (Revenu/Dépense)
-      - Parse Montant (converti en négatif si dépense)
-      - Parse Commentaire (points-virgules remplacés par virgules)
-      - Parse Statut (Potentielle/Validée)
-      - Crée Transaction et appelle ajouterTransaction()
-      - Log chaque import dans la console
-   → Retourne nombre de transactions importées
+5. HomeTabView.importCSV(from: url)
+   → accountsManager.importCSV(from: url)
+   → Parse et importe les transactions
+   → Retourne le nombre de transactions importées
 6. Si count > 0: Affiche alerte "{count} transaction(s) importée(s)"
    Sinon: Affiche alerte d'erreur "Aucune transaction n'a pu être importée"
 7. SwiftUI rafraîchit automatiquement l'UI
 ```
 
----
-
-## 🔒 Persistance et Synchronisation
-
-### UserDefaults
-**Clés utilisées**:
-- `"accounts_data"`: Dictionnaire `[String: AccountData]` encodé JSON
-- `"lastSelectedAccount"`: String du dernier compte sélectionné
-
-### Format de Sauvegarde
-```swift
-{
-  "Compte Alice": {
-    "transactions": [...],
-    "widgetShortcuts": [...]
-  },
-  "Compte Bob": {
-    "transactions": [...],
-    "widgetShortcuts": [...]
-  }
-}
+### Navigation vers Mois Actuel depuis Home
+```
+1. User tap sur la carte "Mois actuel" dans HomeView
+2. navigateToCurrentMonth = true
+3. SwiftUI déclenche .navigationDestination
+4. Push de TransactionsListView avec:
+   - month: currentMonth (mois actuel via Calendar)
+   - year: currentYear (année actuelle via Calendar)
+5. Affichage de la liste des transactions du mois
+6. User peut naviguer en arrière via le bouton back natif
 ```
 
 ---
 
 ## 📌 Version et Date
-- **Version du document**: 1.8
+- **Version du document**: 2.0
 - **Date de création**: 1er janvier 2026
-- **Dernière mise à jour**: 1er janvier 2026
-- **État de l'app**: Production - Architecture refactorisée avec sous-composants
+- **Dernière mise à jour**: 2 janvier 2026
+- **État de l'app**: Production - Navigation mois actuel ajoutée
 
 ---
 

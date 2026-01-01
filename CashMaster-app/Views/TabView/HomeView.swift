@@ -14,7 +14,7 @@ struct HomeView: View {
 	@State private var shortcutToDelete: WidgetShortcut? = nil
 	@State private var showingDeleteConfirmation = false
 	@State private var toasts: [ToastData] = []
-
+	@State private var navigateToCurrentMonth = false
 	
 	private var totalCurrent: Double? {
 		guard let selectedAccount = accountsManager.selectedAccount else {
@@ -50,6 +50,14 @@ struct HomeView: View {
 		let month = Calendar.current.component(.month, from: Date())
 		let year = Calendar.current.component(.year, from: Date())
 		return accountsManager.totalPourMois(month, year: year)
+	}
+	
+	private var currentMonth: Int {
+		Calendar.current.component(.month, from: Date())
+	}
+	
+	private var currentYear: Int {
+		Calendar.current.component(.year, from: Date())
 	}
 	
 	// Ajouter un toast
@@ -215,6 +223,13 @@ struct HomeView: View {
 				}
 			}
 			.padding(.bottom, 20)
+		}
+		.navigationDestination(isPresented: $navigateToCurrentMonth) {
+			TransactionsListView(
+				accountsManager: accountsManager,
+				month: currentMonth,
+				year: currentYear
+			)
 		}
 	}
 }
