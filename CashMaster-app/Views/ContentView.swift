@@ -50,6 +50,7 @@ struct ContentView: View {
 		.onChange(of: tabSelection) { oldValue, newValue in
 			// Détection du tap sur l'onglet "Ajouter"
 			if newValue == .add {
+				// Ouvrir la feuille d'ajout de transaction si un compte est sélectionné
 				if accountsManager.selectedAccount != nil {
 					showingAddTransactionSheet = true
 				}

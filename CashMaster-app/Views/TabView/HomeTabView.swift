@@ -28,13 +28,14 @@ struct HomeTabView: View {
 					.toolbar {
 						// Boutons Import/Export CSV en haut à gauche
 						ToolbarItem(placement: .navigationBarLeading) {
-							HStack(spacing: 16) {
+							HStack(spacing: 10) {
 								// Bouton Export CSV
 								Button {
 									exportCSV()
 								} label: {
 									Image(systemName: "square.and.arrow.up")
 										.imageScale(.large)
+                                        .padding(5)
 								}
 								
 								// Bouton Import CSV
@@ -43,6 +44,7 @@ struct HomeTabView: View {
 								} label: {
 									Image(systemName: "square.and.arrow.down")
 										.imageScale(.large)
+                                        .padding(5)
 								}
 							}
 						}
