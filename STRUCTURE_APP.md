@@ -2,6 +2,14 @@
 
 ## 📑 Changelog
 
+### Version 1.5 - 1er janvier 2026
+**Corrections Export/Import CSV**:
+- ✅ **Boutons distincts visuellement**: Export (bleu) et Import (vert) sont maintenant des bulles circulaires séparées
+- ✅ **Fix ShareSheet**: Remplacement de `ShareSheet` par `ActivityViewController` natif pour corriger la vue blanche
+- ✅ **Validation export**: Vérification que le compte existe et qu'il y a des transactions avant export
+- ✅ **Logs améliorés**: Messages console détaillés pour débugger l'export (nombre de transactions, path du fichier)
+- ✅ **Timestamp unique**: Ajout d'un timestamp dans le nom du fichier CSV pour éviter les conflits
+
 ### Version 1.4 - 1er janvier 2026
 **Améliorations Import/Export CSV**:
 - ✅ **Boutons séparés**: Export et Import sont maintenant deux boutons distincts avec labels accessibles
@@ -432,21 +440,21 @@ Row standard pour afficher une transaction
 - Date (caption, secondary) si présente
 - Montant (vert/rouge)
 
-#### `ShareSheet.swift` 📤
+#### `ActivityViewController.swift` 📤
 Wrapper SwiftUI pour `UIActivityViewController`
 
 **Rôle**: Permet de partager/exporter des fichiers de manière native iOS
 
 **Usage**:
 ```swift
-ShareSheet(items: [url])
+ActivityViewController(activityItems: [url])
 ```
 
-**Fonctionnalités natives iOS**:
-- Partage via AirDrop
-- Sauvegarde dans Fichiers
-- Envoi par Mail/Messages
-- Copie vers d'autres apps
+**Avantages**:
+- Plus léger que ShareSheet
+- Intégration native iOS parfaite
+- Pas de problème de vue blanche
+- Support complet de toutes les activités iOS
 
 #### `DocumentPicker.swift` 📂
 Wrapper SwiftUI pour `UIDocumentPickerViewController`
@@ -600,17 +608,21 @@ Utilisé lors du tap sur un widget shortcut
 
 ### Export CSV
 ```
-1. User tap bouton "square.and.arrow.up" (en haut à gauche)
+1. User tap bouton bleu circulaire "square.and.arrow.up" (en haut à gauche)
 2. accountsManager.generateCSV()
+   → Vérifie selectedAccount != nil
+   → Vérifie qu'il y a des transactions à exporter
    → Récupère toutes les transactions du compte
    → Trie par date (plus récente en premier)
    → Génère le CSV avec colonnes: Date, Type, Montant, Commentaire, Statut
+   → Ajoute timestamp au nom de fichier pour unicité
    → Sauvegarde dans répertoire temporaire
+   → Log le path et le nombre de transactions
    → Retourne URL du fichier ou nil si erreur
-3. Si URL != nil: Present ShareSheet (UIActivityViewController)
+3. Si URL != nil: Present ActivityViewController (UIActivityViewController)
    Sinon: Affiche alerte d'erreur "Impossible de générer le fichier CSV"
-4. Quand ShareSheet se ferme: Affiche alerte "Export réussi"
-5. User peut sauvegarder, partager, AirDrop, etc.
+4. User choisit l'action (Sauvegarder, Partager, AirDrop, etc.)
+5. Quand ActivityViewController se ferme: Affiche alerte "Export réussi"
 ```
 
 ### Import CSV
@@ -923,10 +935,10 @@ Lorsque vous générez du code pour cette app:
 ---
 
 ## 📌 Version et Date
-- **Version du document**: 1.3
+- **Version du document**: 1.5
 - **Date de création**: 1er janvier 2026
 - **Dernière mise à jour**: 1er janvier 2026
-- **État de l'app**: Production - Optimisé + Import/Export CSV
+- **État de l'app**: Production - Export/Import CSV fonctionnels
 
 ---
 

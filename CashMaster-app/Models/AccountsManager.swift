@@ -208,7 +208,10 @@ class AccountsManager: ObservableObject {
 	/// Génère un fichier CSV contenant toutes les transactions du compte sélectionné
 	/// - Returns: URL temporaire du fichier CSV généré, ou nil si erreur
 	func generateCSV() -> URL? {
-		guard let account = selectedAccount else { return nil }
+		guard let account = selectedAccount else {
+			print("❌ Aucun compte sélectionné pour l'export")
+			return nil
+		}
 		
 		let allTransactions = transactions().sorted { tx1, tx2 in
 			// Trier par date (les transactions sans date à la fin)
@@ -219,6 +222,11 @@ class AccountsManager: ObservableObject {
 			} else {
 				return false
 			}
+		}
+		
+		guard !allTransactions.isEmpty else {
+			print("⚠️ Aucune transaction à exporter")
+			return nil
 		}
 		
 		// Construire le CSV
@@ -232,21 +240,23 @@ class AccountsManager: ObservableObject {
 			let dateString = transaction.date.map { dateFormatter.string(from: $0) } ?? "N/A"
 			let type = transaction.amount >= 0 ? "Revenu" : "Dépense"
 			let amount = String(format: "%.2f", abs(transaction.amount))
-			let comment = transaction.comment.replacingOccurrences(of: ",", with: ";") // Éviter les conflits CSV
+			let comment = transaction.comment.replacingOccurrences(of: ",", with: ";")
 			let status = transaction.potentiel ? "Potentielle" : "Validée"
 			
 			csvText += "\(dateString),\(type),\(amount),\(comment),\(status)\n"
 		}
 		
 		// Sauvegarder dans un fichier temporaire
-		let fileName = "\(account)_transactions.csv"
+		let fileName = "\(account)_transactions_\(Date().timeIntervalSince1970).csv"
 		let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
 		
 		do {
 			try csvText.write(to: tempURL, atomically: true, encoding: .utf8)
+			print("✅ CSV généré avec succès: \(tempURL.path)")
+			print("📊 \(allTransactions.count) transactions exportées")
 			return tempURL
 		} catch {
-			print("Erreur lors de la génération du CSV: \(error.localizedDescription)")
+			print("❌ Erreur lors de la génération du CSV: \(error.localizedDescription)")
 			return nil
 		}
 	}

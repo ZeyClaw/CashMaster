@@ -35,7 +35,7 @@ struct ContentView: View {
 						.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
-								HStack(spacing: 16) {
+								HStack(spacing: 12) {
 									// Bouton Export CSV
 									Button {
 										if let url = accountsManager.generateCSV() {
@@ -45,18 +45,24 @@ struct ContentView: View {
 											showingExportErrorAlert = true
 										}
 									} label: {
-										Label("Exporter", systemImage: "square.and.arrow.up")
-											.labelStyle(.iconOnly)
-											.font(.title2)
+										Image(systemName: "square.and.arrow.up")
+											.font(.body)
+											.foregroundColor(.white)
+											.frame(width: 36, height: 36)
+											.background(.blue)
+											.clipShape(Circle())
 									}
 									
 									// Bouton Import CSV
 									Button {
 										showingDocumentPicker = true
 									} label: {
-										Label("Importer", systemImage: "square.and.arrow.down")
-											.labelStyle(.iconOnly)
-											.font(.title2)
+										Image(systemName: "square.and.arrow.down")
+											.font(.body)
+											.foregroundColor(.white)
+											.frame(width: 36, height: 36)
+											.background(.green)
+											.clipShape(Circle())
 									}
 								}
 							}
@@ -159,7 +165,7 @@ struct ContentView: View {
 		}
 		.sheet(isPresented: $showingShareSheet) {
 			if let url = csvFileURL {
-				ShareSheet(items: [url])
+				ActivityViewController(activityItems: [url])
 					.onDisappear {
 						showingExportAlert = true
 					}
@@ -229,4 +235,19 @@ struct ContentView_Previews: PreviewProvider {
 	static var previews: some View {
 		ContentView()
 	}
+}
+
+// Wrapper pour UIActivityViewController
+struct ActivityViewController: UIViewControllerRepresentable {
+	let activityItems: [Any]
+	
+	func makeUIViewController(context: Context) -> UIActivityViewController {
+		let controller = UIActivityViewController(
+			activityItems: activityItems,
+			applicationActivities: nil
+		)
+		return controller
+	}
+	
+	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
