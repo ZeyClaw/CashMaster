@@ -34,30 +34,30 @@ struct ContentView: View {
 					HomeView(accountsManager: accountsManager)
 						.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
 						.toolbar {
-							// Export CSV
 							ToolbarItem(placement: .navigationBarLeading) {
-								Button {
-									if let url = accountsManager.generateCSV() {
-										csvFileURL = url
-										showingShareSheet = true
-									} else {
-										showingExportErrorAlert = true
+								HStack(spacing: 12) {
+									// Bouton Export CSV
+									Button {
+										if let url = accountsManager.generateCSV() {
+											csvFileURL = url
+											showingShareSheet = true
+										} else {
+											showingExportErrorAlert = true
+										}
+									} label: {
+										Image(systemName: "square.and.arrow.up")
 									}
-								} label: {
-									Image(systemName: "square.and.arrow.up")
+									
+									// Bouton Import CSV
+									Button {
+										showingDocumentPicker = true
+									} label: {
+										Image(systemName: "square.and.arrow.down")
+									}
 								}
 							}
 
-							// Import CSV
-							ToolbarItem(placement: .navigationBarLeading) {
-								Button {
-									showingDocumentPicker = true
-								} label: {
-									Image(systemName: "square.and.arrow.down")
-								}
-							}
-
-							// Sélecteur de compte
+							// Bouton Sélection Compte
 							ToolbarItem(placement: .navigationBarTrailing) {
 								Button {
 									showingAccountPicker = true
