@@ -2,6 +2,15 @@
 
 ## 📑 Changelog
 
+### Version 1.7 - 1er janvier 2026
+**Amélioration TabBar style GitHub (liquid glass)**:
+- ✅ **4ème onglet "fantôme"**: Ajout d'un onglet "Ajouter" qui sert uniquement de bouton (pas de contenu)
+- ✅ **onChange detection**: Détection du tap sur l'onglet "Ajouter" pour afficher le sheet
+- ✅ **Retour automatique**: Retour immédiat à l'onglet précédent après le tap
+- ✅ **Liquid glass natif**: iOS applique automatiquement l'effet glass sur l'onglet
+- ✅ **Style GitHub authentique**: TabBar avec 3 onglets + 1 bouton d'action à droite
+- 🐛 **Fix variable inutilisée**: Remplacement de `account` par test booléen dans `importCSV()`
+
 ### Version 1.6 - 1er janvier 2026
 **Amélioration UI : Bouton d'ajout dans la TabBar**:
 - ✅ **Placement natif iOS**: Utilisation de `.toolbar` avec `placement: .bottomBar` (recommandation Apple)
@@ -216,14 +225,15 @@ ContentView (TabView)
 ### Point d'Entrée: `ContentView.swift` 🏠
 
 #### Structure
-- `TabView` avec 3 onglets principaux
+- `TabView` avec **4 onglets** (3 navigables + 1 bouton action)
+- Enum `Tab`: `.home`, `.calendrier`, `.potentielles`, `.add`
 - `@StateObject` pour `AccountsManager` (créé ici, propagé partout)
 - Gestion des sheets (modales):
   - `AccountPickerView`: Sélection/création de compte
   - `AddTransactionView`: Ajout de transaction
   - `ActivityViewController`: Partage du fichier CSV exporté
   - `DocumentPicker`: Sélection d'un fichier CSV à importer
-- **Bouton d'ajout dans TabBar** (`.toolbar` avec `.bottomBar`) présent sur chaque tab
+- **Onglet "Ajouter" fantôme** qui déclenche le sheet via `.onChange(of: tabSelection)`
 - **Boutons d'import/export CSV** (en haut à gauche sur Home) pour gérer les données
 - Logique de fallback si aucun compte sélectionné → `NoAccountView`
 
@@ -231,25 +241,40 @@ ContentView (TabView)
 1. **Home** (`HomeView`)
 2. **Calendrier** (`CalendrierTabView`)
 3. **Potentielles** (`PotentialTransactionsView`)
+4. **Ajouter** (onglet fantôme → ouvre `AddTransactionView`)
 
-#### Bouton d'Ajout de Transaction
+#### Mécanisme Onglet "Ajouter"
 ```swift
-ToolbarItem(placement: .bottomBar) {
-    Button {
+// Onglet fantôme (ne contient que Color.clear)
+Color.clear
+    .tabItem {
+        Label("Ajouter", systemImage: "plus.circle.fill")
+    }
+    .tag(Tab.add)
+
+// Détection du tap
+.onChange(of: tabSelection) { oldValue, newValue in
+    if newValue == .add {
         showingAddTransactionSheet = true
-    } label: {
-        Image(systemName: "plus.circle.fill")
-            .font(.title)
-            .symbolRenderingMode(.palette)
-            .foregroundStyle(.white, .blue)
+        // Retour immédiat à l'onglet précédent
+        DispatchQueue.main.async {
+            tabSelection = oldValue
+        }
     }
 }
 ```
 
+**Avantages**:
+- ✅ Effet liquid glass automatique (iOS 18)
+- ✅ Taille et espacement identiques aux autres onglets
+- ✅ TabBar se gère automatiquement (pas besoin de calcul manuel)
+- ✅ Style natif iOS recommandé par Apple
+- ✅ Exactement comme l'app GitHub
+
 **Rendu selon iOS**:
-- **iOS 18+**: Effet glass/liquid moderne, intégré élégamment dans la TabBar
-- **iOS 16-17**: Bouton standard dans la barre inférieure, fonctionnel
-- **iOS 15**: Compatible avec placement `.bottomBar`
+- **iOS 18+**: Effet glass/liquid moderne sur les 4 onglets
+- **iOS 16-17**: TabBar standard avec 4 onglets fonctionnels
+- **iOS 15**: Compatible avec `.onChange` modifier
 
 ---
 
@@ -555,18 +580,19 @@ WindowGroup {
 
 ### Composants Natifs Apple Utilisés
 - `Form`, `List`, `NavigationStack`, `TabView`
-- `Toolbar` avec placements: `.navigationBarLeading`, `.navigationBarTrailing`, `.bottomBar`
+- `Toolbar` avec placements: `.navigationBarLeading`, `.navigationBarTrailing`
 - `Picker` (segmented style)
 - `DatePicker` (graphical style)
 - `TextField` (décimal/text keyboards)
 - `swipeActions`, `contextMenu`
+- `.onChange` pour détecter les changements de tab
 - Couleurs système: `.systemGroupedBackground`, `.secondarySystemGroupedBackground`
 - Symboles SF Symbols
 
 ### Placement des Boutons
 - **TopBar Leading**: Import/Export CSV (Home uniquement)
 - **TopBar Trailing**: Sélection de compte (toutes les vues)
-- **BottomBar Trailing**: Ajout de transaction (toutes les vues avec compte)
+- **TabBar (4ème onglet)**: Ajout de transaction (onglet fantôme)
 
 ### Palette de Couleurs
 - **Positif**: `.green` (revenus, soldes positifs)
@@ -701,271 +727,11 @@ Utilisé lors du tap sur un widget shortcut
 
 ---
 
-## 📱 États de l'App
-
-### Scénarios d'Utilisation
-
-#### 1. Premier Lancement
-```
-ContentView
-└── NoAccountView
-    └── Bouton "Ajouter un compte"
-        → AccountPickerView
-            → Sheet "Nouveau Compte"
-                → Création + auto-sélection
-```
-
-#### 2. Navigation Standard
-```
-ContentView (selectedAccount != nil)
-├── HomeView avec widgets
-├── CalendrierTabView
-│   └── Navigation Years → Months → Transactions
-└── PotentialTransactionsView
-```
-
-#### 3. Multi-Comptes
-```
-Toolbar → Bouton "person.crop.circle"
-→ AccountPickerView
-    → Liste des comptes avec AccountCardView
-    → Swipe-to-delete
-    → Tap pour sélectionner
-```
-
----
-
-## 🧪 Cas Limites et Gestion d'Erreurs
-
-### Comptes
-- ✅ Si dernier compte supprimé → `selectedAccount = nil`
-- ✅ Si compte actuel supprimé → sélection du premier compte disponible
-- ✅ Prévention doublons: `guard managers[nom] == nil`
-
-### Transactions
-- ✅ Validation montant dans `AddTransactionView` (alerte si nil ou ≤ 0)
-- ✅ Validation montant dans `AddWidgetShortcutView` (alerte si nil ou ≤ 0)
-- ✅ Transactions potentielles: date forcée à nil
-- ✅ Swipe-to-delete avec confirmation pour widgets
-
-### Navigation
-- ✅ Années/mois sans transactions ne s'affichent pas
-- ✅ Fallback `NoAccountView` si pas de compte
-- ✅ Navigation Stack state managed via `@State private var path`
-
-### UI
-- ✅ Toast auto-dismiss après 2.5s
-- ✅ Drag velocity detection pour dismiss
-- ✅ Keyboard types appropriés (.decimalPad, .default)
-
----
-
-## 🏗️ Règles de Développement
-
-### ⚠️ Règles Impératives
-
-1. **JAMAIS modifier directement** `Transaction` ou `TransactionManager` sans passer par `AccountsManager`
-   - Raison: Seul `AccountsManager` notifie SwiftUI (`objectWillChange.send()`)
-
-2. **TOUJOURS** propager `accountsManager` via `@ObservedObject` dans les sous-vues
-
-3. **TOUJOURS** vérifier `selectedAccount != nil` avant d'accéder aux données d'un compte
-
-4. **TOUJOURS** appeler `save()` après modification de données dans `AccountsManager`
-
-5. **NE PAS** créer de transaction non potentielle sans date
-
-### ✅ Bonnes Pratiques
-
-1. **Computed Properties** pour les calculs dérivés (ex: `totalFuture`)
-
-2. **Private methods** pour la logique interne (`save()`, `load()`)
-
-3. **Noms en français** pour les labels utilisateur, code en anglais
-
-4. **Locale fr_FR** pour les formatages de dates/mois
-
-5. **SF Symbols** pour toutes les icônes
-
-6. **Animations Spring** pour les transitions fluides
-
-7. **Haptic Feedback** pour les actions importantes
-
-### 📐 Conventions de Nommage
-
-- **Vues**: `NomDescriptifView.swift`
-- **Models**: `NomSingulier.swift`
-- **Managers**: `NomManager.swift`
-- **Properties privées**: `private func verbeAction()`
-- **Properties published**: `@Published var nomPublic`
-
----
-
-## 🔄 Lifecycle et État
-
-### App Lifecycle
-```
-CashMasterApp.init()
-└── Notifications setup
-└── iCloud sync
-└── ContentView créé
-    └── AccountsManager init
-        └── load() depuis UserDefaults
-        └── Restauration selectedAccount
-```
-
-### View Lifecycle Key Moments
-```
-ContentView.onAppear
-└── Si selectedAccount == nil
-    └── accountsManager.selectedAccount = getAllAccounts().first
-
-HomeView.body (re-render triggers)
-└── @ObservedObject accountsManager changes
-    └── Re-computation des computed properties
-    └── Rafraîchissement UI
-```
-
----
-
-## 🎯 Points d'Extension Futurs
-
-### Suggestions d'Amélioration
-
-1. **Catégories de Transactions**
-   - Enum `TransactionCategory`
-   - Filtres par catégorie
-   - Stats par catégorie
-
-2. **Budgets**
-   - Définir budget mensuel
-   - Alertes de dépassement
-   - Progression visuelle
-
-3. **Export de Données**
-   - ✅ CSV export (implémenté)
-   - ✅ CSV import (implémenté)
-   - PDF reports
-   - iCloud Drive integration
-
-4. **Graphiques et Stats**
-   - Charts.framework (iOS 16+)
-   - Évolution temporelle
-   - Répartition revenus/dépenses
-
-5. **Récurrence**
-   - Transactions récurrentes auto-ajoutées
-   - Gestion des abonnements
-
-6. **Multi-devise**
-   - Support de devises multiples
-   - Taux de change
-
-7. **Widgets iOS**
-   - Home Screen widgets
-   - Lock Screen widgets (iOS 16+)
-
-8. **Backup Cloud**
-   - CloudKit full integration
-   - Restauration de backup
-
----
-
-## 📝 Checklist de Création de Nouvelles Fonctionnalités
-
-Lors de l'ajout d'une nouvelle fonctionnalité:
-
-- [ ] Déterminer si modification de données → Passer par `AccountsManager`
-- [ ] Ajouter `save()` + `objectWillChange.send()` si nécessaire
-- [ ] Mettre à jour `AccountData` si nouvelle propriété persistante
-- [ ] Créer computed properties pour calculs dérivés
-- [ ] Utiliser composants natifs SwiftUI autant que possible
-- [ ] Implémenter animations Spring pour transitions
-- [ ] Ajouter haptic feedback si action importante
-- [ ] Gérer les cas limites (compte vide, liste vide, etc.)
-- [ ] Tester avec plusieurs comptes
-- [ ] Vérifier la réactivité UI (modifications se reflètent immédiatement)
-- [ ] Locale fr_FR pour textes utilisateur
-- [ ] Accessibilité (labels, VoiceOver si applicable)
-
----
-
-## 🐛 Debugging et Maintenance
-
-### Points de Log Existants
-```swift
-NotificationManager.listScheduledNotifications()
-// → Logs des notifications programmées
-```
-
-### Commandes Utiles
-```swift
-// Reset notifications
-NotificationManager.shared.resetNotifications()
-
-// Inspecter données
-print(accountsManager.managers)
-print(accountsManager.transactions())
-```
-
----
-
-## 📚 Glossaire
-
-- **Transaction Potentielle**: Prévision future, non comptabilisée dans le solde actuel
-- **Transaction Validée**: Transaction réelle avec date, comptabilisée
-- **Widget Shortcut**: Bouton de raccourci pour créer rapidement une transaction récurrente
-- **Toast**: Notification temporaire en overlay
-- **AccountsManager**: Source unique de vérité, orchestrateur central
-- **TransactionManager**: Gestionnaire par compte (non-observable)
-- **Solde Actuel**: Total des transactions validées
-- **Solde Futur**: Solde actuel + transactions potentielles
-
----
-
-## 🎓 Pour une IA de Génération de Code
-
-### Consignes Essentielles
-
-Lorsque vous générez du code pour cette app:
-
-1. **Respectez le pattern de données centralisé**
-   - Toujours passer par `AccountsManager` pour les mutations
-   - Ne jamais bypass la couche d'abstraction
-
-2. **Maintenez la cohérence de style**
-   - SwiftUI déclaratif pur
-   - Computed properties pour les dérivations
-   - Animations Spring par défaut
-
-3. **Préservez la simplicité**
-   - Composants natifs Apple en priorité
-   - Évitez les dépendances externes
-   - Code minimal et lisible
-
-4. **Gardez la réactivité**
-   - `@Published` pour les propriétés observées
-   - `objectWillChange.send()` après mutations
-   - `@ObservedObject` dans les sous-vues
-
-5. **Respectez les conventions existantes**
-   - Nommage cohérent avec le code actuel
-   - Structure de dossiers respectée
-   - Patterns de navigation maintenus
-
-6. **Testez mentalement les cas limites**
-   - Compte vide
-   - Liste vide
-   - Transitions d'état
-   - Multi-comptes
-
----
-
 ## 📌 Version et Date
-- **Version du document**: 1.6
+- **Version du document**: 1.7
 - **Date de création**: 1er janvier 2026
 - **Dernière mise à jour**: 1er janvier 2026
-- **État de l'app**: Production - Bouton d'ajout intégré dans TabBar (style iOS 18)
+- **État de l'app**: Production - Bouton d'ajout style GitHub avec liquid glass
 
 ---
 

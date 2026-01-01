@@ -263,7 +263,7 @@ class AccountsManager: ObservableObject {
 	
 	// MARK: - Import CSV
 	func importCSV(from url: URL) -> Int {
-		guard let account = selectedAccount else {
+		guard selectedAccount != nil else {
 			print("❌ Aucun compte sélectionné")
 			return 0
 		}

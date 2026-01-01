@@ -21,43 +21,58 @@ struct ContentView: View {
 	@State private var showingExportErrorAlert = false
 	@State private var tabSelection: Tab = .home
 	
-	enum Tab {
-		case home, calendrier, potentielles
+	enum Tab: Hashable {
+		case home, calendrier, potentielles, add
 	}
 	
 	var body: some View {
 		TabView(selection: $tabSelection) {
 			
 			// Home
-			NavigationStack {
-				if let _ = accountsManager.selectedAccount {
-					HomeView(accountsManager: accountsManager)
-						.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								HStack(spacing: 12) {
-									// Bouton Export CSV
-									Button {
-										if let url = accountsManager.generateCSV() {
-											csvFileURL = url
-											showingShareSheet = true
-										} else {
-											showingExportErrorAlert = true
+			Tab(value: Tab.home) {
+				NavigationStack {
+					if let _ = accountsManager.selectedAccount {
+						HomeView(accountsManager: accountsManager)
+							.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
+							.toolbar {
+								ToolbarItem(placement: .navigationBarLeading) {
+									HStack(spacing: 50) {
+										// Bouton Export CSV
+										Button {
+											if let url = accountsManager.generateCSV() {
+												csvFileURL = url
+												showingShareSheet = true
+											} else {
+												showingExportErrorAlert = true
+											}
+										} label: {
+											Image(systemName: "square.and.arrow.up")
+												.frame(width: 36, height: 36)
 										}
-									} label: {
-										Image(systemName: "square.and.arrow.up")
+										
+										// Bouton Import CSV
+										Button {
+											showingDocumentPicker = true
+										} label: {
+											Image(systemName: "square.and.arrow.down")
+												.frame(width: 36, height: 36)
+										}
 									}
-									
-									// Bouton Import CSV
+								}
+
+								// Bouton Sélection Compte
+								ToolbarItem(placement: .navigationBarTrailing) {
 									Button {
-										showingDocumentPicker = true
+										showingAccountPicker = true
 									} label: {
-										Image(systemName: "square.and.arrow.down")
+										Image(systemName: "person.crop.circle")
+											.font(.title2)
 									}
 								}
 							}
-
-							// Bouton Sélection Compte
+					} else {
+						NoAccountView(accountsManager: accountsManager)
+						.toolbar {
 							ToolbarItem(placement: .navigationBarTrailing) {
 								Button {
 									showingAccountPicker = true
@@ -66,44 +81,30 @@ struct ContentView: View {
 										.font(.title2)
 								}
 							}
-							
-							// Bouton Ajouter Transaction (dans la TabBar)
-							ToolbarItem(placement: .bottomBar) {
-								Spacer()
-							}
-							
-							ToolbarItem(placement: .bottomBar) {
-								Button {
-									showingAddTransactionSheet = true
-								} label: {
-									Image(systemName: "plus.circle.fill")
-										.font(.title)
-										.symbolRenderingMode(.palette)
-										.foregroundStyle(.white, .blue)
-								}
-							}
-						}
-				} else {
-					NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
 						}
 					}
 				}
+			} label: {
+				Label("Home", systemImage: "house")
 			}
-			.tabItem { Label("Home", systemImage: "house") }
-			.tag(Tab.home)
 			
 			// Calendrier
-			NavigationStack {
-				if let _ = accountsManager.selectedAccount {
-					CalendrierTabView(accountsManager: accountsManager)
+			Tab(value: Tab.calendrier) {
+				NavigationStack {
+					if let _ = accountsManager.selectedAccount {
+						CalendrierTabView(accountsManager: accountsManager)
+							.toolbar {
+								ToolbarItem(placement: .navigationBarTrailing) {
+									Button {
+										showingAccountPicker = true
+									} label: {
+										Image(systemName: "person.crop.circle")
+											.font(.title2)
+									}
+								}
+							}
+					} else {
+						NoAccountView(accountsManager: accountsManager)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarTrailing) {
 								Button {
@@ -113,45 +114,31 @@ struct ContentView: View {
 										.font(.title2)
 								}
 							}
-							
-							// Bouton Ajouter Transaction (dans la TabBar)
-							ToolbarItem(placement: .bottomBar) {
-								Spacer()
-							}
-							
-							ToolbarItem(placement: .bottomBar) {
-								Button {
-									showingAddTransactionSheet = true
-								} label: {
-									Image(systemName: "plus.circle.fill")
-										.font(.title)
-										.symbolRenderingMode(.palette)
-										.foregroundStyle(.white, .blue)
-								}
-							}
-						}
-				} else {
-					NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
 						}
 					}
 				}
+			} label: {
+				Label("Calendrier", systemImage: "calendar")
 			}
-			.tabItem { Label("Calendrier", systemImage: "calendar") }
-			.tag(Tab.calendrier)
 			
 			// Potentielles
-			NavigationStack {
-				if let _ = accountsManager.selectedAccount {
-					PotentialTransactionsView(accountsManager: accountsManager)
-						.navigationTitle("Potentielles")
+			Tab(value: Tab.potentielles) {
+				NavigationStack {
+					if let _ = accountsManager.selectedAccount {
+						PotentialTransactionsView(accountsManager: accountsManager)
+							.navigationTitle("Potentielles")
+							.toolbar {
+								ToolbarItem(placement: .navigationBarTrailing) {
+									Button {
+										showingAccountPicker = true
+									} label: {
+										Image(systemName: "person.crop.circle")
+											.font(.title2)
+									}
+								}
+							}
+					} else {
+						NoAccountView(accountsManager: accountsManager)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarTrailing) {
 								Button {
@@ -161,39 +148,31 @@ struct ContentView: View {
 										.font(.title2)
 								}
 							}
-							
-							// Bouton Ajouter Transaction (dans la TabBar)
-							ToolbarItem(placement: .bottomBar) {
-								Spacer()
-							}
-							
-							ToolbarItem(placement: .bottomBar) {
-								Button {
-									showingAddTransactionSheet = true
-								} label: {
-									Image(systemName: "plus.circle.fill")
-										.font(.title)
-										.symbolRenderingMode(.palette)
-										.foregroundStyle(.white, .blue)
-								}
-							}
-						}
-				} else {
-					NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
 						}
 					}
 				}
+			} label: {
+				Label("Potentielles", systemImage: "clock.arrow.circlepath")
 			}
-			.tabItem { Label("Potentielles", systemImage: "clock.arrow.circlepath") }
-			.tag(Tab.potentielles)
+			
+			// Bouton Ajouter avec role search (séparé visuellement)
+			Tab(value: Tab.add, role: .search) {
+				Color.clear
+			} label: {
+				Label("", systemImage: "plus.circle.fill")
+			}
+		}
+		.onChange(of: tabSelection) { oldValue, newValue in
+			// Si l'utilisateur tape sur l'onglet "Ajouter"
+			if newValue == .add {
+				if accountsManager.selectedAccount != nil {
+					showingAddTransactionSheet = true
+				}
+				// Revenir immédiatement à l'onglet précédent
+				DispatchQueue.main.async {
+					tabSelection = oldValue
+				}
+			}
 		}
 		.sheet(isPresented: $showingAccountPicker) {
 			AccountPickerView(accountsManager: accountsManager)
@@ -249,9 +228,6 @@ struct ContentView: View {
 		}
 	}
 }
-
-
-
 
 // Prévisualisation
 struct ContentView_Previews: PreviewProvider {
