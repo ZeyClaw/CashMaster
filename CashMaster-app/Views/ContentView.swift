@@ -7,18 +7,10 @@
 
 import SwiftUI
 
+/// Vue racine de l'application avec TabView principale
 struct ContentView: View {
 	@StateObject private var accountsManager = AccountsManager()
-	@State private var showingAccountPicker = false
 	@State private var showingAddTransactionSheet = false
-	@State private var showingShareSheet = false
-	@State private var showingDocumentPicker = false
-	@State private var csvFileURL: URL?
-	@State private var importedCount: Int = 0
-	@State private var showingImportAlert = false
-	@State private var showingExportAlert = false
-	@State private var showingImportErrorAlert = false
-	@State private var showingExportErrorAlert = false
 	@State private var tabSelection: Tab = .home
 	
 	enum Tab: Hashable {
@@ -27,41 +19,28 @@ struct ContentView: View {
 	
 	var body: some View {
 		TabView(selection: $tabSelection) {
-			// Home
+			// Onglet Home
 			Tab(value: Tab.home) {
-				HomeTabContent(
-					accountsManager: accountsManager,
-					showingAccountPicker: $showingAccountPicker,
-					csvFileURL: $csvFileURL,
-					showingShareSheet: $showingShareSheet,
-					showingExportErrorAlert: $showingExportErrorAlert,
-					showingDocumentPicker: $showingDocumentPicker
-				)
+				HomeTabView(accountsManager: accountsManager)
 			} label: {
 				Label("Home", systemImage: "house")
 			}
 			
-			// Calendrier
+			// Onglet Calendrier
 			Tab(value: Tab.calendrier) {
-				CalendrierTabContent(
-					accountsManager: accountsManager,
-					showingAccountPicker: $showingAccountPicker
-				)
+				CalendrierMainView(accountsManager: accountsManager)
 			} label: {
 				Label("Calendrier", systemImage: "calendar")
 			}
 			
-			// Potentielles
+			// Onglet Potentielles
 			Tab(value: Tab.potentielles) {
-				PotentiellesTabContent(
-					accountsManager: accountsManager,
-					showingAccountPicker: $showingAccountPicker
-				)
+				PotentiellesTabView(accountsManager: accountsManager)
 			} label: {
 				Label("Potentielles", systemImage: "clock.arrow.circlepath")
 			}
 			
-			// Bouton Ajouter avec role search (séparé visuellement)
+			// Bouton Ajouter avec role search (séparé visuellement à droite)
 			Tab(value: Tab.add, role: .search) {
 				Color.clear
 			} label: {
@@ -69,6 +48,7 @@ struct ContentView: View {
 			}
 		}
 		.onChange(of: tabSelection) { oldValue, newValue in
+			// Détection du tap sur l'onglet "Ajouter"
 			if newValue == .add {
 				if accountsManager.selectedAccount != nil {
 					showingAddTransactionSheet = true
@@ -79,54 +59,13 @@ struct ContentView: View {
 				}
 			}
 		}
-		.sheet(isPresented: $showingAccountPicker) {
-			AccountPickerView(accountsManager: accountsManager)
-		}
 		.sheet(isPresented: $showingAddTransactionSheet) {
 			if accountsManager.selectedAccount != nil {
 				AddTransactionView(accountsManager: accountsManager)
 			}
 		}
-		.sheet(isPresented: $showingShareSheet) {
-			if let url = csvFileURL {
-				ActivityViewController(activityItems: [url])
-					.onDisappear {
-						showingExportAlert = true
-					}
-			}
-		}
-		.sheet(isPresented: $showingDocumentPicker) {
-			DocumentPicker { url in
-				let count = accountsManager.importCSV(from: url)
-				importedCount = count
-				if count > 0 {
-					showingImportAlert = true
-				} else {
-					showingImportErrorAlert = true
-				}
-			}
-		}
-		.alert("Export réussi", isPresented: $showingExportAlert) {
-			Button("OK", role: .cancel) {}
-		} message: {
-			Text("Fichier CSV exporté avec succès.")
-		}
-		.alert("Erreur d'export", isPresented: $showingExportErrorAlert) {
-			Button("OK", role: .cancel) {}
-		} message: {
-			Text("Impossible de générer le fichier CSV.")
-		}
-		.alert("Import réussi", isPresented: $showingImportAlert) {
-			Button("OK", role: .cancel) {}
-		} message: {
-			Text("\(importedCount) transaction(s) importée(s) avec succès.")
-		}
-		.alert("Erreur d'import", isPresented: $showingImportErrorAlert) {
-			Button("OK", role: .cancel) {}
-		} message: {
-			Text("Aucune transaction n'a pu être importée. Vérifiez le format du fichier CSV.")
-		}
 		.onAppear {
+			// Auto-sélection du premier compte si aucun n'est sélectionné
 			if accountsManager.selectedAccount == nil {
 				accountsManager.selectedAccount = accountsManager.getAllAccounts().first
 			}
@@ -134,163 +73,6 @@ struct ContentView: View {
 	}
 }
 
-// MARK: - Home Tab Content
-struct HomeTabContent: View {
-	@ObservedObject var accountsManager: AccountsManager
-	@Binding var showingAccountPicker: Bool
-	@Binding var csvFileURL: URL?
-	@Binding var showingShareSheet: Bool
-	@Binding var showingExportErrorAlert: Bool
-	@Binding var showingDocumentPicker: Bool
-	
-	var body: some View {
-		NavigationStack {
-			if accountsManager.selectedAccount != nil {
-				HomeView(accountsManager: accountsManager)
-					.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							HStack(spacing: 50) {
-								// Bouton Export CSV
-								Button {
-									if let url = accountsManager.generateCSV() {
-										csvFileURL = url
-										showingShareSheet = true
-									} else {
-										showingExportErrorAlert = true
-									}
-								} label: {
-									Image(systemName: "square.and.arrow.up")
-										.frame(width: 36, height: 36)
-								}
-								
-								// Bouton Import CSV
-								Button {
-									showingDocumentPicker = true
-								} label: {
-									Image(systemName: "square.and.arrow.down")
-										.frame(width: 36, height: 36)
-								}
-							}
-						}
-						
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
-						}
-					}
-			} else {
-				NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
-						}
-					}
-			}
-		}
-	}
-}
-
-// MARK: - Calendrier Tab Content
-struct CalendrierTabContent: View {
-	@ObservedObject var accountsManager: AccountsManager
-	@Binding var showingAccountPicker: Bool
-	
-	var body: some View {
-		NavigationStack {
-			if accountsManager.selectedAccount != nil {
-				CalendrierTabView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
-						}
-					}
-			} else {
-				NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
-						}
-					}
-			}
-		}
-	}
-}
-
-// MARK: - Potentielles Tab Content
-struct PotentiellesTabContent: View {
-	@ObservedObject var accountsManager: AccountsManager
-	@Binding var showingAccountPicker: Bool
-	
-	var body: some View {
-		NavigationStack {
-			if accountsManager.selectedAccount != nil {
-				PotentialTransactionsView(accountsManager: accountsManager)
-					.navigationTitle("Potentielles")
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
-						}
-					}
-			} else {
-				NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.font(.title2)
-							}
-						}
-					}
-			}
-		}
-	}
-}
-
-// MARK: - Previews
-struct ContentView_Previews: PreviewProvider {
-	static var previews: some View {
-		ContentView()
-	}
-}
-
-// MARK: - Activity View Controller
-struct ActivityViewController: UIViewControllerRepresentable {
-	let activityItems: [Any]
-	
-	func makeUIViewController(context: Context) -> UIActivityViewController {
-		let controller = UIActivityViewController(
-			activityItems: activityItems,
-			applicationActivities: nil
-		)
-		return controller
-	}
-	
-	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+#Preview {
+	ContentView()
 }

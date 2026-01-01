@@ -2,6 +2,19 @@
 
 ## 📑 Changelog
 
+### Version 1.9 - 1er janvier 2026
+**Refactoring Architecture Majeur : Séparation complète des Tabs**:
+- ✅ **Architecture modulaire**: Chaque tab dans son propre fichier (recommandation Apple)
+- ✅ **Création de `HomeTabView.swift`**: Vue complète de l'onglet Home avec toolbar et gestion CSV
+- ✅ **Création de `PotentiellesTabView.swift`**: Vue complète de l'onglet Potentielles avec toolbar
+- ✅ **Création de `CalendrierMainView.swift`**: Vue wrapper pour l'onglet Calendrier avec toolbar
+- ✅ **Simplification drastique de `ContentView.swift`**: Réduit à 80 lignes (vs 300+), uniquement TabView
+- ✅ **Fix erreur compilation définitif**: "unable to type-check this expression" résolu par séparation
+- ✅ **Performances optimales**: Compilation plus rapide, code type-checkable instantanément
+- ✅ **Maintenabilité maximale**: Un fichier = une responsabilité claire
+- ✅ **ActivityViewController déplacé**: Maintenant dans `HomeTabView.swift` où il est utilisé
+- 📝 **Code style Apple**: Simple, fiable, modulaire avec UI liquid glass native
+
 ### Version 1.8 - 1er janvier 2026
 **Refactoring Architecture : Sous-composants pour performances**:
 - ✅ **Extraction des Tab Contents**: Création de `HomeTabContent`, `CalendrierTabContent`, `PotentiellesTabContent`
@@ -94,9 +107,21 @@ CashMaster-app/
 ├── Notifications.swift          # Gestion des notifications
 ├── Models/                      # Couche de données
 ├── Views/                       # Couche de présentation
+│   ├── ContentView.swift        # TabView principale (root)
 │   ├── Account/                 # Composants de gestion des comptes
 │   ├── TabView/                 # Onglets principaux
-│   │   └── Calendrier/          # Navigation calendaire
+│   │   ├── HomeTabView.swift           # Onglet Home complet avec toolbar
+│   │   ├── PotentiellesTabView.swift   # Onglet Potentielles complet avec toolbar
+│   │   ├── HomeView.swift              # Contenu de l'écran Home
+│   │   ├── PotentialTransactionsView.swift  # Contenu de l'écran Potentielles
+│   │   └── Calendrier/                 # Navigation calendaire
+│   │       ├── CalendrierMainView.swift    # Wrapper onglet Calendrier avec toolbar
+│   │       ├── CalendrierTabView.swift     # Contenu de l'écran Calendrier
+│   │       ├── YearsView.swift
+│   │       ├── MonthsView.swift
+│   │       ├── TransactionsListView.swift
+│   │       ├── TransactionRow.swift
+│   │       └── CalendrierRoute.swift
 │   └── Widget/                  # Raccourcis et Toasts
 │       └── Toast/               # Système de notifications
 ├── Assets.xcassets/             # Ressources visuelles
@@ -221,71 +246,80 @@ Permet de créer instantanément une transaction validée (date = `Date()`) depu
 
 ### Architecture de Navigation
 ```
-ContentView (TabView)
-├── Tab 1: HomeView
-├── Tab 2: CalendrierTabView → NavigationStack
+ContentView (TabView racine - 80 lignes)
+├── Tab 1: HomeTabView → NavigationStack → HomeView
+├── Tab 2: CalendrierMainView → NavigationStack → CalendrierTabView
 │   └── YearsView → MonthsView → TransactionsListView
-└── Tab 3: PotentialTransactionsView
+├── Tab 3: PotentiellesTabView → NavigationStack → PotentialTransactionsView
+└── Tab 4: Bouton "+" (role: .search) → Sheet AddTransactionView
 ```
+
+**Principe de séparation**:
+- **ContentView**: Uniquement TabView + gestion du bouton "+"
+- **[Tab]TabView**: Navigation + Toolbar + Sheets pour chaque tab
+- **[Tab]View**: Contenu réel de la tab (UI)
 
 ---
 
 ### Point d'Entrée: `ContentView.swift` 🏠
 
-#### Structure
+#### Structure (Version 1.9 - Simplifiée)
 - `TabView` avec **4 onglets** (3 navigables + 1 bouton action)
 - Enum `Tab: Hashable`: `.home`, `.calendrier`, `.potentielles`, `.add`
 - `@StateObject` pour `AccountsManager` (créé ici, propagé partout)
-- **Sous-composants extraits** pour performances:
-  - `HomeTabContent`: Contenu de l'onglet Home
-  - `CalendrierTabContent`: Contenu de l'onglet Calendrier
-  - `PotentiellesTabContent`: Contenu de l'onglet Potentielles
-- Gestion des sheets (modales):
-  - `AccountPickerView`: Sélection/création de compte
-  - `AddTransactionView`: Ajout de transaction
-  - `ActivityViewController`: Partage du fichier CSV exporté
-  - `DocumentPicker`: Sélection d'un fichier CSV à importer
-- **Onglet "Ajouter"** avec `Tab(value:role: .search)` pour séparation visuelle
-- **Boutons d'import/export CSV** (en haut à gauche sur Home) pour gérer les données
+- **80 lignes** (vs 300+ avant) - Compilable instantanément
+- Gestion minimale:
+  - Sheet `AddTransactionView` (déclenchée par onglet .add)
+  - Auto-sélection du premier compte au démarrage
+- **Onglet "Ajouter"** avec `Tab(value: .add, role: .search)` pour séparation visuelle
 
-#### Sous-composants Tab
-
-##### `HomeTabContent`
+#### Code simplifié
 ```swift
-struct HomeTabContent: View {
-    @ObservedObject var accountsManager: AccountsManager
-    @Binding var showingAccountPicker: Bool
-    @Binding var csvFileURL: URL?
-    @Binding var showingShareSheet: Bool
-    @Binding var showingExportErrorAlert: Bool
-    @Binding var showingDocumentPicker: Bool
-    // ...
-}
-```
-
-##### `CalendrierTabContent`
-```swift
-struct CalendrierTabContent: View {
-    @ObservedObject var accountsManager: AccountsManager
-    @Binding var showingAccountPicker: Bool
-    // ...
-}
-```
-
-##### `PotentiellesTabContent`
-```swift
-struct PotentiellesTabContent: View {
-    @ObservedObject var accountsManager: AccountsManager
-    @Binding var showingAccountPicker: Bool
-    // ...
+struct ContentView: View {
+    @StateObject private var accountsManager = AccountsManager()
+    @State private var showingAddTransactionSheet = false
+    @State private var tabSelection: Tab = .home
+    
+    var body: some View {
+        TabView(selection: $tabSelection) {
+            Tab(value: .home) {
+                HomeTabView(accountsManager: accountsManager)
+            } label: { Label("Home", systemImage: "house") }
+            
+            Tab(value: .calendrier) {
+                CalendrierMainView(accountsManager: accountsManager)
+            } label: { Label("Calendrier", systemImage: "calendar") }
+            
+            Tab(value: .potentielles) {
+                PotentiellesTabView(accountsManager: accountsManager)
+            } label: { Label("Potentielles", systemImage: "clock.arrow.circlepath") }
+            
+            Tab(value: .add, role: .search) {
+                Color.clear
+            } label: { Label("", systemImage: "plus.circle.fill") }
+        }
+        .onChange(of: tabSelection) { oldValue, newValue in
+            if newValue == .add {
+                if accountsManager.selectedAccount != nil {
+                    showingAddTransactionSheet = true
+                }
+                DispatchQueue.main.async { tabSelection = oldValue }
+            }
+        }
+        .sheet(isPresented: $showingAddTransactionSheet) {
+            if accountsManager.selectedAccount != nil {
+                AddTransactionView(accountsManager: accountsManager)
+            }
+        }
+    }
 }
 ```
 
 **Avantages de cette architecture**:
-- ✅ **Performances**: Compilation plus rapide, type-checking simplifié
-- ✅ **Maintenabilité**: Code séparé par onglet, plus facile à modifier
-- ✅ **Réutilisabilité**: Chaque Tab Content est autonome
-- ✅ **Testabilité**: Possibilité de tester chaque onglet indépendamment
+- ✅ **Performances optimales**: Type-checking instantané, compilation ultra-rapide
+- ✅ **Maintenabilité maximale**: Séparation claire des responsabilités
+- ✅ **Simplicité**: ContentView fait une seule chose - gérer la TabView
+- ✅ **Testabilité**: Chaque composant peut être testé indépendamment
 
 #### Mécanisme Onglet "Ajouter"
 ```swift
@@ -316,9 +350,32 @@ Tab(value: Tab.add, role: .search) {
 
 ---
 
-### Tab 1: Home - `HomeView.swift` 🏡
+### Tab 1: `HomeTabView.swift` → `HomeView.swift` 🏡
 
-#### Sections
+#### `HomeTabView.swift` (Wrapper avec Navigation)
+**Rôle**: Vue wrapper de l'onglet Home avec NavigationStack, toolbar et gestion CSV
+
+**Responsabilités**:
+- NavigationStack et titre
+- Toolbar avec boutons Import/Export (en haut à gauche) et Account (en haut à droite)
+- Gestion des sheets: `AccountPickerView`, `ActivityViewController`, `DocumentPicker`
+- Gestion des alertes: Import/Export succès/erreur
+- Méthodes: `exportCSV()`, `importCSV(from:)`
+
+**States**:
+```swift
+@State private var showingAccountPicker = false
+@State private var showingShareSheet = false
+@State private var showingDocumentPicker = false
+@State private var csvFileURL: URL?
+@State private var importedCount: Int = 0
+// + alertes booléennes
+```
+
+#### `HomeView.swift` (Contenu)
+**Rôle**: Contenu réel de l'écran Home (affiché par HomeTabView)
+
+**Sections**:
 1. **Carte Solde Total**
    - Solde actuel (transactions validées)
    - Solde futur (actuel + potentielles)
@@ -335,7 +392,7 @@ Tab(value: Tab.add, role: .search) {
    - Context menu pour supprimer
    - **Toast de confirmation** après ajout de transaction
 
-#### Computed Properties
+**Computed Properties**:
 ```swift
 private var totalCurrent: Double?
 private var totalPotentiel: Double?
@@ -344,7 +401,7 @@ private var currentMonthName: String
 private var currentMonthSolde: Double
 ```
 
-#### Système de Toast
+**Système de Toast**:
 ```swift
 @State private var toasts: [ToastData] = []
 private func addToast(message: String)
@@ -357,18 +414,29 @@ private func removeToast(id: UUID)
 
 ---
 
-### Tab 2: Calendrier - `CalendrierTabView.swift` 📅
+### Tab 2: `CalendrierMainView.swift` → `CalendrierTabView.swift` 📅
 
-#### Navigation Hiérarchique
+#### `CalendrierMainView.swift` (Wrapper avec Navigation)
+**Rôle**: Vue wrapper de l'onglet Calendrier avec NavigationStack et toolbar
+
+**Responsabilités**:
+- NavigationStack externe
+- Toolbar avec bouton Account (en haut à droite)
+- Sheet `AccountPickerView`
+- Gestion du cas "No Account"
+
+#### `CalendrierTabView.swift` (Contenu)
+**Rôle**: Gestion de la navigation calendaire hiérarchique
+
+**Navigation Hiérarchique**:
 ```
-CalendrierTabView
-└── NavigationStack avec enum CalendrierRoute
+CalendrierTabView (pas de NavigationStack, géré par CalendrierMainView)
     ├── YearsView (racine)
     ├── MonthsView (année spécifique)
     └── TransactionsListView (mois spécifique)
 ```
 
-#### Enum de Navigation: `CalendrierRoute`
+**Enum de Navigation**: `CalendrierRoute`
 ```swift
 enum CalendrierRoute: Hashable {
     case months(year: Int)
@@ -376,32 +444,34 @@ enum CalendrierRoute: Hashable {
 }
 ```
 
-#### 2.1 `YearsView.swift`
-- Liste des années disponibles (ayant des transactions)
-- Affichage du total par année
-- Navigation vers `MonthsView`
-
-#### 2.2 `MonthsView.swift`
-- Liste des 12 mois (filtrés: seuls ceux avec transactions != 0)
-- Total par mois avec couleur
-- Noms de mois en français (locale `fr_FR`)
-- Navigation vers `TransactionsListView`
-
-#### 2.3 `TransactionsListView.swift`
-- Liste des transactions pour le mois/année donnés
-- Swipe-to-delete
-- `TransactionRow` pour l'affichage
+**Sous-vues**:
+- **YearsView**: Liste des années avec transactions + total par année
+- **MonthsView**: Liste des 12 mois (filtrés si total != 0) + total par mois
+- **TransactionsListView**: Liste des transactions d'un mois spécifique
 
 ---
 
-### Tab 3: Potentielles - `PotentialTransactionsView.swift` ⏱️
+### Tab 3: `PotentiellesTabView.swift` → `PotentialTransactionsView.swift` ⏱️
 
-#### Fonctionnalités
-- Liste des transactions potentielles uniquement
+#### `PotentiellesTabView.swift` (Wrapper avec Navigation)
+**Rôle**: Vue wrapper de l'onglet Potentielles avec NavigationStack et toolbar
+
+**Responsabilités**:
+- NavigationStack et titre "Potentielles"
+- Toolbar avec bouton Account (en haut à droite)
+- Sheet `AccountPickerView`
+- Gestion du cas "No Account"
+
+#### `PotentialTransactionsView.swift` (Contenu)
+**Rôle**: Liste des transactions potentielles avec swipe actions
+
+**Fonctionnalités**:
+- Liste des transactions potentielles uniquement (`accountsManager.potentialTransactions()`)
 - **Swipe Actions**:
   - Droite (rouge): Supprimer
   - Gauche (vert): Valider (date = `Date()`)
 - Message si vide: "Aucune transaction potentielle"
+- Utilise `TransactionRow` pour l'affichage
 
 ---
 
@@ -525,7 +595,7 @@ Row standard pour afficher une transaction
 - Montant (vert/rouge)
 
 #### `ActivityViewController.swift` 📤
-Wrapper SwiftUI pour `UIActivityViewController`
+Wrapper SwiftUI pour `UIActivityViewController` (situé dans `HomeTabView.swift`)
 
 **Rôle**: Permet de partager/exporter des fichiers de manière native iOS
 
