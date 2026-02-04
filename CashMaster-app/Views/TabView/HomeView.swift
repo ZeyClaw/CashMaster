@@ -15,6 +15,7 @@ struct HomeView: View {
 	@State private var showingDeleteConfirmation = false
 	@State private var toasts: [ToastData] = []
 	@State private var navigateToCurrentMonth = false
+	@State private var navigateToPotentielles = false
 	
 	private var totalCurrent: Double? {
 		guard let selectedAccount = accountsManager.selectedAccount else {
@@ -111,9 +112,9 @@ struct HomeView: View {
 								ZStack {
 									Circle()
 										.fill(Color.blue.opacity(0.1))
-										.frame(width: 32, height: 32)
+										.frame(width: 40, height: 40)
 									Image(systemName: "banknote")
-										.font(.system(size: 16))
+										.font(.system(size: 18))
 										.foregroundStyle(.blue)
 								}
 								
@@ -128,7 +129,7 @@ struct HomeView: View {
 										.foregroundStyle(.primary)
 								}
 							}
-							.padding(16)
+							.padding(12)
 							.frame(maxWidth: .infinity, minHeight: 140)
 							.background(Color(UIColor.secondarySystemGroupedBackground))
 							.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -136,35 +137,40 @@ struct HomeView: View {
 						}
 						.buttonStyle(PlainButtonStyle())
 						
-						// Carte Achats Futurs
-						VStack(alignment: .leading, spacing: 0) {
-							ZStack {
-								Circle()
-									.fill(Color.orange.opacity(0.1))
-									.frame(width: 32, height: 32)
-								Image(systemName: "cart")
-									.font(.system(size: 16))
-									.foregroundStyle(.orange)
-							}
-							
-							Spacer()
-							
-							VStack(alignment: .leading, spacing: 2) {
-								Text("Achats futurs")
-									.font(.system(size: 13, weight: .medium))
-									.foregroundStyle(.secondary)
-								if let totalPotentiel = totalPotentiel {
-									Text("\(totalPotentiel, specifier: "%.2f") €")
-										.font(.system(size: 17, weight: .bold))
-										.foregroundStyle(.primary)
+						// Carte Achats Futurs (cliquable)
+						Button {
+							navigateToPotentielles = true
+						} label: {
+							VStack(alignment: .leading, spacing: 0) {
+								ZStack {
+									Circle()
+										.fill(Color.orange.opacity(0.1))
+										.frame(width: 40, height: 40)
+									Image(systemName: "cart")
+										.font(.system(size: 18))
+										.foregroundStyle(.orange)
+								}
+								
+								Spacer()
+								
+								VStack(alignment: .leading, spacing: 2) {
+									Text("Achats futurs")
+										.font(.system(size: 13, weight: .medium))
+										.foregroundStyle(.secondary)
+									if let totalPotentiel = totalPotentiel {
+										Text("\(totalPotentiel, specifier: "%.2f") €")
+											.font(.system(size: 17, weight: .bold))
+											.foregroundStyle(.primary)
+									}
 								}
 							}
+							.padding(12)
+							.frame(maxWidth: .infinity, minHeight: 140)
+							.background(Color(UIColor.secondarySystemGroupedBackground))
+							.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+							.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
 						}
-						.padding(16)
-						.frame(maxWidth: .infinity, minHeight: 140)
-						.background(Color(UIColor.secondarySystemGroupedBackground))
-						.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-						.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
+						.buttonStyle(PlainButtonStyle())
 					}
 					.padding(.horizontal, 20)
 					
@@ -288,6 +294,9 @@ struct HomeView: View {
 				month: currentMonth,
 				year: currentYear
 			)
+		}
+		.navigationDestination(isPresented: $navigateToPotentielles) {
+			PotentialTransactionsView(accountsManager: accountsManager)
 		}
 	}
 }

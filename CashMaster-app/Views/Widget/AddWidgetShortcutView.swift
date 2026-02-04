@@ -14,7 +14,7 @@ struct AddWidgetShortcutView: View {
 	@State private var amount: Double?
 	@State private var comment = ""
 	@State private var type: TransactionType = .income
-	@State private var selectedStyle: ShortcutStyle = .expense
+	@State private var selectedStyle: ShortcutStyle = .income
 	@State private var showError = false
 	
 	var body: some View {
