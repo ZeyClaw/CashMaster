@@ -258,9 +258,14 @@ struct HomeView: View {
 												.font(.system(size: 12, weight: .medium))
 												.foregroundStyle(.secondary)
 												.lineLimit(1)
-											Text("\(shortcut.amount, specifier: "%.2f") €")
-												.font(.system(size: 14, weight: .bold))
-												.foregroundStyle(.primary)
+											HStack(spacing: 2) {
+												Text(shortcut.type == .income ? "+" : "−")
+													.font(.system(size: 14, weight: .bold))
+													.foregroundStyle(shortcut.type == .income ? .green : .red)
+												Text("\(shortcut.amount, specifier: "%.2f") €")
+													.font(.system(size: 14, weight: .bold))
+													.foregroundStyle(.primary)
+											}
 										}
 										
 										Spacer()
