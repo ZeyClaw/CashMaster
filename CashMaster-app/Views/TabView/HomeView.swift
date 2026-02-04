@@ -83,7 +83,7 @@ struct HomeView: View {
 		ZStack(alignment: .bottom) {
 			ScrollView {
 				VStack(spacing: 24) {
-					// MARK: - En-tête Solde Total (style HTML)
+					// MARK: - En-tête Solde Total
 					VStack(spacing: 4) {
 						Text("Solde total")
 							.font(.caption)
@@ -101,7 +101,7 @@ struct HomeView: View {
 					.padding(.top, 8)
 					.padding(.bottom, 16)
 					
-					// MARK: - Cartes Solde Mois & Achats Futurs (style grille HTML)
+					// MARK: - Cartes Solde Mois & Achats Futurs
 					HStack(spacing: 16) {
 						// Carte Solde du mois
 						Button {
@@ -168,7 +168,7 @@ struct HomeView: View {
 					}
 					.padding(.horizontal, 20)
 					
-					// MARK: - Section Raccourcis (style HTML)
+					// MARK: - Section Raccourcis
 					VStack(alignment: .leading, spacing: 16) {
 						HStack {
 							Text("Raccourcis")
@@ -176,7 +176,7 @@ struct HomeView: View {
 							
 							Spacer()
 							
-							// Bouton Ajouter Widget (style HTML)
+							// Bouton Ajouter Widget
 							Button {
 								showingAddWidgetSheet = true
 							} label: {
@@ -196,7 +196,7 @@ struct HomeView: View {
 						
 						LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
 							
-							// Affichage des raccourcis (style HTML)
+							// Affichage des raccourcis
 							ForEach(accountsManager.getWidgetShortcuts()) { shortcut in
 								Button {
 									let feedback = UIImpactFeedbackGenerator(style: .medium)
@@ -215,14 +215,14 @@ struct HomeView: View {
 									
 								} label: {
 									HStack(spacing: 12) {
-										// Icône colorée selon le type
+										// Icône colorée (utilise le style du shortcut)
 										ZStack {
 											Circle()
-												.fill(shortcutIconColor(for: shortcut).opacity(0.15))
+												.fill(shortcut.style.color.opacity(0.15))
 												.frame(width: 40, height: 40)
-											Image(systemName: shortcutIcon(for: shortcut))
+											Image(systemName: shortcut.style.icon)
 												.font(.system(size: 18))
-												.foregroundStyle(shortcutIconColor(for: shortcut))
+												.foregroundStyle(shortcut.style.color)
 										}
 										
 										VStack(alignment: .leading, spacing: 2) {
@@ -288,44 +288,6 @@ struct HomeView: View {
 				month: currentMonth,
 				year: currentYear
 			)
-		}
-	}
-	
-	// MARK: - Helpers pour icônes des raccourcis
-	
-	/// Retourne une icône appropriée selon le commentaire du raccourci
-	private func shortcutIcon(for shortcut: WidgetShortcut) -> String {
-		let comment = shortcut.comment.lowercased()
-		if comment.contains("carburant") || comment.contains("essence") || comment.contains("gasoil") {
-			return "fuelpump.fill"
-		} else if comment.contains("course") || comment.contains("supermarché") || comment.contains("magasin") {
-			return "cart.fill"
-		} else if comment.contains("maman") || comment.contains("papa") || comment.contains("famille") {
-			return "person.fill"
-		} else if comment.contains("soirée") || comment.contains("resto") || comment.contains("bar") {
-			return "heart.fill"
-		} else if shortcut.type == .income {
-			return "arrow.down.circle.fill"
-		} else {
-			return "arrow.up.circle.fill"
-		}
-	}
-	
-	/// Retourne une couleur appropriée selon le commentaire du raccourci
-	private func shortcutIconColor(for shortcut: WidgetShortcut) -> Color {
-		let comment = shortcut.comment.lowercased()
-		if comment.contains("carburant") || comment.contains("essence") || comment.contains("gasoil") {
-			return .orange
-		} else if comment.contains("course") || comment.contains("supermarché") || comment.contains("magasin") {
-			return .blue
-		} else if comment.contains("maman") || comment.contains("papa") || comment.contains("famille") {
-			return .purple
-		} else if comment.contains("soirée") || comment.contains("resto") || comment.contains("bar") {
-			return .pink
-		} else if shortcut.type == .income {
-			return .green
-		} else {
-			return .red
 		}
 	}
 }

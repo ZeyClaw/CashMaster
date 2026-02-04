@@ -14,6 +14,7 @@ struct AddWidgetShortcutView: View {
 	@State private var amount: Double?
 	@State private var comment = ""
 	@State private var type: TransactionType = .income
+	@State private var selectedStyle: ShortcutStyle = .expense
 	@State private var showError = false
 	
 	var body: some View {
@@ -23,6 +24,10 @@ struct AddWidgetShortcutView: View {
 					.keyboardType(.decimalPad)
 				
 				TextField("Commentaire", text: $comment)
+					.onChange(of: comment) { _, newValue in
+						// Met à jour automatiquement le style selon le commentaire
+						selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
+					}
 				
 				Picker("Type", selection: $type) {
 					ForEach(TransactionType.allCases) { t in
@@ -30,6 +35,38 @@ struct AddWidgetShortcutView: View {
 					}
 				}
 				.pickerStyle(.segmented)
+				.onChange(of: type) { _, newValue in
+					// Met à jour le style si c'est le style par défaut
+					if selectedStyle == .income || selectedStyle == .expense {
+						selectedStyle = newValue == .income ? .income : .expense
+					}
+				}
+				
+				// MARK: - Sélecteur d'icône
+				Section("Icône") {
+					LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
+						ForEach(ShortcutStyle.allCases) { style in
+							Button {
+								selectedStyle = style
+							} label: {
+								ZStack {
+									Circle()
+										.fill(style.color.opacity(selectedStyle == style ? 0.3 : 0.1))
+										.frame(width: 44, height: 44)
+									Image(systemName: style.icon)
+										.font(.system(size: 18))
+										.foregroundStyle(style.color)
+								}
+								.overlay(
+									Circle()
+										.stroke(style.color, lineWidth: selectedStyle == style ? 2 : 0)
+								)
+							}
+							.buttonStyle(PlainButtonStyle())
+						}
+					}
+					.padding(.vertical, 8)
+				}
 			}
 			.navigationTitle("Nouveau widget")
 			.toolbar {
@@ -42,7 +79,12 @@ struct AddWidgetShortcutView: View {
 							showError = true
 							return
 						}
-						let shortcut = WidgetShortcut(amount: amount, comment: comment, type: type)
+						let shortcut = WidgetShortcut(
+							amount: amount,
+							comment: comment,
+							type: type,
+							style: selectedStyle
+						)
 						accountsManager.addWidgetShortcut(shortcut)
 						dismiss()
 					}

@@ -11,53 +11,17 @@ struct WidgetCardView: View {
 	let shortcut: WidgetShortcut
 	let action: () -> Void
 	
-	/// Retourne une icône appropriée selon le commentaire du raccourci
-	private var iconName: String {
-		let comment = shortcut.comment.lowercased()
-		if comment.contains("carburant") || comment.contains("essence") || comment.contains("gasoil") {
-			return "fuelpump.fill"
-		} else if comment.contains("course") || comment.contains("supermarché") || comment.contains("magasin") {
-			return "cart.fill"
-		} else if comment.contains("maman") || comment.contains("papa") || comment.contains("famille") {
-			return "person.fill"
-		} else if comment.contains("soirée") || comment.contains("resto") || comment.contains("bar") {
-			return "heart.fill"
-		} else if shortcut.type == .income {
-			return "arrow.down.circle.fill"
-		} else {
-			return "arrow.up.circle.fill"
-		}
-	}
-	
-	/// Retourne une couleur appropriée selon le commentaire du raccourci
-	private var iconColor: Color {
-		let comment = shortcut.comment.lowercased()
-		if comment.contains("carburant") || comment.contains("essence") || comment.contains("gasoil") {
-			return .orange
-		} else if comment.contains("course") || comment.contains("supermarché") || comment.contains("magasin") {
-			return .blue
-		} else if comment.contains("maman") || comment.contains("papa") || comment.contains("famille") {
-			return .purple
-		} else if comment.contains("soirée") || comment.contains("resto") || comment.contains("bar") {
-			return .pink
-		} else if shortcut.type == .income {
-			return .green
-		} else {
-			return .red
-		}
-	}
-	
 	var body: some View {
 		Button(action: action) {
 			HStack(spacing: 12) {
-				// Icône colorée avec cercle de fond
+				// Icône colorée avec cercle de fond (utilise le style du shortcut)
 				ZStack {
 					Circle()
-						.fill(iconColor.opacity(0.15))
+						.fill(shortcut.style.color.opacity(0.15))
 						.frame(width: 40, height: 40)
-					Image(systemName: iconName)
+					Image(systemName: shortcut.style.icon)
 						.font(.system(size: 18))
-						.foregroundStyle(iconColor)
+						.foregroundStyle(shortcut.style.color)
 				}
 				
 				VStack(alignment: .leading, spacing: 2) {
