@@ -82,86 +82,121 @@ struct HomeView: View {
 	var body: some View {
 		ZStack(alignment: .bottom) {
 			ScrollView {
-				VStack(spacing: 16) {
-					// Carte solde
-					VStack(alignment: .leading, spacing: 8) {
+				VStack(spacing: 24) {
+					// MARK: - En-tête Solde Total (style HTML)
+					VStack(spacing: 4) {
 						Text("Solde total")
-							.font(.headline)
+							.font(.caption)
+							.fontWeight(.medium)
+							.foregroundStyle(.secondary)
+							.textCase(.uppercase)
+							.tracking(1)
 						
-						HStack {
-							VStack(alignment: .leading) {
-								Text("Actuel")
-									.font(.caption)
-								if let totalCurrent = totalCurrent {
-									Text("\(totalCurrent, specifier: "%.2f") €")
-										.font(.title3)
-										.foregroundStyle(totalCurrent >= 0 ? .green : .red)
-								}
-							}
-							Spacer()
-							VStack(alignment: .leading) {
-								Text("Futur")
-									.font(.caption)
-								if let totalFuture = totalFuture {
-									Text("\(totalFuture, specifier: "%.2f") €")
-										.font(.title3)
-										.foregroundStyle(totalFuture >= 0 ? .green : .red)
-								}
-							}
+						if let totalCurrent = totalCurrent {
+							Text(formatCurrency(totalCurrent))
+								.font(.system(size: 36, weight: .heavy, design: .rounded))
+								.tracking(-0.5)
 						}
 					}
-					.padding()
-					.background(Color(UIColor.secondarySystemGroupedBackground))
-					.cornerRadius(12)
-					.padding(.horizontal)
+					.padding(.top, 8)
+					.padding(.bottom, 16)
 					
-					// Solde du mois actuel
-					VStack(alignment: .leading, spacing: 8) {
-						Text("Solde de ce mois")
-							.font(.headline)
-							.padding(.horizontal)
-						
+					// MARK: - Cartes Solde Mois & Achats Futurs (style grille HTML)
+					HStack(spacing: 16) {
+						// Carte Solde du mois
 						Button {
 							navigateToCurrentMonth = true
 						} label: {
-							HStack {
-								Text(currentMonthName)
-									.foregroundColor(.primary)
+							VStack(alignment: .leading, spacing: 0) {
+								ZStack {
+									Circle()
+										.fill(Color.blue.opacity(0.1))
+										.frame(width: 32, height: 32)
+									Image(systemName: "banknote")
+										.font(.system(size: 16))
+										.foregroundStyle(.blue)
+								}
+								
 								Spacer()
-								Text("\(currentMonthSolde, specifier: "%.2f") €")
-									.foregroundStyle(currentMonthSolde >= 0 ? .green : .red)
+								
+								VStack(alignment: .leading, spacing: 2) {
+									Text("Solde du mois")
+										.font(.system(size: 13, weight: .medium))
+										.foregroundStyle(.secondary)
+									Text(formatCurrency(currentMonthSolde))
+										.font(.system(size: 17, weight: .bold))
+										.foregroundStyle(.primary)
+								}
 							}
-							.padding()
+							.padding(16)
+							.frame(maxWidth: .infinity, minHeight: 140)
 							.background(Color(UIColor.secondarySystemGroupedBackground))
-							.cornerRadius(8)
+							.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+							.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
 						}
 						.buttonStyle(PlainButtonStyle())
-						.padding(.horizontal)
-					}
-					
-					// MARK: - Widget Shortcuts
-					VStack(alignment: .leading) {
-						Text("Raccourcis")
-							.font(.headline)
-							.padding(.horizontal)
 						
-						LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-							// Ajouter un raccourci
+						// Carte Achats Futurs
+						VStack(alignment: .leading, spacing: 0) {
+							ZStack {
+								Circle()
+									.fill(Color.orange.opacity(0.1))
+									.frame(width: 32, height: 32)
+								Image(systemName: "cart")
+									.font(.system(size: 16))
+									.foregroundStyle(.orange)
+							}
+							
+							Spacer()
+							
+							VStack(alignment: .leading, spacing: 2) {
+								Text("Achats futurs")
+									.font(.system(size: 13, weight: .medium))
+									.foregroundStyle(.secondary)
+								if let totalPotentiel = totalPotentiel {
+									Text(formatCurrency(totalPotentiel))
+										.font(.system(size: 17, weight: .bold))
+										.foregroundStyle(.primary)
+								}
+							}
+						}
+						.padding(16)
+						.frame(maxWidth: .infinity, minHeight: 140)
+						.background(Color(UIColor.secondarySystemGroupedBackground))
+						.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+						.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
+					}
+					.padding(.horizontal, 20)
+					
+					// MARK: - Section Raccourcis (style HTML)
+					VStack(alignment: .leading, spacing: 16) {
+						HStack {
+							Text("Raccourcis")
+								.font(.system(size: 18, weight: .bold))
+							
+							Spacer()
+							
+							// Bouton Ajouter Widget (style HTML)
 							Button {
 								showingAddWidgetSheet = true
 							} label: {
-								VStack {
-									Image(systemName: "plus.circle")
-										.font(.largeTitle)
+								HStack(spacing: 4) {
+									Image(systemName: "plus")
+										.font(.system(size: 12, weight: .bold))
 									Text("Ajouter Widget")
-										.font(.caption)
+										.font(.system(size: 11, weight: .bold))
 								}
-								.frame(maxWidth: .infinity, minHeight: 80)
-								.background(Color(UIColor.secondarySystemGroupedBackground))
-								.cornerRadius(12)
+								.foregroundStyle(.blue)
+								.padding(.horizontal, 12)
+								.padding(.vertical, 6)
+								.background(Color.blue.opacity(0.1))
+								.clipShape(Capsule())
 							}
+						}
+						
+						LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
 							
-							// Affichage des raccourcis
+							// Affichage des raccourcis (style HTML)
 							ForEach(accountsManager.getWidgetShortcuts()) { shortcut in
 								Button {
 									let feedback = UIImpactFeedbackGenerator(style: .medium)
@@ -179,18 +214,35 @@ struct HomeView: View {
 									addToast(message: "Transaction ajoutée 💸")
 									
 								} label: {
-									VStack(spacing: 4) {
-										Text(shortcut.comment)
-											.font(.body)
-											.lineLimit(1)
-										Text("\(shortcut.amount, specifier: "%.2f") €")
-											.font(.subheadline)
-											.foregroundStyle(shortcut.type == .income ? .green : .red)
+									HStack(spacing: 12) {
+										// Icône colorée selon le type
+										ZStack {
+											Circle()
+												.fill(shortcutIconColor(for: shortcut).opacity(0.15))
+												.frame(width: 40, height: 40)
+											Image(systemName: shortcutIcon(for: shortcut))
+												.font(.system(size: 18))
+												.foregroundStyle(shortcutIconColor(for: shortcut))
+										}
+										
+										VStack(alignment: .leading, spacing: 2) {
+											Text(shortcut.comment)
+												.font(.system(size: 12, weight: .medium))
+												.foregroundStyle(.secondary)
+												.lineLimit(1)
+											Text(formatCurrency(shortcut.amount))
+												.font(.system(size: 14, weight: .bold))
+												.foregroundStyle(.primary)
+										}
+										
+										Spacer()
 									}
-									.frame(maxWidth: .infinity, minHeight: 80)
+									.padding(12)
 									.background(Color(UIColor.secondarySystemGroupedBackground))
-									.cornerRadius(12)
+									.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+									.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
 								}
+								.buttonStyle(PlainButtonStyle())
 								.contextMenu {
 									Button(role: .destructive) {
 										shortcutToDelete = shortcut
@@ -201,8 +253,8 @@ struct HomeView: View {
 								}
 							}
 						}
-						.padding(.horizontal)
 					}
+					.padding(.horizontal, 20)
 				}
 				.padding(.vertical)
 			}
@@ -236,6 +288,56 @@ struct HomeView: View {
 				month: currentMonth,
 				year: currentYear
 			)
+		}
+	}
+	
+	// MARK: - Helpers de formatage
+	
+	/// Formate un montant en devise avec séparateurs français
+	private func formatCurrency(_ value: Double) -> String {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.minimumFractionDigits = 2
+		formatter.maximumFractionDigits = 2
+		formatter.groupingSeparator = " "
+		formatter.decimalSeparator = ","
+		let formatted = formatter.string(from: NSNumber(value: abs(value))) ?? "0,00"
+		return "\(value < 0 ? "-" : "")\(formatted) €"
+	}
+	
+	/// Retourne une icône appropriée selon le commentaire du raccourci
+	private func shortcutIcon(for shortcut: WidgetShortcut) -> String {
+		let comment = shortcut.comment.lowercased()
+		if comment.contains("carburant") || comment.contains("essence") || comment.contains("gasoil") {
+			return "fuelpump.fill"
+		} else if comment.contains("course") || comment.contains("supermarché") || comment.contains("magasin") {
+			return "cart.fill"
+		} else if comment.contains("maman") || comment.contains("papa") || comment.contains("famille") {
+			return "person.fill"
+		} else if comment.contains("soirée") || comment.contains("resto") || comment.contains("bar") {
+			return "heart.fill"
+		} else if shortcut.type == .income {
+			return "arrow.down.circle.fill"
+		} else {
+			return "arrow.up.circle.fill"
+		}
+	}
+	
+	/// Retourne une couleur appropriée selon le commentaire du raccourci
+	private func shortcutIconColor(for shortcut: WidgetShortcut) -> Color {
+		let comment = shortcut.comment.lowercased()
+		if comment.contains("carburant") || comment.contains("essence") || comment.contains("gasoil") {
+			return .orange
+		} else if comment.contains("course") || comment.contains("supermarché") || comment.contains("magasin") {
+			return .blue
+		} else if comment.contains("maman") || comment.contains("papa") || comment.contains("famille") {
+			return .purple
+		} else if comment.contains("soirée") || comment.contains("resto") || comment.contains("bar") {
+			return .pink
+		} else if shortcut.type == .income {
+			return .green
+		} else {
+			return .red
 		}
 	}
 }
