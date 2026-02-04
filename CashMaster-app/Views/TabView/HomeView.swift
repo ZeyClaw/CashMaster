@@ -93,7 +93,7 @@ struct HomeView: View {
 							.tracking(1)
 						
 						if let totalCurrent = totalCurrent {
-							Text(formatCurrency(totalCurrent))
+							Text("\(totalCurrent, specifier: "%.2f") €")
 								.font(.system(size: 36, weight: .heavy, design: .rounded))
 								.tracking(-0.5)
 						}
@@ -123,7 +123,7 @@ struct HomeView: View {
 									Text("Solde du mois")
 										.font(.system(size: 13, weight: .medium))
 										.foregroundStyle(.secondary)
-									Text(formatCurrency(currentMonthSolde))
+									Text("\(currentMonthSolde, specifier: "%.2f") €")
 										.font(.system(size: 17, weight: .bold))
 										.foregroundStyle(.primary)
 								}
@@ -154,7 +154,7 @@ struct HomeView: View {
 									.font(.system(size: 13, weight: .medium))
 									.foregroundStyle(.secondary)
 								if let totalPotentiel = totalPotentiel {
-									Text(formatCurrency(totalPotentiel))
+									Text("\(totalPotentiel, specifier: "%.2f") €")
 										.font(.system(size: 17, weight: .bold))
 										.foregroundStyle(.primary)
 								}
@@ -230,7 +230,7 @@ struct HomeView: View {
 												.font(.system(size: 12, weight: .medium))
 												.foregroundStyle(.secondary)
 												.lineLimit(1)
-											Text(formatCurrency(shortcut.amount))
+											Text("\(shortcut.amount, specifier: "%.2f") €")
 												.font(.system(size: 14, weight: .bold))
 												.foregroundStyle(.primary)
 										}
@@ -291,19 +291,7 @@ struct HomeView: View {
 		}
 	}
 	
-	// MARK: - Helpers de formatage
-	
-	/// Formate un montant en devise avec séparateurs français
-	private func formatCurrency(_ value: Double) -> String {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		formatter.minimumFractionDigits = 2
-		formatter.maximumFractionDigits = 2
-		formatter.groupingSeparator = " "
-		formatter.decimalSeparator = ","
-		let formatted = formatter.string(from: NSNumber(value: abs(value))) ?? "0,00"
-		return "\(value < 0 ? "-" : "")\(formatted) €"
-	}
+	// MARK: - Helpers pour icônes des raccourcis
 	
 	/// Retourne une icône appropriée selon le commentaire du raccourci
 	private func shortcutIcon(for shortcut: WidgetShortcut) -> String {

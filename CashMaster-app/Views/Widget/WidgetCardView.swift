@@ -47,18 +47,6 @@ struct WidgetCardView: View {
 		}
 	}
 	
-	/// Formate un montant en devise avec séparateurs français
-	private func formatCurrency(_ value: Double) -> String {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .decimal
-		formatter.minimumFractionDigits = 2
-		formatter.maximumFractionDigits = 2
-		formatter.groupingSeparator = " "
-		formatter.decimalSeparator = ","
-		let formatted = formatter.string(from: NSNumber(value: abs(value))) ?? "0,00"
-		return "\(value < 0 ? "-" : "")\(formatted) €"
-	}
-	
 	var body: some View {
 		Button(action: action) {
 			HStack(spacing: 12) {
@@ -77,7 +65,7 @@ struct WidgetCardView: View {
 						.font(.system(size: 12, weight: .medium))
 						.foregroundStyle(.secondary)
 						.lineLimit(1)
-					Text(formatCurrency(shortcut.amount))
+					Text("\(shortcut.amount, specifier: "%.2f") €")
 						.font(.system(size: 14, weight: .bold))
 						.foregroundStyle(.primary)
 				}
