@@ -87,19 +87,33 @@ struct HomeView: View {
 					// MARK: - En-tête Solde Total
 					VStack(spacing: 4) {
 						Text("Solde total")
-							.font(.caption)
-							.fontWeight(.medium)
+							.font(.system(size: 12, weight: .bold))
 							.foregroundStyle(.secondary)
 							.textCase(.uppercase)
-							.tracking(1)
+							.tracking(2)
 						
 						if let totalCurrent = totalCurrent {
 							Text("\(totalCurrent, specifier: "%.2f") €")
-								.font(.system(size: 36, weight: .heavy, design: .rounded))
-								.tracking(-0.5)
+								.font(.system(size: 48, weight: .bold))
+								.tracking(-1)
+						}
+						
+						// Pourcentage de changement
+						if let pourcentage = accountsManager.pourcentageChangementMois() {
+							HStack(spacing: 4) {
+								Image(systemName: pourcentage >= 0 ? "arrow.up.right" : "arrow.down.right")
+									.font(.system(size: 12, weight: .semibold))
+								Text("\(pourcentage >= 0 ? "+" : "")\(pourcentage, specifier: "%.1f")% ce mois-ci")
+									.font(.system(size: 14, weight: .semibold))
+							}
+							.foregroundStyle(pourcentage >= 0 ? .green : .red)
+						} else {
+							Text("Premier mois")
+								.font(.system(size: 14, weight: .medium))
+								.foregroundStyle(.secondary)
 						}
 					}
-					.padding(.top, 8)
+					.padding(.top, 16)
 					.padding(.bottom, 16)
 					
 					// MARK: - Cartes Solde Mois & Achats Futurs
