@@ -1,6 +1,5 @@
 //
-//  Notifications.swift
-//  CashMaster
+//  Notifications.swift 
 //
 //  Created by Godefroy REYNAUD on 21/10/2024.
 //
@@ -76,7 +75,7 @@ struct NotificationManager {
 	// Fonction pour envoyer une notification hebdomadaire
 	private func scheduleWeeklyNotification() {
 		let content = UNMutableNotificationContent()
-		content.title = "Rappel - CashMaster"
+		content.title = "Rappel - Finoria"
 		content.body = "As-tu acheté quelque chose cette semaine ?"
 		content.sound = UNNotificationSound.default
 		

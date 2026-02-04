@@ -108,7 +108,7 @@ struct HomeView: View {
 						Button {
 							navigateToCurrentMonth = true
 						} label: {
-							VStack(alignment: .leading, spacing: 0) {
+							VStack(alignment: .leading, spacing: 16) {
 								ZStack {
 									Circle()
 										.fill(Color.blue.opacity(0.1))
@@ -118,22 +118,20 @@ struct HomeView: View {
 										.foregroundStyle(.blue)
 								}
 								
-								Spacer()
-								
-								VStack(alignment: .leading, spacing: 2) {
+								VStack(alignment: .leading, spacing: 4) {
 									Text("Solde du mois")
-										.font(.system(size: 13, weight: .medium))
-										.foregroundStyle(.secondary)
-									Text("\(currentMonthSolde, specifier: "%.2f") €")
-										.font(.system(size: 17, weight: .bold))
+										.font(.system(size: 15, weight: .bold))
 										.foregroundStyle(.primary)
+									Text("\(currentMonthSolde, specifier: "%.2f") €")
+										.font(.system(size: 14, weight: .medium))
+										.foregroundStyle(.secondary)
 								}
 							}
-							.padding(12)
-							.frame(maxWidth: .infinity, minHeight: 140)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding(16)
 							.background(Color(UIColor.secondarySystemGroupedBackground))
-							.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-							.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
+							.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+							.shadow(color: .black.opacity(0.03), radius: 8, x: 0, y: 2)
 						}
 						.buttonStyle(PlainButtonStyle())
 						
@@ -141,7 +139,7 @@ struct HomeView: View {
 						Button {
 							navigateToPotentielles = true
 						} label: {
-							VStack(alignment: .leading, spacing: 0) {
+							VStack(alignment: .leading, spacing: 16) {
 								ZStack {
 									Circle()
 										.fill(Color.orange.opacity(0.1))
@@ -151,28 +149,26 @@ struct HomeView: View {
 										.foregroundStyle(.orange)
 								}
 								
-								Spacer()
-								
-								VStack(alignment: .leading, spacing: 2) {
+								VStack(alignment: .leading, spacing: 4) {
 									Text("Achats futurs")
-										.font(.system(size: 13, weight: .medium))
-										.foregroundStyle(.secondary)
+										.font(.system(size: 15, weight: .bold))
+										.foregroundStyle(.primary)
 									if let totalPotentiel = totalPotentiel {
 										Text("\(totalPotentiel, specifier: "%.2f") €")
-											.font(.system(size: 17, weight: .bold))
-											.foregroundStyle(.primary)
+											.font(.system(size: 14, weight: .medium))
+											.foregroundStyle(.secondary)
 									}
 								}
 							}
-							.padding(12)
-							.frame(maxWidth: .infinity, minHeight: 140)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding(16)
 							.background(Color(UIColor.secondarySystemGroupedBackground))
-							.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-							.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
+							.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+							.shadow(color: .black.opacity(0.03), radius: 8, x: 0, y: 2)
 						}
 						.buttonStyle(PlainButtonStyle())
 					}
-					.padding(.horizontal, 20)
+					.padding(.horizontal, 16)
 					
 					// MARK: - Section Raccourcis
 					VStack(alignment: .leading, spacing: 16) {

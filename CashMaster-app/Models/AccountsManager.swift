@@ -158,6 +158,35 @@ class AccountsManager: ObservableObject {
 			.reduce(0, +)
 	}
 	
+	/// Retourne le pourcentage de changement entre le mois actuel et le mois précédent
+	/// Retourne nil si pas assez de données
+	func pourcentageChangementMois() -> Double? {
+		let calendar = Calendar.current
+		let now = Date()
+		
+		let currentMonth = calendar.component(.month, from: now)
+		let currentYear = calendar.component(.year, from: now)
+		
+		// Calcul du mois précédent
+		let previousMonth: Int
+		let previousYear: Int
+		if currentMonth == 1 {
+			previousMonth = 12
+			previousYear = currentYear - 1
+		} else {
+			previousMonth = currentMonth - 1
+			previousYear = currentYear
+		}
+		
+		let currentTotal = totalPourMois(currentMonth, year: currentYear)
+		let previousTotal = totalPourMois(previousMonth, year: previousYear)
+		
+		// Si le mois précédent est à 0, on ne peut pas calculer de pourcentage
+		guard previousTotal != 0 else { return nil }
+		
+		return ((currentTotal - previousTotal) / abs(previousTotal)) * 100
+	}
+	
 	// MARK: - Sélections utiles
 	
 	/// Retourne toutes les transactions validées (non potentielles)
