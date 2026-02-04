@@ -24,7 +24,7 @@ struct HomeTabView: View {
 		NavigationStack {
 			if accountsManager.selectedAccount != nil {
 				HomeView(accountsManager: accountsManager)
-					.navigationTitle(accountsManager.selectedAccount ?? "CashMaster")
+					.navigationBarTitleDisplayMode(.inline)
 					.toolbar {
 						// Boutons Import/Export CSV en haut à gauche
 						ToolbarItem(placement: .navigationBarLeading) {

@@ -86,6 +86,14 @@ struct HomeView: View {
 				VStack(spacing: 24) {
 					// MARK: - En-tête Solde Total
 					VStack(spacing: 4) {
+						// Nom du compte
+						if let accountName = accountsManager.selectedAccount {
+							Text(accountName)
+								.font(.system(size: 17, weight: .semibold))
+								.foregroundStyle(.primary)
+								.padding(.bottom, 8)
+						}
+						
 						Text("Solde total")
 							.font(.system(size: 12, weight: .bold))
 							.foregroundStyle(.secondary)
@@ -108,9 +116,13 @@ struct HomeView: View {
 							}
 							.foregroundStyle(pourcentage >= 0 ? .green : .red)
 						} else {
-							Text("Premier mois")
-								.font(.system(size: 14, weight: .medium))
-								.foregroundStyle(.secondary)
+							HStack(spacing: 4) {
+								Image(systemName: "arrow.forward")
+									.font(.system(size: 12, weight: .semibold))
+								Text("+\(0.0, specifier: "%.1f")% ce mois-ci")
+									.font(.system(size: 14, weight: .semibold))
+							}
+							.foregroundStyle(.secondary)
 						}
 					}
 					.padding(.top, 16)
