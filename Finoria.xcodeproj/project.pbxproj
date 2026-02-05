@@ -29,6 +29,7 @@
 		F812E1FA2CC7BCFF00619857 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */; };
 		F8388E732F349A380081F2F9 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E722F349A380081F2F9 /* Account.swift */; };
 		F8388E752F349A540081F2F9 /* AddAccountSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E742F349A530081F2F9 /* AddAccountSheet.swift */; };
+		F8388E772F350F150081F2F9 /* AllTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E762F350F150081F2F9 /* AllTransactionsView.swift */; };
 		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
@@ -87,6 +88,7 @@
 		F812E1FB2CC828DF00619857 /* Finoria-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Finoria-Info.plist"; sourceTree = "<group>"; };
 		F8388E722F349A380081F2F9 /* Account.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		F8388E742F349A530081F2F9 /* AddAccountSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddAccountSheet.swift; sourceTree = "<group>"; };
+		F8388E762F350F150081F2F9 /* AllTransactionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllTransactionsView.swift; sourceTree = "<group>"; };
 		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 		F810E3172E4608CC00C2DFA9 /* Calendrier */ = {
 			isa = PBXGroup;
 			children = (
+				F8388E762F350F150081F2F9 /* AllTransactionsView.swift */,
 				F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */,
 				F800A3EB2E4DF82400918507 /* CalendrierTabView.swift */,
 				F810E2F82E43D2B100C2DFA9 /* YearsView.swift */,
@@ -410,6 +413,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F810E2F52E42903300C2DFA9 /* TransactionRow.swift in Sources */,
+				F8388E772F350F150081F2F9 /* AllTransactionsView.swift in Sources */,
 				F800A3EE2E4E01F700918507 /* NoAccountView.swift in Sources */,
 				F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */,
 				F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */,
