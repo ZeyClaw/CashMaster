@@ -24,6 +24,7 @@ struct AccountPickerView: View {
 					)
 					.listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
 					.listRowBackground(Color.clear)
+					.listRowSeparator(.hidden)
 					.contentShape(Rectangle())
 					.onTapGesture {
 						accountsManager.selectedAccountId = account.id
@@ -48,9 +49,17 @@ struct AccountPickerView: View {
 						Text("Ajouter un compte")
 							.font(.headline)
 					}
+					.foregroundStyle(.blue)
 					.frame(maxWidth: .infinity)
+					.padding(.vertical, 20)
+					.background(Color(.systemBackground))
+					.clipShape(RoundedRectangle(cornerRadius: 20))
+					.shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 4)
 				}
+				.buttonStyle(PlainButtonStyle())
+				.listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
 				.listRowBackground(Color.clear)
+				.listRowSeparator(.hidden)
 			}
 			.listStyle(.plain)
 			.scrollContentBackground(.hidden)

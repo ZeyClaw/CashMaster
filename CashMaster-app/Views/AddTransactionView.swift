@@ -46,7 +46,7 @@ struct AddTransactionView: View {
 						TextField(
 							"Montant",
 							value: $montant,
-							format: .number.precision(.fractionLength(2))
+							format: .number.precision(.fractionLength(0...2))
 						)
 						.keyboardType(.decimalPad)
 						
