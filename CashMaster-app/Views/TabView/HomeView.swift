@@ -109,12 +109,12 @@ struct HomeView: View {
 						// Pourcentage de changement
 						if let pourcentage = accountsManager.pourcentageChangementMois() {
 							HStack(spacing: 4) {
-								Image(systemName: pourcentage >= 0 ? "arrow.up.right" : "arrow.down.right")
+								Image(systemName: pourcentage > 0 ? "arrow.up.right" : (pourcentage < 0 ? "arrow.down.right" : "arrow.forward"))
 									.font(.system(size: 12, weight: .semibold))
-								Text("\(pourcentage >= 0 ? "+" : "")\(pourcentage, specifier: "%.1f")% ce mois-ci")
+								Text("\(pourcentage > 0 ? "+" : "")\(pourcentage, specifier: "%.1f")% ce mois-ci")
 									.font(.system(size: 14, weight: .semibold))
 							}
-							.foregroundStyle(pourcentage >= 0 ? .green : .red)
+							.foregroundStyle(pourcentage > 0 ? .green : (pourcentage < 0 ? .red : .secondary))
 						} else {
 							HStack(spacing: 4) {
 								Image(systemName: "arrow.forward")

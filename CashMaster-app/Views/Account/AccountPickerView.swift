@@ -58,7 +58,7 @@ struct AccountPickerView: View {
 				}
 				.padding()
 			}
-			.background(Color(.systemGroupedBackground))
+			.background(Color(UIColor.systemGroupedBackground))
 			.navigationTitle("Mes comptes")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
