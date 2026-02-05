@@ -14,7 +14,7 @@ struct CalendrierMainView: View {
 	
 	var body: some View {
 		NavigationStack {
-			if accountsManager.selectedAccount != nil {
+			if accountsManager.selectedAccountId != nil {
 				CalendrierTabView(accountsManager: accountsManager)
 					.toolbar {
 						ToolbarItem(placement: .navigationBarTrailing) {

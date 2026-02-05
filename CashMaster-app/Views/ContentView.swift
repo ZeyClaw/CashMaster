@@ -51,7 +51,7 @@ struct ContentView: View {
 			// Détection du tap sur l'onglet "Ajouter"
 			if newValue == .add {
 				// Ouvrir la feuille d'ajout de transaction si un compte est sélectionné
-				if accountsManager.selectedAccount != nil {
+				if accountsManager.selectedAccountId != nil {
 					showingAddTransactionSheet = true
 				}
 				// Revenir immédiatement à l'onglet précédent
@@ -61,7 +61,7 @@ struct ContentView: View {
 			}
 		}
 		.sheet(isPresented: $showingAddTransactionSheet) {
-			if accountsManager.selectedAccount != nil {
+			if accountsManager.selectedAccountId != nil {
 				AddTransactionView(accountsManager: accountsManager)
 			}
 		}
