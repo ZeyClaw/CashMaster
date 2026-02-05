@@ -20,8 +20,15 @@ struct AddWidgetShortcutView: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				TextField("Montant", value: $amount, format: .number)
-					.keyboardType(.decimalPad)
+				HStack {
+					TextField("Montant", value: $amount, format: .number.precision(.fractionLength(0...2)))
+						.keyboardType(.decimalPad)
+					
+					Text("€")
+						.foregroundStyle(.secondary)
+				}
+				
+				Divider()
 				
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in

@@ -54,6 +54,8 @@ struct AddTransactionView: View {
 							.foregroundStyle(.secondary)
 					}
 					
+					Divider()
+					
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in
 							if newValue.count > maxCommentLength {
