@@ -20,37 +20,34 @@ struct AddWidgetShortcutView: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				Section {
-					HStack {
-						TextField("Montant", value: $amount, format: .number.precision(.fractionLength(0...2)))
-							.keyboardType(.decimalPad)
-						
-						Text("€")
-							.foregroundStyle(.secondary)
-					}
+				HStack {
+					TextField("Montant", value: $amount, format: .number.precision(.fractionLength(0...2)))
+						.keyboardType(.decimalPad)
 					
-					TextField("Commentaire", text: $comment)
-						.onChange(of: comment) { _, newValue in
-							// Met à jour automatiquement le style selon le commentaire
-							selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
-						}
+					Text("€")
+						.foregroundStyle(.secondary)
 				}
 				
-				Section {
-					Picker("Type", selection: $type) {
-						ForEach(TransactionType.allCases) { t in
-							Text(t.label).tag(t)
-						}
+				TextField("Commentaire", text: $comment)
+					.onChange(of: comment) { _, newValue in
+						// Met à jour automatiquement le style selon le commentaire
+						selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
 					}
-					.pickerStyle(.segmented)
-					.onChange(of: type) { _, newValue in
-						// Met à jour le style si c'est le style par défaut
-						if selectedStyle == .income || selectedStyle == .expense {
-							selectedStyle = newValue == .income ? .income : .expense
-						}
+			
+
+				Picker("Type", selection: $type) {
+					ForEach(TransactionType.allCases) { t in
+						Text(t.label).tag(t)
 					}
 				}
-				.listRowSeparator(.hidden)
+				.pickerStyle(.segmented)
+				.onChange(of: type) { _, newValue in
+					// Met à jour le style si c'est le style par défaut
+					if selectedStyle == .income || selectedStyle == .expense {
+						selectedStyle = newValue == .income ? .income : .expense
+					}
+				}
+
 				
 				// MARK: - Sélecteur d'icône
 				Section("Icône") {
