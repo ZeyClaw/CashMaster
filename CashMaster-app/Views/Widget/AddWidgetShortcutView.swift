@@ -27,11 +27,8 @@ struct AddWidgetShortcutView: View {
 					Text("€")
 						.foregroundStyle(.secondary)
 				}
-				.listRowSeparator(.hidden) // Masque le séparateur par défaut
+				.listRowSeparator(.visible) // afficher le separateur sous tout le HStack
 
-				Spacer()
-					.frame(height: 0.0001) // Hauteur quasi nulle pour forcer l'affichage du séparateur personnalisé
-				
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in
 						// Met à jour automatiquement le style selon le commentaire

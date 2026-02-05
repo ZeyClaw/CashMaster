@@ -42,23 +42,25 @@ struct AddTransactionView: View {
 				}
 				
 				Section {
-					HStack {
-						TextField(
-							"Montant",
-							value: $montant,
-							format: .number.precision(.fractionLength(0...2))
-						)
-						.keyboardType(.decimalPad)
-						
-						Text("€")
-							.foregroundStyle(.secondary)
-					}
-					.listRowSeparator(.hidden) // Masque le séparateur par défaut
+					VStack(spacing: 0) { // `spacing: 0` pour éviter les espaces indésirables
+						HStack {
+							TextField(
+								"Montant",
+								value: $montant,
+								format: .number.precision(.fractionLength(0...2))
+							)
+							.keyboardType(.decimalPad)
 
-					Rectangle()
-						.fill(Color.clear)
-						.frame(height: 0.0001) // Hauteur quasi nulle pour forcer l'affichage du séparateur personnalisé
-					
+							Text("€")
+								.foregroundStyle(.secondary)
+						}
+						.listRowSeparator(.hidden) // Masque le séparateur par défaut
+
+						// Divider pleine largeur sous le HStack
+						Divider()
+					}
+					.listRowInsets(EdgeInsets()) // Supprime les marges par défaut
+
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in
 							if newValue.count > maxCommentLength {
