@@ -17,12 +17,13 @@ struct MonthsView: View {
 			CalendrierTabView(accountsManager: accountsManager)
 		} else {
 			List {
-				ForEach(1...12, id: \.self) { month in
+				// Tri du plus récent (décembre) au plus ancien (janvier)
+				ForEach((1...12).reversed(), id: \.self) { month in
 					let total = accountsManager.totalPourMois(month, year: year)
 					if total != 0 {
 						NavigationLink(value: CalendrierRoute.transactions(month: month, year: year)) {
 							HStack {
-								Text(nomDuMois(month))
+								Text(Date.monthName(month))
 								Spacer()
 								Text("\(total, specifier: "%.2f") €")
 									.foregroundStyle(total >= 0 ? .green : .red)
@@ -30,7 +31,6 @@ struct MonthsView: View {
 						}
 					}
 				}
-				
 			}
 			.navigationTitle("\(year)")
 			.toolbar {
@@ -47,11 +47,5 @@ struct MonthsView: View {
 				AccountPickerView(accountsManager: accountsManager)
 			}
 		}
-	}
-	
-	private func nomDuMois(_ mois: Int) -> String {
-		let formatter = DateFormatter()
-		formatter.locale = Locale(identifier: "fr_FR")
-		return formatter.monthSymbols[mois - 1].capitalized
 	}
 }

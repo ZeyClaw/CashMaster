@@ -33,35 +33,7 @@ struct AddAccountSheet: View {
 				}
 				
 				Section("Icône") {
-					LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 16) {
-						ForEach(AccountStyle.allCases) { s in
-							Button {
-								style = s
-							} label: {
-								VStack(spacing: 6) {
-									ZStack {
-										Circle()
-											.fill(s.color.opacity(style == s ? 0.3 : 0.1))
-											.frame(width: 52, height: 52)
-										Image(systemName: s.icon)
-											.font(.system(size: 22))
-											.foregroundStyle(s.color)
-									}
-									.overlay(
-										Circle()
-											.stroke(s.color, lineWidth: style == s ? 2 : 0)
-									)
-									
-									Text(s.label)
-										.font(.caption2)
-										.foregroundStyle(style == s ? s.color : .secondary)
-										.lineLimit(1)
-								}
-							}
-							.buttonStyle(PlainButtonStyle())
-						}
-					}
-					.padding(.vertical, 8)
+					StylePickerGrid(selection: $style, columns: 4, showLabels: true)
 				}
 				
 				// Aperçu

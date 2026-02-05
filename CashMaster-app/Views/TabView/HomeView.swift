@@ -17,11 +17,6 @@ struct HomeView: View {
 	@State private var showingDeleteConfirmation = false
 	@State private var toasts: [ToastData] = []
 	
-	// Navigation
-	@State private var navigateToCurrentMonth = false
-	@State private var navigateToPotentielles = false
-	@State private var navigateToAllTransactions = false
-	
 	// MARK: - Computed Properties
 	
 	private var totalCurrent: Double? {
@@ -54,21 +49,43 @@ struct HomeView: View {
 		ZStack(alignment: .bottom) {
 			ScrollView {
 				VStack(spacing: 24) {
-					// En-tête avec solde total
-					BalanceHeaderView(
-						accountName: accountsManager.selectedAccount?.name,
-						totalCurrent: totalCurrent,
-						percentageChange: accountsManager.pourcentageChangementMois(),
-						onTap: { navigateToAllTransactions = true }
-					)
+					// En-tête avec solde total (NavigationLink)
+					NavigationLink(destination: AllTransactionsView(accountsManager: accountsManager)) {
+						BalanceHeaderContent(
+							accountName: accountsManager.selectedAccount?.name,
+							totalCurrent: totalCurrent,
+							percentageChange: accountsManager.pourcentageChangementMois()
+						)
+					}
+					.buttonStyle(PlainButtonStyle())
 					
 					// Cartes rapides (mois + à venir)
-					QuickCardsSection(
-						currentMonthSolde: currentMonthSolde,
-						totalPotentiel: totalPotentiel,
-						onMonthTap: { navigateToCurrentMonth = true },
-						onFutureTap: { navigateToPotentielles = true }
-					)
+					HStack(spacing: 16) {
+						NavigationLink(destination: TransactionsListView(
+							accountsManager: accountsManager,
+							month: currentMonth,
+							year: currentYear
+						)) {
+							QuickCardContent(
+								icon: "banknote",
+								iconColor: .blue,
+								title: "Solde du mois",
+								value: currentMonthSolde
+							)
+						}
+						.buttonStyle(PlainButtonStyle())
+						
+						NavigationLink(destination: PotentialTransactionsView(accountsManager: accountsManager)) {
+							QuickCardContent(
+								icon: "cart",
+								iconColor: .orange,
+								title: "À venir",
+								value: totalPotentiel
+							)
+						}
+						.buttonStyle(PlainButtonStyle())
+					}
+					.padding(.horizontal, 16)
 					
 					// Grille de raccourcis
 					ShortcutsGridView(
@@ -100,19 +117,6 @@ struct HomeView: View {
 				}
 			}
 			Button("Annuler", role: .cancel) { }
-		}
-		.navigationDestination(isPresented: $navigateToCurrentMonth) {
-			TransactionsListView(
-				accountsManager: accountsManager,
-				month: currentMonth,
-				year: currentYear
-			)
-		}
-		.navigationDestination(isPresented: $navigateToPotentielles) {
-			PotentialTransactionsView(accountsManager: accountsManager)
-		}
-		.navigationDestination(isPresented: $navigateToAllTransactions) {
-			AllTransactionsView(accountsManager: accountsManager)
 		}
 	}
 	
@@ -149,26 +153,11 @@ struct HomeView: View {
 	}
 }
 
-// MARK: - Toast Stack View
-
-private struct ToastStackView: View {
-	let toasts: [ToastData]
-	let onDismiss: (UUID) -> Void
-	
-	var body: some View {
-		VStack(spacing: -30) {
-			ForEach(Array(toasts.enumerated()), id: \.element.id) { idx, toast in
-				let depth = toasts.count - 1 - idx
-				ToastCard(toast: toast, depth: depth, onDismiss: onDismiss)
-					.transition(.move(edge: .bottom).combined(with: .opacity))
-			}
-		}
-		.padding(.bottom, 20)
-	}
-}
+// MARK: - Preview
 
 #Preview {
 	NavigationStack {
 		HomeView(accountsManager: AccountsManager())
 	}
 }
+

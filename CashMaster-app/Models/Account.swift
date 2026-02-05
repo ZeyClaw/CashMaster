@@ -10,7 +10,7 @@ import SwiftUI
 
 // MARK: - Style des comptes (icône + couleur liés)
 
-enum AccountStyle: String, Codable, CaseIterable, Identifiable {
+enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 	case bank        // Compte courant
 	case savings     // Épargne
 	case investment  // Investissements

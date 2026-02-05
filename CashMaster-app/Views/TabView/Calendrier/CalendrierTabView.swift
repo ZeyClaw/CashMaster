@@ -65,13 +65,13 @@ struct CalendrierTabView: View {
 	}
 }
 
-// MARK: - Vue Années (contenu uniquement)
+// MARK: - Vue Années (contenu uniquement, triées du plus récent au plus ancien)
 private struct CalendrierYearsContentView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	
 	var body: some View {
 		List {
-			ForEach(accountsManager.anneesDisponibles(), id: \.self) { year in
+			ForEach(accountsManager.anneesDisponibles().reversed(), id: \.self) { year in
 				NavigationLink(value: CalendrierRoute.months(year: year)) {
 					HStack {
 						Text("\(year)")
@@ -86,17 +86,19 @@ private struct CalendrierYearsContentView: View {
 	}
 }
 
-// MARK: - Vue Mois (contenu uniquement, tous les mois de toutes les années)
+// MARK: - Vue Mois (contenu uniquement, tous les mois de toutes les années, triés du plus récent)
 private struct CalendrierMonthsContentView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	
-	private var monthsWithData: [(year: Int, month: Int, total: Double)] {
-		var result: [(year: Int, month: Int, total: Double)] = []
+	private var monthsWithData: [(id: String, year: Int, month: Int, total: Double)] {
+		var result: [(id: String, year: Int, month: Int, total: Double)] = []
 		for year in accountsManager.anneesDisponibles().reversed() {
 			for month in (1...12).reversed() {
 				let total = accountsManager.totalPourMois(month, year: year)
 				if total != 0 {
-					result.append((year: year, month: month, total: total))
+					// ID unique combinant année et mois
+					let id = "\(year)-\(month)"
+					result.append((id: id, year: year, month: month, total: total))
 				}
 			}
 		}
@@ -105,10 +107,10 @@ private struct CalendrierMonthsContentView: View {
 	
 	var body: some View {
 		List {
-			ForEach(monthsWithData, id: \.month) { item in
+			ForEach(monthsWithData, id: \.id) { item in
 				NavigationLink(value: CalendrierRoute.transactions(month: item.month, year: item.year)) {
 					HStack {
-						Text("\(nomDuMois(item.month)) \(item.year)")
+						Text("\(Date.monthName(item.month)) \(item.year)")
 						Spacer()
 						Text("\(item.total, specifier: "%.2f") €")
 							.foregroundStyle(item.total >= 0 ? .green : .red)
@@ -117,11 +119,5 @@ private struct CalendrierMonthsContentView: View {
 			}
 		}
 		.scrollContentBackground(.hidden)
-	}
-	
-	private func nomDuMois(_ mois: Int) -> String {
-		let formatter = DateFormatter()
-		formatter.locale = Locale(identifier: "fr_FR")
-		return formatter.monthSymbols[mois - 1].capitalized
 	}
 }

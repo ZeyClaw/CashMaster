@@ -52,17 +52,11 @@ struct TransactionsListView: View {
 	
 	private var titleText: String {
 		if let year = year, let month = month {
-			return "\(nomDuMois(month)) \(year)"
+			return "\(Date.monthName(month)) \(year)"
 		} else if let year = year {
 			return "\(year)"
 		} else {
 			return "Transactions"
 		}
-	}
-	
-	private func nomDuMois(_ mois: Int) -> String {
-		let formatter = DateFormatter()
-		formatter.locale = Locale(identifier: "fr_FR")
-		return formatter.monthSymbols[mois - 1].capitalized
 	}
 }

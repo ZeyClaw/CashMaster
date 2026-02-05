@@ -10,7 +10,7 @@ import SwiftUI
 
 // MARK: - Style des raccourcis (icône + couleur liés)
 
-enum ShortcutStyle: String, Codable, CaseIterable, Identifiable {
+enum ShortcutStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 	case fuel       // Carburant
 	case shopping   // Courses
 	case family     // Famille

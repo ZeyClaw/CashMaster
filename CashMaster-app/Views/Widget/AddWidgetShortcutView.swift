@@ -20,14 +20,7 @@ struct AddWidgetShortcutView: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				TextField("Montant", value: $amount, format: .number.precision(.fractionLength(0...2)))
-					.keyboardType(.decimalPad)
-					.overlay(
-						Text("€")
-							.foregroundColor(.gray) // Couleur grise pour le symbole
-							.padding(.trailing, 16), // Espacement à droite
-						alignment: .trailing // Alignement à droite
-					)
+				CurrencyTextField("Montant", amount: $amount)
 
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in
@@ -50,28 +43,7 @@ struct AddWidgetShortcutView: View {
 				
 				// MARK: - Sélecteur d'icône
 				Section("Icône") {
-					LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
-						ForEach(ShortcutStyle.allCases) { style in
-							Button {
-								selectedStyle = style
-							} label: {
-								ZStack {
-									Circle()
-										.fill(style.color.opacity(selectedStyle == style ? 0.3 : 0.1))
-										.frame(width: 44, height: 44)
-									Image(systemName: style.icon)
-										.font(.system(size: 18))
-										.foregroundStyle(style.color)
-								}
-								.overlay(
-									Circle()
-										.stroke(style.color, lineWidth: selectedStyle == style ? 2 : 0)
-								)
-							}
-							.buttonStyle(PlainButtonStyle())
-						}
-					}
-					.padding(.vertical, 8)
+					StylePickerGrid(selection: $selectedStyle, columns: 5)
 				}
 			}
 			.navigationTitle("Nouveau widget")
