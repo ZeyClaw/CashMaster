@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddAccountSheet: View {
 	@Environment(\.dismiss) var dismiss
+	@Environment(\.colorScheme) var colorScheme
 	@ObservedObject var accountsManager: AccountsManager
 	var onAccountCreated: (() -> Void)?
 	
@@ -72,10 +73,7 @@ struct AddAccountSheet: View {
 						futur: 0
 					)
 					.listRowInsets(EdgeInsets())
-					.listRowBackground(
-						Color(UIColor.systemGroupedBackground)
-							.colorScheme(.dark, Color(UIColor.secondarySystemBackground))
-					)
+					.listRowBackground(backgroundColor(for: colorScheme))
 				}
 			}
 			.navigationTitle("Nouveau compte")
@@ -104,5 +102,17 @@ struct AddAccountSheet: View {
 		accountsManager.selectedAccountId = account.id
 		dismiss()
 		onAccountCreated?()
+	}
+	
+	// Fonction pour obtenir la couleur de fond souhaitée
+	private func backgroundColor(for scheme: ColorScheme) -> Color {
+		switch scheme {
+		case .light:
+			return Color(UIColor.secondarySystemGroupedBackground) // Gris clair en mode clair
+		case .dark:
+			return Color(UIColor.secondarySystemBackground) // Gris clair en mode sombre
+		@unknown default:
+			return Color(UIColor.secondarySystemGroupedBackground)
+		}
 	}
 }
