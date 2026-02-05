@@ -5,117 +5,27 @@
 //  Created by Godefroy REYNAUD on 05/08/2025.
 //
 
-// AccountsManager.swift
 import Foundation
-import SwiftUI
-
-// MARK: - Style des comptes (icône + couleur liés)
-
-enum AccountStyle: String, Codable, CaseIterable, Identifiable {
-	case bank        // Compte courant
-	case savings     // Épargne
-	case investment  // Investissements
-	case card        // Carte
-	case cash        // Espèces
-	case piggy       // Tirelire
-	case wallet      // Portefeuille
-	case business    // Professionnel
-	
-	var id: String { rawValue }
-	
-	var icon: String {
-		switch self {
-		case .bank:       return "building.columns.fill"
-		case .savings:    return "banknote.fill"
-		case .investment: return "chart.line.uptrend.xyaxis"
-		case .card:       return "creditcard.fill"
-		case .cash:       return "dollarsign.circle.fill"
-		case .piggy:      return "gift.fill"
-		case .wallet:     return "wallet.bifold.fill"
-		case .business:   return "briefcase.fill"
-		}
-	}
-	
-	var color: Color {
-		switch self {
-		case .bank:       return .blue
-		case .savings:    return .orange
-		case .investment: return .purple
-		case .card:       return .green
-		case .cash:       return .cyan
-		case .piggy:      return .pink
-		case .wallet:     return .brown
-		case .business:   return .indigo
-		}
-	}
-	
-	var label: String {
-		switch self {
-		case .bank:       return "Compte courant"
-		case .savings:    return "Épargne"
-		case .investment: return "Investissements"
-		case .card:       return "Carte"
-		case .cash:       return "Espèces"
-		case .piggy:      return "Tirelire"
-		case .wallet:     return "Portefeuille"
-		case .business:   return "Professionnel"
-		}
-	}
-	
-	/// Devine le style par défaut selon le nom du compte
-	static func guessFrom(name: String) -> AccountStyle {
-		let text = name.lowercased()
-		if text.contains("courant") || text.contains("principal") || text.contains("bnp") || text.contains("société générale") || text.contains("crédit") {
-			return .bank
-		} else if text.contains("livret") || text.contains("épargne") || text.contains("ldd") || text.contains("pel") {
-			return .savings
-		} else if text.contains("invest") || text.contains("pea") || text.contains("crypto") || text.contains("bourse") || text.contains("action") {
-			return .investment
-		} else if text.contains("carte") || text.contains("revolut") || text.contains("n26") || text.contains("lydia") {
-			return .card
-		} else if text.contains("espèce") || text.contains("cash") || text.contains("liquide") {
-			return .cash
-		} else if text.contains("tirelire") || text.contains("économie") {
-			return .piggy
-		} else if text.contains("portefeuille") || text.contains("wallet") {
-			return .wallet
-		} else if text.contains("pro") || text.contains("entreprise") || text.contains("business") {
-			return .business
-		}
-		return .bank
-	}
-}
-
-// MARK: - Modèle Account
-
-struct Account: Identifiable, Codable, Equatable {
-	let id: UUID
-	var name: String
-	var detail: String
-	var style: AccountStyle
-	
-	init(id: UUID = UUID(), name: String, detail: String = "", style: AccountStyle? = nil) {
-		self.id = id
-		self.name = name
-		self.detail = detail
-		self.style = style ?? AccountStyle.guessFrom(name: name)
-	}
-}
 
 //  Classe centrale de gestion des comptes et transactions.
 //
 //  Très important : toutes les modifications de comptes/transactions DOIVENT passer
 //  par cette classe.
 //  Pourquoi ?
-//  - C’est elle qui appelle `objectWillChange.send()` après chaque mise à jour
-//    afin que SwiftUI rafraîchisse automatiquement l’interface.
+//  - C'est elle qui appelle `objectWillChange.send()` après chaque mise à jour
+//    afin que SwiftUI rafraîchisse automatiquement l'interface.
 //  - Si tu modifies directement un `Transaction` ou un `TransactionManager` sans passer par ici,
-//    l’UI ne sera pas informée et l’affichage ne se mettra pas à jour.
+//    l'UI ne sera pas informée et l'affichage ne se mettra pas à jour.
 class AccountsManager: ObservableObject {
+	
+	// MARK: - Données publiées
+	
 	/// Liste des comptes
 	@Published private(set) var accounts: [Account] = []
+	
 	/// Dictionnaire des gestionnaires de transactions, où les clés sont des IDs de comptes
-	@Published private(set) var managers: [UUID: TransactionManager] = []
+	/// et les valeurs sont des instances de TransactionManager (liste des transactions pour un compte)
+	@Published private(set) var transactionManagers: [UUID: TransactionManager] = [:]
 	@Published var selectedAccountId: UUID? {
 		didSet {
 			if let id = selectedAccountId {
@@ -130,6 +40,7 @@ class AccountsManager: ObservableObject {
 
 	private let saveKey = "accounts_data_v2"
 	
+	// MARK: - Init
 	init() { 
 		load()
 		if let idString = UserDefaults.standard.string(forKey: "lastSelectedAccountId"),
@@ -138,25 +49,26 @@ class AccountsManager: ObservableObject {
 		}
 	}
 	
+	// MARK: - Structure de sauvegarde
 	private struct AccountData: Codable {
 		var account: Account
 		var transactions: [Transaction]
 		var widgetShortcuts: [WidgetShortcut]
 	}
 
-	
 	// MARK: - Gestion des comptes
+	
 	func ajouterCompte(_ account: Account) {
 		guard !accounts.contains(where: { $0.id == account.id }) else { return }
 		accounts.append(account)
-		managers[account.id] = TransactionManager(accountName: account.name)
+		transactionManagers[account.id] = TransactionManager(accountName: account.name)
 		save()
 		objectWillChange.send()
 	}
 	
 	func deleteAccount(_ account: Account) {
 		accounts.removeAll { $0.id == account.id }
-		managers.removeValue(forKey: account.id)
+		transactionManagers.removeValue(forKey: account.id)
 		save()
 		if accounts.isEmpty {
 			selectedAccountId = nil
@@ -171,16 +83,17 @@ class AccountsManager: ObservableObject {
 	}
 	
 	// MARK: - Gestion des transactions
+	
 	func ajouterTransaction(_ transaction: Transaction) {
 		guard let accountId = selectedAccountId else { return }
-		managers[accountId]?.ajouter(transaction)
+		transactionManagers[accountId]?.ajouter(transaction)
 		save()
 		objectWillChange.send()
 	}
 	
 	func supprimerTransaction(_ transaction: Transaction) {
 		guard let accountId = selectedAccountId else { return }
-		managers[accountId]?.supprimer(transaction)
+		transactionManagers[accountId]?.supprimer(transaction)
 		save()
 		objectWillChange.send()
 	}
@@ -193,26 +106,27 @@ class AccountsManager: ObservableObject {
 	
 	func transactions() -> [Transaction] {
 		guard let accountId = selectedAccountId else { return [] }
-		return managers[accountId]?.transactions ?? []
+		return transactionManagers[accountId]?.transactions ?? []
 	}
 	
 	// MARK: - Totaux
+	
 	func totalNonPotentiel(for account: Account) -> Double {
-		managers[account.id]?.totalNonPotentiel() ?? 0
+		transactionManagers[account.id]?.totalNonPotentiel() ?? 0
 	}
 	
 	func totalPotentiel(for account: Account) -> Double {
-		managers[account.id]?.totalPotentiel() ?? 0
+		transactionManagers[account.id]?.totalPotentiel() ?? 0
 	}
 	
-	
 	// MARK: - Persistance
+	
 	private func save() {
 		let dataArray = accounts.map { account in
 			AccountData(
 				account: account,
-				transactions: managers[account.id]?.transactions ?? [],
-				widgetShortcuts: managers[account.id]?.widgetShortcuts ?? []
+				transactions: transactionManagers[account.id]?.transactions ?? [],
+				widgetShortcuts: transactionManagers[account.id]?.widgetShortcuts ?? []
 			)
 		}
 		if let data = try? JSONEncoder().encode(dataArray) {
@@ -221,19 +135,28 @@ class AccountsManager: ObservableObject {
 	}
 	
 	private func load() {
-		if let data = UserDefaults.standard.data(forKey: saveKey),
-		   let decoded = try? JSONDecoder().decode([AccountData].self, from: data) {
-			accounts = decoded.map { $0.account }
-			managers = Dictionary(uniqueKeysWithValues: decoded.map { entry in
-				let manager = TransactionManager(accountName: entry.account.name)
-				manager.transactions = entry.transactions
-				manager.widgetShortcuts = entry.widgetShortcuts
-				return (entry.account.id, manager)
-			})
+		guard let data = UserDefaults.standard.data(forKey: saveKey),
+			  let decoded = try? JSONDecoder().decode([AccountData].self, from: data) else {
+			return
 		}
+		
+		var loadedAccounts: [Account] = []
+		var loadedManagers: [UUID: TransactionManager] = [:]
+		
+		for entry in decoded {
+			loadedAccounts.append(entry.account)
+			let manager = TransactionManager(accountName: entry.account.name)
+			manager.transactions = entry.transactions
+			manager.widgetShortcuts = entry.widgetShortcuts
+			loadedManagers[entry.account.id] = manager
+		}
+		
+		accounts = loadedAccounts
+		transactionManagers = loadedManagers
 	}
 	
 	// MARK: - Regroupements
+	
 	func anneesDisponibles() -> [Int] {
 		let txs = transactions().filter { !$0.potentiel }
 		let years = txs.compactMap { tx -> Int? in
@@ -286,7 +209,6 @@ class AccountsManager: ObservableObject {
 		
 		// Si le mois précédent est à 0, on ne peut pas calculer de pourcentage
 		guard previousTotal != 0 else { return nil }
-		
 		return ((currentTotal - previousTotal) / abs(previousTotal)) * 100
 	}
 	
@@ -314,23 +236,23 @@ class AccountsManager: ObservableObject {
 		return txs
 	}
 	
-	
 	// MARK: - Widgets
+	
 	func getWidgetShortcuts() -> [WidgetShortcut] {
 		guard let accountId = selectedAccountId else { return [] }
-		return managers[accountId]?.widgetShortcuts ?? []
+		return transactionManagers[accountId]?.widgetShortcuts ?? []
 	}
 	
 	func addWidgetShortcut(_ shortcut: WidgetShortcut) {
 		guard let accountId = selectedAccountId else { return }
-		managers[accountId]?.widgetShortcuts.append(shortcut)
+		transactionManagers[accountId]?.widgetShortcuts.append(shortcut)
 		save()
 		objectWillChange.send()
 	}
 	
 	func deleteWidgetShortcut(_ shortcut: WidgetShortcut) {
 		guard let accountId = selectedAccountId else { return }
-		managers[accountId]?.widgetShortcuts.removeAll { $0.id == shortcut.id }
+		transactionManagers[accountId]?.widgetShortcuts.removeAll { $0.id == shortcut.id }
 		save()
 		objectWillChange.send()
 	}
@@ -346,9 +268,8 @@ class AccountsManager: ObservableObject {
 		}
 		
 		let allTransactions = transactions().sorted { tx1, tx2 in
-			// Trier par date (les transactions sans date à la fin)
 			if let date1 = tx1.date, let date2 = tx2.date {
-				return date1 > date2 // Plus récente en premier
+				return date1 > date2
 			} else if tx1.date != nil {
 				return true
 			} else {
@@ -394,6 +315,7 @@ class AccountsManager: ObservableObject {
 	}
 	
 	// MARK: - Import CSV
+	
 	func importCSV(from url: URL) -> Int {
 		guard selectedAccountId != nil else {
 			print("❌ Aucun compte sélectionné")
@@ -412,7 +334,6 @@ class AccountsManager: ObservableObject {
 			let lines = content.components(separatedBy: .newlines)
 			var importedCount = 0
 	
-			// Ignorer la première ligne (header) et les lignes vides
 			for line in lines.dropFirst() {
 				let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
 				guard !trimmedLine.isEmpty else { continue }
@@ -461,7 +382,6 @@ class AccountsManager: ObservableObject {
 				let statutString = columns[4].trimmingCharacters(in: .whitespacesAndNewlines)
 				let isPotentielle = (statutString == "Potentielle")
 		
-				// Créer et ajouter la transaction
 				let transaction = Transaction(
 					amount: amount,
 					comment: comment,
@@ -469,6 +389,7 @@ class AccountsManager: ObservableObject {
 					date: isPotentielle ? nil : (date ?? Date())
 				)
 		
+				// Créer et ajouter la transaction
 				ajouterTransaction(transaction)
 				importedCount += 1
 				print("✅ Transaction importée: \(comment) - \(amount)€")
@@ -482,7 +403,5 @@ class AccountsManager: ObservableObject {
 			return 0
 		}
 	}
-
-
 }
 

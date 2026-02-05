@@ -43,11 +43,11 @@ struct AccountCardView: View {
 			VStack(alignment: .trailing, spacing: 2) {
 				Text("\(solde, specifier: "%.2f") €")
 					.font(.title3.bold())
-					.foregroundStyle(solde >= 0 ? .primary : .red)
+					.foregroundColor(solde >= 0 ? .primary : .red)
 				if futur != solde {
 					Text("→ \(futur, specifier: "%.2f") €")
 						.font(.caption)
-						.foregroundStyle(futur >= 0 ? .secondary : .red.opacity(0.7))
+						.foregroundColor(futur >= 0 ? .secondary : .red.opacity(0.7))
 				}
 			}
 		}
