@@ -42,24 +42,26 @@ struct AddTransactionView: View {
 				}
 				
 				Section {
-					HStack {
-						TextField(
-							"Montant",
-							value: $montant,
-							format: .number.precision(.fractionLength(0...2))
-						)
-						.keyboardType(.decimalPad)
-						
-						Text("€")
-							.foregroundStyle(.secondary)
-					}
-					
-					TextField("Commentaire", text: $transactionComment)
-						.onChange(of: transactionComment) { _, newValue in
-							if newValue.count > maxCommentLength {
-								transactionComment = String(newValue.prefix(maxCommentLength))
-							}
+					Form {
+						HStack {
+							TextField(
+								"Montant",
+								value: $montant,
+								format: .number.precision(.fractionLength(0...2))
+							)
+							.keyboardType(.decimalPad)
+							
+							Text("€")
+								.foregroundStyle(.secondary)
 						}
+						
+						TextField("Commentaire", text: $transactionComment)
+							.onChange(of: transactionComment) { _, newValue in
+								if newValue.count > maxCommentLength {
+									transactionComment = String(newValue.prefix(maxCommentLength))
+								}
+							}
+					}
 				} header: {
 					Text("Détails")
 				} footer: {

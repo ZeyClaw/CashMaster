@@ -33,21 +33,20 @@ struct AddWidgetShortcutView: View {
 						// Met à jour automatiquement le style selon le commentaire
 						selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
 					}
-			
-
+				
 				Picker("Type", selection: $type) {
 					ForEach(TransactionType.allCases) { t in
 						Text(t.label).tag(t)
 					}
 				}
 				.pickerStyle(.segmented)
+				.listRowSeparator(.hidden)
 				.onChange(of: type) { _, newValue in
 					// Met à jour le style si c'est le style par défaut
 					if selectedStyle == .income || selectedStyle == .expense {
 						selectedStyle = newValue == .income ? .income : .expense
 					}
 				}
-
 				
 				// MARK: - Sélecteur d'icône
 				Section("Icône") {
