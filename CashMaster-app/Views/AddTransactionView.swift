@@ -41,8 +41,8 @@ struct AddTransactionView: View {
 					.pickerStyle(.segmented)
 				}
 				
-				Section {
-					Form {
+				Form {
+					Section {
 						HStack {
 							TextField(
 								"Montant",
@@ -61,13 +61,13 @@ struct AddTransactionView: View {
 									transactionComment = String(newValue.prefix(maxCommentLength))
 								}
 							}
-					}
-				} header: {
-					Text("Détails")
-				} footer: {
-					HStack {
-						Spacer()
-						Text("\(transactionComment.count)/\(maxCommentLength)")
+					} header: {
+						Text("Détails")
+					} footer: {
+						HStack {
+							Spacer()
+							Text("\(transactionComment.count)/\(maxCommentLength)")
+						}
 					}
 				}
 				
