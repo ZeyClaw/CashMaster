@@ -28,6 +28,9 @@ struct AddWidgetShortcutView: View {
 						.foregroundStyle(.secondary)
 				}
 				.listRowSeparator(.hidden) // Masque le séparateur par défaut
+
+				Spacer()
+					.frame(height: 0.0001) // Hauteur quasi nulle pour forcer l'affichage du séparateur personnalisé
 				
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in

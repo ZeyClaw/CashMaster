@@ -57,7 +57,7 @@ struct AddTransactionView: View {
 
 					Rectangle()
 						.fill(Color.clear)
-						.frame(height: 0.01)
+						.frame(height: 0.0001) // Hauteur quasi nulle pour forcer l'affichage du séparateur personnalisé
 					
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in
