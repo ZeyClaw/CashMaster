@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PotentialTransactionsView: View {
 	@ObservedObject var accountsManager: AccountsManager
+	@State private var transactionToEdit: Transaction? = nil
 	
 	var body: some View {
 		List {
@@ -18,6 +19,10 @@ struct PotentialTransactionsView: View {
 			} else {
 				ForEach(accountsManager.potentialTransactions()) { transaction in
 					TransactionRow(transaction: transaction)
+						.contentShape(Rectangle())
+						.onTapGesture {
+							transactionToEdit = transaction
+						}
 						.swipeActions(edge: .trailing, allowsFullSwipe: true) {
 							Button(role: .destructive) {
 								accountsManager.supprimerTransaction(transaction)
@@ -37,5 +42,8 @@ struct PotentialTransactionsView: View {
 			}
 		}
 		.navigationTitle("Futur")
+		.sheet(item: $transactionToEdit) { transaction in
+			AddTransactionView(accountsManager: accountsManager, transactionToEdit: transaction)
+		}
 	}
 }

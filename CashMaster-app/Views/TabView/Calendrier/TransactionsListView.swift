@@ -12,11 +12,16 @@ struct TransactionsListView: View {
 	var month: Int? = nil
 	var year: Int? = nil
 	@State private var showingAccountPicker = false
+	@State private var transactionToEdit: Transaction? = nil
 	
 	var body: some View {
 		List {
 			ForEach(accountsManager.validatedTransactions(year: year, month: month)) { transaction in
 				TransactionRow(transaction: transaction)
+					.contentShape(Rectangle())
+					.onTapGesture {
+						transactionToEdit = transaction
+					}
 					.swipeActions(edge: .trailing, allowsFullSwipe: true) {
 						Button(role: .destructive) {
 							accountsManager.supprimerTransaction(transaction)
@@ -39,6 +44,9 @@ struct TransactionsListView: View {
 		}
 		.sheet(isPresented: $showingAccountPicker) {
 			AccountPickerView(accountsManager: accountsManager)
+		}
+		.sheet(item: $transactionToEdit) { transaction in
+			AddTransactionView(accountsManager: accountsManager, transactionToEdit: transaction)
 		}
 	}
 	

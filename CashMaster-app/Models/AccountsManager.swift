@@ -121,6 +121,12 @@ class AccountsManager: ObservableObject {
 	
 	// MARK: - Persistance
 	
+	/// Sauvegarde publique (pour les modifications de transaction)
+	func sauvegarder() {
+		save()
+		objectWillChange.send()
+	}
+	
 	private func save() {
 		let dataArray = accounts.map { account in
 			AccountData(
