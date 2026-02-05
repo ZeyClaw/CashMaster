@@ -47,6 +47,12 @@ struct CalendrierTabView: View {
 				}
 			}
 		}
+		.background(
+			Color(UIColor { traitCollection in
+				traitCollection.userInterfaceStyle == .dark ? .black : .systemGroupedBackground
+			})
+			.ignoresSafeArea()
+		)
 		.navigationTitle("Calendrier")
 		.navigationDestination(for: CalendrierRoute.self) { route in
 			switch route {
@@ -76,6 +82,7 @@ private struct CalendrierYearsContentView: View {
 				}
 			}
 		}
+		.scrollContentBackground(.hidden)
 	}
 }
 
@@ -109,6 +116,7 @@ private struct CalendrierMonthsContentView: View {
 				}
 			}
 		}
+		.scrollContentBackground(.hidden)
 	}
 	
 	private func nomDuMois(_ mois: Int) -> String {

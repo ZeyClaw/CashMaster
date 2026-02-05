@@ -57,6 +57,7 @@ struct AllTransactionsView: View {
 				}
 			}
 		}
+		.scrollContentBackground(embedded ? .hidden : .visible)
 		.if(!embedded) { view in
 			view
 				.navigationTitle("Toutes les transactions")
