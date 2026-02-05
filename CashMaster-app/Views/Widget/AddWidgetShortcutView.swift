@@ -28,8 +28,6 @@ struct AddWidgetShortcutView: View {
 						.foregroundStyle(.secondary)
 				}
 				
-				Divider()
-				
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in
 						// Met à jour automatiquement le style selon le commentaire
@@ -42,6 +40,7 @@ struct AddWidgetShortcutView: View {
 					}
 				}
 				.pickerStyle(.segmented)
+				.listRowSeparator(.hidden)
 				.onChange(of: type) { _, newValue in
 					// Met à jour le style si c'est le style par défaut
 					if selectedStyle == .income || selectedStyle == .expense {
