@@ -70,7 +70,8 @@ struct PercentageChangeIndicator: View {
 	
 	private var formattedText: String {
 		guard let p = percentage else { return "+0.0% ce mois-ci" }
-		return "\(p > 0 ? "+" : "")\(p, specifier: "%.1f")% ce mois-ci"
+		let sign = p > 0 ? "+" : ""
+		return "\(sign)\(String(format: "%.1f", p))% ce mois-ci"
 	}
 	
 	private var color: Color {

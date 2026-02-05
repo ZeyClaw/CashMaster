@@ -33,7 +33,7 @@ struct AddAccountSheet: View {
 				}
 				
 				Section("Icône") {
-					StylePickerGrid(selection: $style, columns: 4, showLabels: true)
+					StylePickerGrid(selectedStyle: $style, columns: 4)
 				}
 				
 				// Aperçu

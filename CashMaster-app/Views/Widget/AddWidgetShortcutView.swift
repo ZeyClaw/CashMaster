@@ -43,7 +43,7 @@ struct AddWidgetShortcutView: View {
 				
 				// MARK: - Sélecteur d'icône
 				Section("Icône") {
-					StylePickerGrid(selection: $selectedStyle, columns: 5)
+					StylePickerGrid(selectedStyle: $selectedStyle, columns: 5)
 				}
 			}
 			.navigationTitle("Nouveau widget")
