@@ -31,7 +31,7 @@ struct AddWidgetShortcutView: View {
 
 				// Divider personnalisé (pleine largeur)
 				Divider()
-					.listRowSeparator(.hidden) // Évite les doublons de séparateurs
+					.padding(.leading, 0)
 				
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in
