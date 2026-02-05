@@ -15,7 +15,7 @@ struct AddTransactionView: View {
 	var transactionToEdit: Transaction? = nil
 	
 	// MARK: - Limites
-	private let maxCommentLength = 50
+	private let maxCommentLength = 30
 	private let maxMontant: Double = 999_999_999.99
 	
 	// MARK: - State
@@ -46,7 +46,7 @@ struct AddTransactionView: View {
 						TextField(
 							"Montant",
 							value: $montant,
-							format: .number.precision(.fractionLength(0...2))
+							format: .number.precision(.fractionLength(2))
 						)
 						.keyboardType(.decimalPad)
 						

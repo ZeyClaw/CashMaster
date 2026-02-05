@@ -176,7 +176,7 @@ struct HomeView: View {
 								}
 								
 								VStack(alignment: .leading, spacing: 4) {
-									Text("Transactions futures")
+									Text("À venir")
 										.font(.system(size: 15, weight: .bold))
 										.foregroundStyle(.primary)
 									if let totalPotentiel = totalPotentiel {

@@ -15,49 +15,45 @@ struct AccountPickerView: View {
 	
 	var body: some View {
 		NavigationStack {
-			ScrollView {
-				LazyVStack(spacing: 12) {
-					ForEach(accountsManager.getAllAccounts()) { account in
-						AccountCardView(
-							account: account,
-							solde: accountsManager.totalNonPotentiel(for: account),
-							futur: accountsManager.totalNonPotentiel(for: account) + accountsManager.totalPotentiel(for: account)
-						)
-						.contentShape(Rectangle())
-						.onTapGesture {
-							accountsManager.selectedAccountId = account.id
-							dismiss()
-						}
-						.contextMenu {
-							Button(role: .destructive) {
-								accountsManager.deleteAccount(account)
-							} label: {
-								Label("Supprimer", systemImage: "trash")
-							}
+			List {
+				ForEach(accountsManager.getAllAccounts()) { account in
+					AccountCardView(
+						account: account,
+						solde: accountsManager.totalNonPotentiel(for: account),
+						futur: accountsManager.totalNonPotentiel(for: account) + accountsManager.totalPotentiel(for: account)
+					)
+					.listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+					.listRowBackground(Color.clear)
+					.contentShape(Rectangle())
+					.onTapGesture {
+						accountsManager.selectedAccountId = account.id
+						dismiss()
+					}
+					.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+						Button(role: .destructive) {
+							accountsManager.deleteAccount(account)
+						} label: {
+							Label("Supprimer", systemImage: "trash")
 						}
 					}
-					
-					// Bouton Ajouter
-					Button {
-						showingAddAccount = true
-					} label: {
-						HStack {
-							Image(systemName: "plus.circle.fill")
-								.font(.title2)
-							Text("Ajouter un compte")
-								.font(.headline)
-						}
-						.foregroundStyle(.blue)
-						.frame(maxWidth: .infinity)
-						.padding(.vertical, 20)
-						.background(Color(.systemBackground))
-						.clipShape(RoundedRectangle(cornerRadius: 20))
-						.shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 4)
-					}
-					.buttonStyle(PlainButtonStyle())
 				}
-				.padding()
+				
+				// Bouton Ajouter
+				Button {
+					showingAddAccount = true
+				} label: {
+					HStack {
+						Image(systemName: "plus.circle.fill")
+							.font(.title2)
+						Text("Ajouter un compte")
+							.font(.headline)
+					}
+					.frame(maxWidth: .infinity)
+				}
+				.listRowBackground(Color.clear)
 			}
+			.listStyle(.plain)
+			.scrollContentBackground(.hidden)
 			.background(
 				Color(UIColor { traitCollection in
 					traitCollection.userInterfaceStyle == .dark ? .black : .systemGroupedBackground
