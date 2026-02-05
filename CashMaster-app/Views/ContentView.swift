@@ -67,8 +67,8 @@ struct ContentView: View {
 		}
 		.onAppear {
 			// Auto-sélection du premier compte si aucun n'est sélectionné
-			if accountsManager.selectedAccount == nil {
-				accountsManager.selectedAccount = accountsManager.getAllAccounts().first
+			if accountsManager.selectedAccountId == nil {
+				accountsManager.selectedAccountId = accountsManager.getAllAccounts().first?.id
 			}
 		}
 	}

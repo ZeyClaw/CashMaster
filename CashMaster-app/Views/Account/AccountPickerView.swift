@@ -13,81 +13,170 @@ struct AccountPickerView: View {
 	
 	@State private var showingAddAccount = false
 	@State private var newAccountName = ""
+	@State private var newAccountDetail = ""
+	@State private var selectedStyle: AccountStyle = .bank
 	
 	var body: some View {
 		NavigationStack {
-			List {
-				ForEach(accountsManager.getAllAccounts(), id: \.self) { account in
-					Button {
-						accountsManager.selectedAccount = account
-						dismiss()
-					} label: {
+			ScrollView {
+				LazyVStack(spacing: 12) {
+					ForEach(accountsManager.getAllAccounts()) { account in
 						AccountCardView(
 							account: account,
 							solde: accountsManager.totalNonPotentiel(for: account),
 							futur: accountsManager.totalNonPotentiel(for: account) + accountsManager.totalPotentiel(for: account)
 						)
-					}
-					.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-						Button(role: .destructive) {
-							accountsManager.deleteAccount(account)
-						} label: {
-							Label("Supprimer", systemImage: "trash")
+						.contentShape(Rectangle())
+						.onTapGesture {
+							accountsManager.selectedAccountId = account.id
+							dismiss()
+						}
+						.contextMenu {
+							Button(role: .destructive) {
+								accountsManager.deleteAccount(account)
+							} label: {
+								Label("Supprimer", systemImage: "trash")
+							}
 						}
 					}
-				}
-				
-				Section {
+					
+					// Bouton Ajouter
 					Button {
 						showingAddAccount = true
 					} label: {
 						HStack {
-							Spacer()
-							Label("Ajouter un compte", systemImage: "plus.circle.fill")
+							Image(systemName: "plus.circle.fill")
+								.font(.title2)
+							Text("Ajouter un compte")
 								.font(.headline)
-								.foregroundStyle(.blue)
-							Spacer()
 						}
+						.foregroundStyle(.blue)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 20)
+						.background(Color(.systemBackground))
+						.clipShape(RoundedRectangle(cornerRadius: 20))
+						.shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 4)
 					}
-					.padding(.vertical, 8)
+					.buttonStyle(PlainButtonStyle())
 				}
+				.padding()
 			}
-			.navigationTitle("Choisir un compte")
+			.background(Color(.systemGroupedBackground))
+			.navigationTitle("Mes comptes")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button("Annuler") {
+					Button("Fermer") {
 						dismiss()
 					}
 				}
 			}
 			.sheet(isPresented: $showingAddAccount) {
-				NavigationStack {
-					Form {
-						Section("Nom du compte") {
-							TextField("Ex: Alice", text: $newAccountName)
+				AddAccountSheet(
+					accountsManager: accountsManager,
+					name: $newAccountName,
+					detail: $newAccountDetail,
+					style: $selectedStyle,
+					onDismiss: {
+						newAccountName = ""
+						newAccountDetail = ""
+						selectedStyle = .bank
+						showingAddAccount = false
+					},
+					onSave: {
+						let trimmed = newAccountName.trimmingCharacters(in: .whitespacesAndNewlines)
+						if !trimmed.isEmpty {
+							let account = Account(name: trimmed, detail: newAccountDetail, style: selectedStyle)
+							accountsManager.ajouterCompte(account)
+							accountsManager.selectedAccountId = account.id
+							newAccountName = ""
+							newAccountDetail = ""
+							selectedStyle = .bank
+							showingAddAccount = false
+							dismiss()
 						}
 					}
-					.navigationTitle("Nouveau Compte")
-					.toolbar {
-						ToolbarItem(placement: .cancellationAction) {
-							Button("Annuler") {
-								newAccountName = ""
-								showingAddAccount = false
-							}
+				)
+			}
+		}
+	}
+}
+
+// MARK: - Sheet d'ajout de compte
+
+struct AddAccountSheet: View {
+	@ObservedObject var accountsManager: AccountsManager
+	@Binding var name: String
+	@Binding var detail: String
+	@Binding var style: AccountStyle
+	var onDismiss: () -> Void
+	var onSave: () -> Void
+	
+	var body: some View {
+		NavigationStack {
+			Form {
+				Section("Informations") {
+					TextField("Nom du compte", text: $name)
+						.onChange(of: name) { _, newValue in
+							style = AccountStyle.guessFrom(name: newValue)
 						}
-						ToolbarItem(placement: .confirmationAction) {
-							Button("Créer") {
-								let trimmed = newAccountName.trimmingCharacters(in: .whitespacesAndNewlines)
-								if !trimmed.isEmpty {
-									accountsManager.ajouterCompte(trimmed)
-									accountsManager.selectedAccount = trimmed
-									newAccountName = ""
-									showingAddAccount = false
-									dismiss() // ferme tout
+					TextField("Détail (optionnel)", text: $detail)
+				}
+				
+				Section("Icône") {
+					LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 16) {
+						ForEach(AccountStyle.allCases) { s in
+							Button {
+								style = s
+							} label: {
+								VStack(spacing: 6) {
+									ZStack {
+										Circle()
+											.fill(s.color.opacity(style == s ? 0.3 : 0.1))
+											.frame(width: 52, height: 52)
+										Image(systemName: s.icon)
+											.font(.system(size: 22))
+											.foregroundStyle(s.color)
+									}
+									.overlay(
+										Circle()
+											.stroke(s.color, lineWidth: style == s ? 2 : 0)
+									)
+									
+									Text(s.label)
+										.font(.caption2)
+										.foregroundStyle(style == s ? s.color : .secondary)
+										.lineLimit(1)
 								}
 							}
+							.buttonStyle(PlainButtonStyle())
 						}
 					}
+					.padding(.vertical, 8)
+				}
+				
+				// Aperçu
+				Section("Aperçu") {
+					AccountCardView(
+						account: Account(name: name.isEmpty ? "Nouveau compte" : name, detail: detail, style: style),
+						solde: 0,
+						futur: 0
+					)
+					.listRowInsets(EdgeInsets())
+					.listRowBackground(Color.clear)
+				}
+			}
+			.navigationTitle("Nouveau compte")
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("Annuler") {
+						onDismiss()
+					}
+				}
+				ToolbarItem(placement: .confirmationAction) {
+					Button("Créer") {
+						onSave()
+					}
+					.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 				}
 			}
 		}

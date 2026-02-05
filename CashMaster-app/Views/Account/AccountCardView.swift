@@ -8,38 +8,53 @@
 import SwiftUI
 
 struct AccountCardView: View {
-	let account: String
+	let account: Account
 	let solde: Double
 	let futur: Double
 	
 	var body: some View {
-		VStack(alignment: .leading, spacing: 8) {
-			Text(account)
-				.font(.headline)
+		HStack(spacing: 16) {
+			// Icône avec fond coloré
+			ZStack {
+				RoundedRectangle(cornerRadius: 12)
+					.fill(account.style.color.opacity(0.15))
+					.frame(width: 48, height: 48)
+				Image(systemName: account.style.icon)
+					.font(.system(size: 20))
+					.foregroundStyle(account.style.color)
+			}
 			
-			HStack {
-				VStack(alignment: .leading) {
-					Text("Solde actuel")
+			// Nom et détail
+			VStack(alignment: .leading, spacing: 2) {
+				Text(account.name)
+					.font(.headline)
+					.foregroundStyle(.primary)
+				if !account.detail.isEmpty {
+					Text(account.detail)
 						.font(.caption)
-					Text("\(solde, specifier: "%.2f") €")
-						.font(.title3)
-						.foregroundStyle(solde >= 0 ? .green : .red)
+						.foregroundStyle(.secondary)
+						.textCase(.uppercase)
 				}
-				
-				Spacer()
-				
-				VStack(alignment: .leading) {
-					Text("Futur")
+			}
+			
+			Spacer()
+			
+			// Solde
+			VStack(alignment: .trailing, spacing: 2) {
+				Text("\(solde, specifier: "%.2f") €")
+					.font(.title3.bold())
+					.foregroundStyle(solde >= 0 ? .primary : .red)
+				if futur != solde {
+					Text("→ \(futur, specifier: "%.2f") €")
 						.font(.caption)
-					Text("\(futur, specifier: "%.2f") €")
-						.font(.title3)
-						.foregroundStyle(futur >= 0 ? .green : .red)
+						.foregroundStyle(futur >= 0 ? .secondary : .red.opacity(0.7))
 				}
 			}
 		}
-		.padding()
-		.frame(maxWidth: .infinity)
-		.cornerRadius(12)
+		.padding(16)
+		.background(Color(.systemBackground))
+		.clipShape(RoundedRectangle(cornerRadius: 20))
+		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
 	}
 }
 

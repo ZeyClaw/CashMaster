@@ -87,8 +87,8 @@ struct HomeView: View {
 					// MARK: - En-tête Solde Total
 					VStack(spacing: 4) {
 						// Nom du compte
-						if let accountName = accountsManager.selectedAccount {
-							Text(accountName)
+						if let account = accountsManager.selectedAccount {
+							Text(account.name)
 								.font(.system(size: 17, weight: .semibold))
 								.foregroundStyle(.primary)
 								.padding(.bottom, 8)

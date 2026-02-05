@@ -7,6 +7,100 @@
 
 // AccountsManager.swift
 import Foundation
+import SwiftUI
+
+// MARK: - Style des comptes (icône + couleur liés)
+
+enum AccountStyle: String, Codable, CaseIterable, Identifiable {
+	case bank        // Compte courant
+	case savings     // Épargne
+	case investment  // Investissements
+	case card        // Carte
+	case cash        // Espèces
+	case piggy       // Tirelire
+	case wallet      // Portefeuille
+	case business    // Professionnel
+	
+	var id: String { rawValue }
+	
+	var icon: String {
+		switch self {
+		case .bank:       return "building.columns.fill"
+		case .savings:    return "banknote.fill"
+		case .investment: return "chart.line.uptrend.xyaxis"
+		case .card:       return "creditcard.fill"
+		case .cash:       return "dollarsign.circle.fill"
+		case .piggy:      return "gift.fill"
+		case .wallet:     return "wallet.bifold.fill"
+		case .business:   return "briefcase.fill"
+		}
+	}
+	
+	var color: Color {
+		switch self {
+		case .bank:       return .blue
+		case .savings:    return .orange
+		case .investment: return .purple
+		case .card:       return .green
+		case .cash:       return .cyan
+		case .piggy:      return .pink
+		case .wallet:     return .brown
+		case .business:   return .indigo
+		}
+	}
+	
+	var label: String {
+		switch self {
+		case .bank:       return "Compte courant"
+		case .savings:    return "Épargne"
+		case .investment: return "Investissements"
+		case .card:       return "Carte"
+		case .cash:       return "Espèces"
+		case .piggy:      return "Tirelire"
+		case .wallet:     return "Portefeuille"
+		case .business:   return "Professionnel"
+		}
+	}
+	
+	/// Devine le style par défaut selon le nom du compte
+	static func guessFrom(name: String) -> AccountStyle {
+		let text = name.lowercased()
+		if text.contains("courant") || text.contains("principal") || text.contains("bnp") || text.contains("société générale") || text.contains("crédit") {
+			return .bank
+		} else if text.contains("livret") || text.contains("épargne") || text.contains("ldd") || text.contains("pel") {
+			return .savings
+		} else if text.contains("invest") || text.contains("pea") || text.contains("crypto") || text.contains("bourse") || text.contains("action") {
+			return .investment
+		} else if text.contains("carte") || text.contains("revolut") || text.contains("n26") || text.contains("lydia") {
+			return .card
+		} else if text.contains("espèce") || text.contains("cash") || text.contains("liquide") {
+			return .cash
+		} else if text.contains("tirelire") || text.contains("économie") {
+			return .piggy
+		} else if text.contains("portefeuille") || text.contains("wallet") {
+			return .wallet
+		} else if text.contains("pro") || text.contains("entreprise") || text.contains("business") {
+			return .business
+		}
+		return .bank
+	}
+}
+
+// MARK: - Modèle Account
+
+struct Account: Identifiable, Codable, Equatable {
+	let id: UUID
+	var name: String
+	var detail: String
+	var style: AccountStyle
+	
+	init(id: UUID = UUID(), name: String, detail: String = "", style: AccountStyle? = nil) {
+		self.id = id
+		self.name = name
+		self.detail = detail
+		self.style = style ?? AccountStyle.guessFrom(name: name)
+	}
+}
 
 //  Classe centrale de gestion des comptes et transactions.
 //
@@ -18,66 +112,75 @@ import Foundation
 //  - Si tu modifies directement un `Transaction` ou un `TransactionManager` sans passer par ici,
 //    l’UI ne sera pas informée et l’affichage ne se mettra pas à jour.
 class AccountsManager: ObservableObject {
-	/// Dictionnaire des gestionnaires de transactions, où les clés sont des noms de comptes et les valeurs sont des instances de TransactionManager correspondant à chaque compte (liste des transactions pour un compte).
-	@Published private(set) var managers: [String: TransactionManager] = [:]
-	@Published var selectedAccount: String? {
+	/// Liste des comptes
+	@Published private(set) var accounts: [Account] = []
+	/// Dictionnaire des gestionnaires de transactions, où les clés sont des IDs de comptes
+	@Published private(set) var managers: [UUID: TransactionManager] = []
+	@Published var selectedAccountId: UUID? {
 		didSet {
-			UserDefaults.standard.set(selectedAccount, forKey: "lastSelectedAccount")
+			if let id = selectedAccountId {
+				UserDefaults.standard.set(id.uuidString, forKey: "lastSelectedAccountId")
+			}
 		}
 	}
+	
+	var selectedAccount: Account? {
+		accounts.first { $0.id == selectedAccountId }
+	}
 
-	private let saveKey = "accounts_data"
+	private let saveKey = "accounts_data_v2"
 	
 	init() { 
 		load()
-		selectedAccount = UserDefaults.standard.string(forKey: "lastSelectedAccount")
+		if let idString = UserDefaults.standard.string(forKey: "lastSelectedAccountId"),
+		   let id = UUID(uuidString: idString) {
+			selectedAccountId = id
+		}
 	}
 	
 	private struct AccountData: Codable {
+		var account: Account
 		var transactions: [Transaction]
 		var widgetShortcuts: [WidgetShortcut]
 	}
 
 	
 	// MARK: - Gestion des comptes
-	private func creerCompte(nom: String) {
-		guard managers[nom] == nil else { return }
-		managers[nom] = TransactionManager(accountName: nom)
+	func ajouterCompte(_ account: Account) {
+		guard !accounts.contains(where: { $0.id == account.id }) else { return }
+		accounts.append(account)
+		managers[account.id] = TransactionManager(accountName: account.name)
 		save()
 		objectWillChange.send()
 	}
 	
-	func ajouterCompte(_ nom: String) {
-		creerCompte(nom: nom)
-	}
-	
-	func deleteAccount(_ account: String) {
-		managers.removeValue(forKey: account)
+	func deleteAccount(_ account: Account) {
+		accounts.removeAll { $0.id == account.id }
+		managers.removeValue(forKey: account.id)
 		save()
-		if managers.isEmpty {
-			selectedAccount = nil
-		} else if selectedAccount == account {
-			selectedAccount = getAllAccounts().first
+		if accounts.isEmpty {
+			selectedAccountId = nil
+		} else if selectedAccountId == account.id {
+			selectedAccountId = accounts.first?.id
 		}
 		objectWillChange.send()
 	}
 	
-	func getAllAccounts() -> [String] {
-		Array(managers.keys).sorted()
+	func getAllAccounts() -> [Account] {
+		accounts.sorted { $0.name < $1.name }
 	}
 	
 	// MARK: - Gestion des transactions
 	func ajouterTransaction(_ transaction: Transaction) {
-		guard let account = selectedAccount else { return }
-		if managers[account] == nil { creerCompte(nom: account) }
-		managers[account]?.ajouter(transaction)
+		guard let accountId = selectedAccountId else { return }
+		managers[accountId]?.ajouter(transaction)
 		save()
 		objectWillChange.send()
 	}
 	
 	func supprimerTransaction(_ transaction: Transaction) {
-		guard let account = selectedAccount else { return }
-		managers[account]?.supprimer(transaction)
+		guard let accountId = selectedAccountId else { return }
+		managers[accountId]?.supprimer(transaction)
 		save()
 		objectWillChange.send()
 	}
@@ -89,44 +192,44 @@ class AccountsManager: ObservableObject {
 	}
 	
 	func transactions() -> [Transaction] {
-		guard let account = selectedAccount else { return [] }
-		return managers[account]?.transactions ?? []
+		guard let accountId = selectedAccountId else { return [] }
+		return managers[accountId]?.transactions ?? []
 	}
 	
 	// MARK: - Totaux
-	func totalNonPotentiel(for account: String) -> Double {
-		managers[account]?.totalNonPotentiel() ?? 0
+	func totalNonPotentiel(for account: Account) -> Double {
+		managers[account.id]?.totalNonPotentiel() ?? 0
 	}
 	
-	func totalPotentiel(for account: String) -> Double {
-		managers[account]?.totalPotentiel() ?? 0
+	func totalPotentiel(for account: Account) -> Double {
+		managers[account.id]?.totalPotentiel() ?? 0
 	}
 	
 	
 	// MARK: - Persistance
 	private func save() {
-		if let data = try? JSONEncoder().encode(
-			managers.mapValues { manager in
-				AccountData(
-					transactions: manager.transactions,
-					widgetShortcuts: manager.widgetShortcuts
-				)
-			}
-		)
- {
+		let dataArray = accounts.map { account in
+			AccountData(
+				account: account,
+				transactions: managers[account.id]?.transactions ?? [],
+				widgetShortcuts: managers[account.id]?.widgetShortcuts ?? []
+			)
+		}
+		if let data = try? JSONEncoder().encode(dataArray) {
 			UserDefaults.standard.set(data, forKey: saveKey)
 		}
 	}
 	
 	private func load() {
 		if let data = UserDefaults.standard.data(forKey: saveKey),
-		   let decoded = try? JSONDecoder().decode([String: AccountData].self, from: data) {
-			managers = decoded.mapValues { entry in
-				let manager = TransactionManager(accountName: "Compte")
+		   let decoded = try? JSONDecoder().decode([AccountData].self, from: data) {
+			accounts = decoded.map { $0.account }
+			managers = Dictionary(uniqueKeysWithValues: decoded.map { entry in
+				let manager = TransactionManager(accountName: entry.account.name)
 				manager.transactions = entry.transactions
 				manager.widgetShortcuts = entry.widgetShortcuts
-				return manager
-			}
+				return (entry.account.id, manager)
+			})
 		}
 	}
 	
@@ -214,20 +317,20 @@ class AccountsManager: ObservableObject {
 	
 	// MARK: - Widgets
 	func getWidgetShortcuts() -> [WidgetShortcut] {
-		guard let account = selectedAccount else { return [] }
-		return managers[account]?.widgetShortcuts ?? []
+		guard let accountId = selectedAccountId else { return [] }
+		return managers[accountId]?.widgetShortcuts ?? []
 	}
 	
 	func addWidgetShortcut(_ shortcut: WidgetShortcut) {
-		guard let account = selectedAccount else { return }
-		managers[account]?.widgetShortcuts.append(shortcut)
+		guard let accountId = selectedAccountId else { return }
+		managers[accountId]?.widgetShortcuts.append(shortcut)
 		save()
 		objectWillChange.send()
 	}
 	
 	func deleteWidgetShortcut(_ shortcut: WidgetShortcut) {
-		guard let account = selectedAccount else { return }
-		managers[account]?.widgetShortcuts.removeAll { $0.id == shortcut.id }
+		guard let accountId = selectedAccountId else { return }
+		managers[accountId]?.widgetShortcuts.removeAll { $0.id == shortcut.id }
 		save()
 		objectWillChange.send()
 	}
@@ -276,7 +379,7 @@ class AccountsManager: ObservableObject {
 		}
 		
 		// Sauvegarder dans un fichier temporaire
-		let fileName = "\(account)_transactions_\(Date().timeIntervalSince1970).csv"
+		let fileName = "\(account.name)_transactions_\(Date().timeIntervalSince1970).csv"
 		let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
 		
 		do {
@@ -292,7 +395,7 @@ class AccountsManager: ObservableObject {
 	
 	// MARK: - Import CSV
 	func importCSV(from url: URL) -> Int {
-		guard selectedAccount != nil else {
+		guard selectedAccountId != nil else {
 			print("❌ Aucun compte sélectionné")
 			return 0
 		}
