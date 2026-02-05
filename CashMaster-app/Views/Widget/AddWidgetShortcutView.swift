@@ -28,10 +28,6 @@ struct AddWidgetShortcutView: View {
 						.foregroundStyle(.secondary)
 				}
 				.listRowSeparator(.hidden) // Masque le séparateur par défaut
-
-				// Divider personnalisé (pleine largeur)
-				Divider()
-					.padding(.leading, 0)
 				
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in

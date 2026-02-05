@@ -55,9 +55,9 @@ struct AddTransactionView: View {
 					}
 					.listRowSeparator(.hidden) // Masque le séparateur par défaut
 
-					// Divider personnalisé (pleine largeur)
-					Divider()
-						.padding(.leading, 0)
+					Rectangle()
+						.fill(Color.clear)
+						.frame(height: 0.01)
 					
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in
