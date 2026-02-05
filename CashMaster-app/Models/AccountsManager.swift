@@ -101,7 +101,16 @@ class AccountsManager: ObservableObject {
 	}
 	
 	func validerTransaction(_ transaction: Transaction) {
-		transaction.valider(date: Date())
+		guard let accountId = selectedAccountId else { return }
+		let validatedTransaction = transaction.validated(at: Date())
+		transactionManagers[accountId]?.mettreAJour(validatedTransaction)
+		save()
+		objectWillChange.send()
+	}
+	
+	func mettreAJourTransaction(_ transaction: Transaction) {
+		guard let accountId = selectedAccountId else { return }
+		transactionManagers[accountId]?.mettreAJour(transaction)
 		save()
 		objectWillChange.send()
 	}

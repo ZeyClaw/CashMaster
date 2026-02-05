@@ -27,12 +27,20 @@ class TransactionManager {
 	}
 	
 	// MARK: - Gestion basique
+	
 	func ajouter(_ transaction: Transaction) {
 		transactions.append(transaction)
 	}
 	
 	func supprimer(_ transaction: Transaction) {
 		transactions.removeAll { $0.id == transaction.id }
+	}
+	
+	/// Met à jour une transaction existante (recherche par ID)
+	func mettreAJour(_ transaction: Transaction) {
+		if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
+			transactions[index] = transaction
+		}
 	}
 	
 	// MARK: - Totaux

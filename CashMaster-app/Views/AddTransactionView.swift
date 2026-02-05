@@ -134,19 +134,24 @@ struct AddTransactionView: View {
 		
 		let finalAmount = transactionType == .income ? m : -m
 		let finalComment = String(transactionComment.prefix(maxCommentLength))
+		let finalDate: Date? = isPotentiel ? nil : transactionDate
 		
-		if let t = transactionToEdit {
-			t.amount = finalAmount
-			t.comment = finalComment
-			t.potentiel = isPotentiel
-			t.date = isPotentiel ? nil : transactionDate
-			accountsManager.sauvegarder()
+		if let existingTransaction = transactionToEdit {
+			// Mode édition : créer une copie modifiée (struct immuable)
+			let updatedTransaction = existingTransaction.modified(
+				amount: finalAmount,
+				comment: finalComment,
+				potentiel: isPotentiel,
+				date: finalDate
+			)
+			accountsManager.mettreAJourTransaction(updatedTransaction)
 		} else {
+			// Mode création : nouvelle transaction
 			accountsManager.ajouterTransaction(Transaction(
 				amount: finalAmount,
 				comment: finalComment,
 				potentiel: isPotentiel,
-				date: isPotentiel ? nil : transactionDate
+				date: finalDate
 			))
 		}
 		dismiss()
