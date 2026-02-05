@@ -72,7 +72,6 @@ struct AddAccountSheet: View {
 						futur: 0
 					)
 					.listRowInsets(EdgeInsets())
-					.listRowBackground(Color.clear)
 				}
 			}
 			.navigationTitle("Nouveau compte")

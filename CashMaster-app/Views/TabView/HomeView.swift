@@ -16,6 +16,7 @@ struct HomeView: View {
 	@State private var toasts: [ToastData] = []
 	@State private var navigateToCurrentMonth = false
 	@State private var navigateToPotentielles = false
+	@State private var navigateToAllTransactions = false
 	
 	private var totalCurrent: Double? {
 		guard let selectedAccount = accountsManager.selectedAccount else {
@@ -85,48 +86,53 @@ struct HomeView: View {
 			ScrollView {
 				VStack(spacing: 24) {
 					// MARK: - En-tête Solde Total
-					VStack(spacing: 4) {
-						// Nom du compte
-						if let account = accountsManager.selectedAccount {
-							Text(account.name)
-								.font(.system(size: 17, weight: .semibold))
-								.foregroundStyle(.primary)
-								.padding(.bottom, 8)
-						}
-						
-						Text("Solde total")
-							.font(.system(size: 12, weight: .bold))
-							.foregroundStyle(.secondary)
-							.textCase(.uppercase)
-							.tracking(2)
-						
-						if let totalCurrent = totalCurrent {
-							Text("\(totalCurrent, specifier: "%.2f") €")
-								.font(.system(size: 48, weight: .bold))
-								.tracking(-1)
-						}
-						
-						// Pourcentage de changement
-						if let pourcentage = accountsManager.pourcentageChangementMois() {
-							HStack(spacing: 4) {
-								Image(systemName: pourcentage > 0 ? "arrow.up.right" : (pourcentage < 0 ? "arrow.down.right" : "arrow.forward"))
-									.font(.system(size: 12, weight: .semibold))
-								Text("\(pourcentage > 0 ? "+" : "")\(pourcentage, specifier: "%.1f")% ce mois-ci")
-									.font(.system(size: 14, weight: .semibold))
+					Button {
+						navigateToAllTransactions = true
+					} label: {
+						VStack(spacing: 4) {
+							// Nom du compte
+							if let account = accountsManager.selectedAccount {
+								Text(account.name)
+									.font(.system(size: 17, weight: .semibold))
+									.foregroundStyle(.primary)
+									.padding(.bottom, 8)
 							}
-							.foregroundStyle(pourcentage > 0 ? .green : (pourcentage < 0 ? .red : .secondary))
-						} else {
-							HStack(spacing: 4) {
-								Image(systemName: "arrow.forward")
-									.font(.system(size: 12, weight: .semibold))
-								Text("+\(0.0, specifier: "%.1f")% ce mois-ci")
-									.font(.system(size: 14, weight: .semibold))
+							
+							Text("Solde total")
+								.font(.system(size: 12, weight: .bold))
+								.foregroundStyle(.secondary)
+								.textCase(.uppercase)
+								.tracking(2)
+							
+							if let totalCurrent = totalCurrent {
+								Text("\(totalCurrent, specifier: "%.2f") €")
+									.font(.system(size: 48, weight: .bold))
+									.tracking(-1)
 							}
-							.foregroundStyle(.secondary)
+							
+							// Pourcentage de changement
+							if let pourcentage = accountsManager.pourcentageChangementMois() {
+								HStack(spacing: 4) {
+									Image(systemName: pourcentage > 0 ? "arrow.up.right" : (pourcentage < 0 ? "arrow.down.right" : "arrow.forward"))
+										.font(.system(size: 12, weight: .semibold))
+									Text("\(pourcentage > 0 ? "+" : "")\(pourcentage, specifier: "%.1f")% ce mois-ci")
+										.font(.system(size: 14, weight: .semibold))
+								}
+								.foregroundStyle(pourcentage > 0 ? .green : (pourcentage < 0 ? .red : .secondary))
+							} else {
+								HStack(spacing: 4) {
+									Image(systemName: "arrow.forward")
+										.font(.system(size: 12, weight: .semibold))
+									Text("+\(0.0, specifier: "%.1f")% ce mois-ci")
+										.font(.system(size: 14, weight: .semibold))
+								}
+								.foregroundStyle(.secondary)
+							}
 						}
+						.padding(.top, 16)
+						.padding(.bottom, 16)
 					}
-					.padding(.top, 16)
-					.padding(.bottom, 16)
+					.buttonStyle(PlainButtonStyle())
 					
 					// MARK: - Cartes Solde Mois & Achats Futurs
 					HStack(spacing: 16) {
@@ -324,6 +330,9 @@ struct HomeView: View {
 		}
 		.navigationDestination(isPresented: $navigateToPotentielles) {
 			PotentialTransactionsView(accountsManager: accountsManager)
+		}
+		.navigationDestination(isPresented: $navigateToAllTransactions) {
+			AllTransactionsView(accountsManager: accountsManager)
 		}
 	}
 }
