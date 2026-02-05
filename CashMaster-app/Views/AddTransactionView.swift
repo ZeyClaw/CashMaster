@@ -42,24 +42,14 @@ struct AddTransactionView: View {
 				}
 				
 				Section {
-					VStack(spacing: 0) { // `spacing: 0` pour éviter les espaces indésirables
-						HStack {
-							TextField(
-								"Montant",
-								value: $montant,
-								format: .number.precision(.fractionLength(0...2))
-							)
-							.keyboardType(.decimalPad)
-
+					TextField("Montant", value: $montant, format: .number.precision(.fractionLength(0...2)))
+						.keyboardType(.decimalPad)
+						.overlay(
 							Text("€")
-								.foregroundStyle(.secondary)
-						}
-						.listRowSeparator(.hidden) // Masque le séparateur par défaut
-
-						// Divider pleine largeur sous le HStack
-						Divider()
-					}
-					.listRowInsets(EdgeInsets()) // Supprime les marges par défaut
+								.foregroundColor(.gray) // Couleur grise pour le symbole
+								.padding(.trailing, 16), // Espacement à droite
+							alignment: .trailing // Alignement à droite
+						)
 
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in

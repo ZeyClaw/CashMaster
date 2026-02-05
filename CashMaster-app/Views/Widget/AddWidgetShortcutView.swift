@@ -20,14 +20,14 @@ struct AddWidgetShortcutView: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				HStack {
-					TextField("Montant", value: $amount, format: .number.precision(.fractionLength(0...2)))
-						.keyboardType(.decimalPad)
-					
-					Text("€")
-						.foregroundStyle(.secondary)
-				}
-				.listRowSeparator(.visible) // afficher le separateur sous tout le HStack
+				TextField("Montant", value: $amount, format: .number.precision(.fractionLength(0...2)))
+					.keyboardType(.decimalPad)
+					.overlay(
+						Text("€")
+							.foregroundColor(.gray) // Couleur grise pour le symbole
+							.padding(.trailing, 16), // Espacement à droite
+						alignment: .trailing // Alignement à droite
+					)
 
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in
