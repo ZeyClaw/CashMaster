@@ -110,6 +110,3 @@ struct AddAccountSheet: View {
 		onAccountCreated?()
 	}
 }
-		}
-	}
-}
