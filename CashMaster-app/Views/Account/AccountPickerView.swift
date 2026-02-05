@@ -15,29 +15,29 @@ struct AccountPickerView: View {
 	
 	var body: some View {
 		NavigationStack {
-			List {
-				ForEach(accountsManager.getAllAccounts()) { account in
-					AccountCardView(
-						account: account,
-						solde: accountsManager.totalNonPotentiel(for: account),
-						futur: accountsManager.totalNonPotentiel(for: account) + accountsManager.totalPotentiel(for: account)
-					)
-					.listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-					.listRowBackground(Color.clear)
-					.listRowSeparator(.hidden)
-					.contentShape(Rectangle())
-					.onTapGesture {
-						accountsManager.selectedAccountId = account.id
-						dismiss()
-					}
-					.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-						Button(role: .destructive) {
-							accountsManager.deleteAccount(account)
-						} label: {
-							Label("Supprimer", systemImage: "trash")
+				List {
+					ForEach(accountsManager.getAllAccounts()) { account in
+						AccountCardView(
+							account: account,
+							solde: accountsManager.totalNonPotentiel(for: account),
+							futur: accountsManager.totalNonPotentiel(for: account) + accountsManager.totalPotentiel(for: account)
+						)
+						.listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+						.listRowBackground(Color.clear)
+						.listRowSeparator(.hidden)
+						.contentShape(Rectangle())
+						.onTapGesture {
+							accountsManager.selectedAccountId = account.id
+							dismiss()
+						}
+						.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+							Button(role: .destructive) {
+								accountsManager.deleteAccount(account)
+							} label: {
+								Label("Supprimer", systemImage: "trash")
+							}
 						}
 					}
-				}
 				
 				// Bouton Ajouter
 				Button {

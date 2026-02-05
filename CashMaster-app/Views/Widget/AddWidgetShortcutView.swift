@@ -27,6 +27,11 @@ struct AddWidgetShortcutView: View {
 					Text("€")
 						.foregroundStyle(.secondary)
 				}
+				.listRowSeparator(.hidden) // Masque le séparateur par défaut
+
+				// Divider personnalisé (pleine largeur)
+				Divider()
+					.listRowSeparator(.hidden) // Évite les doublons de séparateurs
 				
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in

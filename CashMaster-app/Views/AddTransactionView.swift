@@ -53,6 +53,11 @@ struct AddTransactionView: View {
 						Text("€")
 							.foregroundStyle(.secondary)
 					}
+					.listRowSeparator(.hidden) // Masque le séparateur par défaut
+
+					// Divider personnalisé (pleine largeur)
+					Divider()
+						.listRowSeparator(.hidden) // Évite les doublons de séparateurs
 					
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in

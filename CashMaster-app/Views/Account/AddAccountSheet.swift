@@ -72,7 +72,10 @@ struct AddAccountSheet: View {
 						futur: 0
 					)
 					.listRowInsets(EdgeInsets())
-					.listRowBackground(Color(UIColor.secondarySystemGroupedBackground))
+					.listRowBackground(
+						Color(UIColor.systemGroupedBackground)
+							.colorScheme(.dark, Color(UIColor.secondarySystemBackground))
+					)
 				}
 			}
 			.navigationTitle("Nouveau compte")
