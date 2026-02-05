@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AllTransactionsView: View {
 	@ObservedObject var accountsManager: AccountsManager
+	var embedded: Bool = false // Si true, pas de titre ni toolbar (utilisé dans CalendrierTabView)
+	
 	@State private var showingAccountPicker = false
 	@State private var transactionToEdit: Transaction? = nil
 	
@@ -55,16 +57,19 @@ struct AllTransactionsView: View {
 				}
 			}
 		}
-		.navigationTitle("Toutes les transactions")
-		.toolbar {
-			ToolbarItem(placement: .navigationBarTrailing) {
-				Button {
-					showingAccountPicker = true
-				} label: {
-					Image(systemName: "person.crop.circle")
-						.font(.title2)
+		.if(!embedded) { view in
+			view
+				.navigationTitle("Toutes les transactions")
+				.toolbar {
+					ToolbarItem(placement: .navigationBarTrailing) {
+						Button {
+							showingAccountPicker = true
+						} label: {
+							Image(systemName: "person.crop.circle")
+								.font(.title2)
+						}
+					}
 				}
-			}
 		}
 		.sheet(isPresented: $showingAccountPicker) {
 			AccountPickerView(accountsManager: accountsManager)
@@ -90,3 +95,16 @@ struct AllTransactionsView: View {
 		}
 	}
 }
+
+// MARK: - Extension conditionnelle
+extension View {
+	@ViewBuilder
+	func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+		if condition {
+			transform(self)
+		} else {
+			self
+		}
+	}
+}
+
