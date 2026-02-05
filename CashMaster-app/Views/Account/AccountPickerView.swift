@@ -16,7 +16,7 @@ struct AccountPickerView: View {
 	var body: some View {
 		NavigationStack {
 			ScrollView {
-				VStack(spacing: 12) {
+				LazyVStack(spacing: 12) {
 					ForEach(accountsManager.getAllAccounts()) { account in
 						AccountCardView(
 							account: account,
@@ -57,9 +57,13 @@ struct AccountPickerView: View {
 					.buttonStyle(PlainButtonStyle())
 				}
 				.padding()
-				.frame(maxWidth: .infinity, minHeight: UIScreen.main.bounds.height)
 			}
-			.background(Color(UIColor.systemGroupedBackground))
+			.background(
+				Color(UIColor { traitCollection in
+					traitCollection.userInterfaceStyle == .dark ? .black : .systemGroupedBackground
+				})
+				.ignoresSafeArea()
+			)
 			.navigationTitle("Mes comptes")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
