@@ -30,6 +30,8 @@
 		F8388E732F349A380081F2F9 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E722F349A380081F2F9 /* Account.swift */; };
 		F8388E752F349A540081F2F9 /* AddAccountSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E742F349A530081F2F9 /* AddAccountSheet.swift */; };
 		F8388E772F350F150081F2F9 /* AllTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E762F350F150081F2F9 /* AllTransactionsView.swift */; };
+		F8388E7F2F35532D0081F2F9 /* CSVService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E7D2F35532D0081F2F9 /* CSVService.swift */; };
+		F8388E802F35532D0081F2F9 /* CalculationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E7E2F35532D0081F2F9 /* CalculationService.swift */; };
 		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
@@ -89,6 +91,8 @@
 		F8388E722F349A380081F2F9 /* Account.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		F8388E742F349A530081F2F9 /* AddAccountSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddAccountSheet.swift; sourceTree = "<group>"; };
 		F8388E762F350F150081F2F9 /* AllTransactionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AllTransactionsView.swift; sourceTree = "<group>"; };
+		F8388E7D2F35532D0081F2F9 /* CSVService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVService.swift; sourceTree = "<group>"; };
+		F8388E7E2F35532D0081F2F9 /* CalculationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculationService.swift; sourceTree = "<group>"; };
 		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -219,6 +223,15 @@
 			path = Calendrier;
 			sourceTree = "<group>";
 		};
+		F8388E7C2F35532D0081F2F9 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F8388E7D2F35532D0081F2F9 /* CSVService.swift */,
+				F8388E7E2F35532D0081F2F9 /* CalculationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		F8B79A622CAEC5E4002D88AE = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +260,7 @@
 				F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */,
 				F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */,
 				F807613D2CC6E31B00C34EDD /* Notifications.swift */,
+				F8388E7C2F35532D0081F2F9 /* Services */,
 				F810E3042E43EA7B00C2DFA9 /* Models */,
 				F810E3082E43EADA00C2DFA9 /* Views */,
 				F8B79A722CAEC5EE002D88AE /* Assets.xcassets */,
@@ -434,10 +448,12 @@
 				F810E3012E43E42800C2DFA9 /* TransactionsListView.swift in Sources */,
 				F800A3EA2E4DF80C00918507 /* CalendrierRoute.swift in Sources */,
 				F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */,
+				F8388E7F2F35532D0081F2F9 /* CSVService.swift in Sources */,
 				F810E2EF2E422F1E00C2DFA9 /* AccountsManager.swift in Sources */,
 				F800A3EC2E4DF82400918507 /* CalendrierTabView.swift in Sources */,
 				F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */,
 				F810E2FF2E43DFC300C2DFA9 /* PotentialTransactionsView.swift in Sources */,
+				F8388E802F35532D0081F2F9 /* CalculationService.swift in Sources */,
 				F810E3122E46080E00C2DFA9 /* WidgetCardView.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
 				F8B818FC2F06D137002D02F2 /* PotentiellesTabView.swift in Sources */,
