@@ -16,6 +16,7 @@ struct AddTransactionView: View {
 	
 	// MARK: - Limites
 	private let maxCommentLength = 50
+	private let maxMontant: Double = 999_999_999.99
 	
 	// MARK: - State
 	@State private var montant: Double? = nil
@@ -24,6 +25,7 @@ struct AddTransactionView: View {
 	@State private var transactionDate: Date = Date()
 	@State private var isPotentiel: Bool = false
 	@State private var showingErrorAlert = false
+	@State private var errorMessage = ""
 	
 	private var isEditMode: Bool { transactionToEdit != nil }
 	
@@ -40,8 +42,17 @@ struct AddTransactionView: View {
 				}
 				
 				Section {
-					TextField("Montant", value: $montant, format: .currency(code: "EUR"))
+					HStack {
+						TextField(
+							"Montant",
+							value: $montant,
+							format: .number.precision(.fractionLength(0...2))
+						)
 						.keyboardType(.decimalPad)
+						
+						Text("€")
+							.foregroundStyle(.secondary)
+					}
 					
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in
@@ -94,10 +105,10 @@ struct AddTransactionView: View {
 					}
 				}
 			}
-			.alert("Montant invalide", isPresented: $showingErrorAlert) {
+			.alert("Erreur", isPresented: $showingErrorAlert) {
 				Button("OK", role: .cancel) {}
 			} message: {
-				Text("Veuillez entrer un montant positif.")
+				Text(errorMessage)
 			}
 			.onAppear {
 				if let t = transactionToEdit {
@@ -113,12 +124,18 @@ struct AddTransactionView: View {
 	
 	private func sauvegarder() {
 		guard let m = montant, m > 0 else {
+			errorMessage = "Veuillez entrer un montant positif."
 			showingErrorAlert = true
 			return
 		}
 		
-		let montantArrondi = (m * 100).rounded() / 100
-		let finalAmount = transactionType == .income ? montantArrondi : -montantArrondi
+		if m > maxMontant {
+			errorMessage = "Montant maximum: \(maxMontant.formatted()) €"
+			showingErrorAlert = true
+			return
+		}
+		
+		let finalAmount = transactionType == .income ? m : -m
 		let finalComment = String(transactionComment.prefix(maxCommentLength))
 		
 		if let t = transactionToEdit {
