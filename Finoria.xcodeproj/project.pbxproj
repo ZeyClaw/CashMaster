@@ -16,7 +16,6 @@
 		F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F807613D2CC6E31B00C34EDD /* Notifications.swift */; };
 		F810E2EF2E422F1E00C2DFA9 /* AccountsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2EE2E422F1E00C2DFA9 /* AccountsManager.swift */; };
 		F810E2F12E428FFB00C2DFA9 /* AccountCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */; };
-		F810E2F52E42903300C2DFA9 /* TransactionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2F42E42903300C2DFA9 /* TransactionRow.swift */; };
 		F810E2FB2E43D2CB00C2DFA9 /* MonthsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2FA2E43D2CB00C2DFA9 /* MonthsView.swift */; };
 		F810E2FF2E43DFC300C2DFA9 /* PotentialTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E2FE2E43DFC300C2DFA9 /* PotentialTransactionsView.swift */; };
 		F810E3012E43E42800C2DFA9 /* TransactionsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810E3002E43E42800C2DFA9 /* TransactionsListView.swift */; };
@@ -35,6 +34,9 @@
 		F8388E8C2F3563CC0081F2F9 /* StylableEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E8A2F3563CB0081F2F9 /* StylableEnum.swift */; };
 		F8388E8F2F3563DD0081F2F9 /* CurrencyTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E8E2F3563DD0081F2F9 /* CurrencyTextField.swift */; };
 		F8388E912F3564140081F2F9 /* HomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E902F3564140081F2F9 /* HomeComponents.swift */; };
+		F8388E932F356B670081F2F9 /* FutureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E922F356B670081F2F9 /* FutureTabView.swift */; };
+		F8388E972F356BB10081F2F9 /* TransactionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E952F356BB10081F2F9 /* TransactionRow.swift */; };
+		F8388E982F356BB10081F2F9 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E962F356BB10081F2F9 /* AddTransactionView.swift */; };
 		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
@@ -45,7 +47,6 @@
 		F8B79A8A2CAEC5EF002D88AE /* CashMaster_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */; };
 		F8B79A8C2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */; };
 		F8B818F92F06A7A7002D02F2 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */; };
-		F8B818FC2F06D137002D02F2 /* PotentiellesTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FA2F06D137002D02F2 /* PotentiellesTabView.swift */; };
 		F8B818FD2F06D137002D02F2 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FB2F06D137002D02F2 /* HomeTabView.swift */; };
 		F8B818FF2F06D14E002D02F2 /* CalendrierMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */; };
 		F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */; };
@@ -78,7 +79,6 @@
 		F807613D2CC6E31B00C34EDD /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		F810E2EE2E422F1E00C2DFA9 /* AccountsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsManager.swift; sourceTree = "<group>"; };
 		F810E2F02E428FFB00C2DFA9 /* AccountCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCardView.swift; sourceTree = "<group>"; };
-		F810E2F42E42903300C2DFA9 /* TransactionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionRow.swift; sourceTree = "<group>"; };
 		F810E2FA2E43D2CB00C2DFA9 /* MonthsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthsView.swift; sourceTree = "<group>"; };
 		F810E2FE2E43DFC300C2DFA9 /* PotentialTransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PotentialTransactionsView.swift; sourceTree = "<group>"; };
 		F810E3002E43E42800C2DFA9 /* TransactionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsListView.swift; sourceTree = "<group>"; };
@@ -98,6 +98,9 @@
 		F8388E8A2F3563CB0081F2F9 /* StylableEnum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StylableEnum.swift; sourceTree = "<group>"; };
 		F8388E8E2F3563DD0081F2F9 /* CurrencyTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrencyTextField.swift; sourceTree = "<group>"; };
 		F8388E902F3564140081F2F9 /* HomeComponents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
+		F8388E922F356B670081F2F9 /* FutureTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTabView.swift; sourceTree = "<group>"; };
+		F8388E952F356BB10081F2F9 /* TransactionRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRow.swift; sourceTree = "<group>"; };
+		F8388E962F356BB10081F2F9 /* AddTransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -112,7 +115,6 @@
 		F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		F8B818F52F059289002D02F2 /* Finoria.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Finoria.entitlements; sourceTree = "<group>"; };
 		F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
-		F8B818FA2F06D137002D02F2 /* PotentiellesTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PotentiellesTabView.swift; sourceTree = "<group>"; };
 		F8B818FB2F06D137002D02F2 /* HomeTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
 		F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendrierMainView.swift; sourceTree = "<group>"; };
 		F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManager.swift; sourceTree = "<group>"; };
@@ -168,9 +170,9 @@
 		F810E3072E43EAC800C2DFA9 /* TabView */ = {
 			isa = PBXGroup;
 			children = (
+				F8388E922F356B670081F2F9 /* FutureTabView.swift */,
 				F8388E812F355B600081F2F9 /* Home */,
 				F8B818FB2F06D137002D02F2 /* HomeTabView.swift */,
-				F8B818FA2F06D137002D02F2 /* PotentiellesTabView.swift */,
 				F810E30D2E45331900C2DFA9 /* HomeView.swift */,
 				F810E2FE2E43DFC300C2DFA9 /* PotentialTransactionsView.swift */,
 				F810E3172E4608CC00C2DFA9 /* Calendrier */,
@@ -181,6 +183,7 @@
 		F810E3082E43EADA00C2DFA9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F8388E942F356BB10081F2F9 /* Transactions */,
 				F8388E8D2F3563DD0081F2F9 /* Components */,
 				F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
@@ -220,7 +223,6 @@
 				F800A3EB2E4DF82400918507 /* CalendrierTabView.swift */,
 				F810E2FA2E43D2CB00C2DFA9 /* MonthsView.swift */,
 				F810E3002E43E42800C2DFA9 /* TransactionsListView.swift */,
-				F810E2F42E42903300C2DFA9 /* TransactionRow.swift */,
 				F800A3E92E4DF80C00918507 /* CalendrierRoute.swift */,
 			);
 			path = Calendrier;
@@ -259,6 +261,15 @@
 				F8388E8E2F3563DD0081F2F9 /* CurrencyTextField.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		F8388E942F356BB10081F2F9 /* Transactions */ = {
+			isa = PBXGroup;
+			children = (
+				F8388E952F356BB10081F2F9 /* TransactionRow.swift */,
+				F8388E962F356BB10081F2F9 /* AddTransactionView.swift */,
+			);
+			path = Transactions;
 			sourceTree = "<group>";
 		};
 		F8B79A622CAEC5E4002D88AE = {
@@ -456,7 +467,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F810E2F52E42903300C2DFA9 /* TransactionRow.swift in Sources */,
 				F8388E772F350F150081F2F9 /* AllTransactionsView.swift in Sources */,
 				F800A3EE2E4E01F700918507 /* NoAccountView.swift in Sources */,
 				F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */,
@@ -466,10 +476,13 @@
 				F8388E732F349A380081F2F9 /* Account.swift in Sources */,
 				F810E30E2E45331900C2DFA9 /* HomeView.swift in Sources */,
 				F800A3F32E4F6D3400918507 /* ToastView.swift in Sources */,
+				F8388E972F356BB10081F2F9 /* TransactionRow.swift in Sources */,
 				F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */,
 				F800A3F12E4F6D1E00918507 /* ToastData.swift in Sources */,
+				F8388E982F356BB10081F2F9 /* AddTransactionView.swift in Sources */,
 				F810E3142E46082900C2DFA9 /* AddWidgetShortcutView.swift in Sources */,
 				F8388E8F2F3563DD0081F2F9 /* CurrencyTextField.swift in Sources */,
+				F8388E932F356B670081F2F9 /* FutureTabView.swift in Sources */,
 				F8B818FD2F06D137002D02F2 /* HomeTabView.swift in Sources */,
 				F8388E8B2F3563CC0081F2F9 /* DateFormatting.swift in Sources */,
 				F8B818FF2F06D14E002D02F2 /* CalendrierMainView.swift in Sources */,
@@ -488,7 +501,6 @@
 				F8388E862F355B600081F2F9 /* ShortcutsGridView.swift in Sources */,
 				F8388E802F35532D0081F2F9 /* CalculationService.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
-				F8B818FC2F06D137002D02F2 /* PotentiellesTabView.swift in Sources */,
 				F810E30C2E44D4F100C2DFA9 /* AccountPickerView.swift in Sources */,
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
 				F800A3F72E5C72F200918507 /* ToastCard.swift in Sources */,
