@@ -1,341 +1,294 @@
 # 💰 Finoria
 
-> Application iOS de gestion financière personnelle — Simple, élégante et native.
-
-[![Swift](https://img.shields.io/badge/Swift-5.9+-orange.svg)](https://swift.org)
-[![SwiftUI](https://img.shields.io/badge/SwiftUI-iOS%2016+-blue.svg)](https://developer.apple.com/xcode/swiftui/)
-[![Platform](https://img.shields.io/badge/Platform-iOS%2016+-lightgrey.svg)](https://www.apple.com/ios/)
+> Application iOS de gestion de finances personnelles — Simple, Native, Efficace
 
 ---
 
-## 📖 Table des matières
+## 🎯 Vision Générale
 
-- [Présentation](#-présentation)
-- [Fonctionnalités](#-fonctionnalités)
-- [Captures d'écran](#-captures-décran)
-- [Guide Utilisateur](#-guide-utilisateur)
-- [Documentation Développeur](#-documentation-développeur)
-- [Architecture](#-architecture)
-- [Installation](#-installation)
-- [Contribution](#-contribution)
+**Finoria** est une application de gestion budgétaire conçue pour être :
 
----
+- **📱 100% Native** — SwiftUI pur, aucune dépendance externe
+- **⚡ Rapide** — Interface réactive avec état centralisé
+- **🔒 Privée** — Données stockées localement (UserDefaults)
+- **🧩 Maintenable** — Architecture claire avec séparation des responsabilités
 
-## 🎯 Présentation
+### Fonctionnalités Clés
 
-**Finoria** (anciennement CashMaster) est une application iOS native conçue pour la gestion de budget personnel. L'objectif est d'offrir une interface minimaliste et intuitive, exploitant les dernières fonctionnalités SwiftUI (effet "liquid glass" iOS 18+) tout en restant performante et légère.
-
-### Philosophie
-- **Native First** : Utilisation maximale des composants Apple
-- **Simplicité** : Une fonctionnalité = un geste
-- **Confidentialité** : Données stockées localement uniquement
+| Fonctionnalité | Description |
+|----------------|-------------|
+| Multi-comptes | Gérez plusieurs comptes avec styles personnalisés |
+| Transactions potentielles | Planifiez vos dépenses futures |
+| Calendrier financier | Visualisez votre historique par année/mois |
+| Export CSV | Exportez vos données pour analyse externe |
+| Import CSV | Restaurez vos données depuis un fichier |
+| Raccourcis rapides | Ajoutez des transactions récurrentes en un tap |
 
 ---
 
-## ✨ Fonctionnalités
+## 🏗️ Architecture
 
-### Gestion des Comptes
-- 🏦 Multi-comptes avec styles personnalisés (courant, épargne, investissement...)
-- 🎨 Icônes et couleurs automatiques selon le type de compte
-- 🔄 Sélection rapide via le picker de compte accessible partout
+### Pattern: Observable + Single Source of Truth
 
-### Transactions
-- ➕ Création rapide de revenus et dépenses
-- 📅 Transactions validées (avec date) et potentielles (futures)
-- ✅ Validation des transactions potentielles d'un simple swipe
-- ✏️ Édition et suppression avec confirmation
-
-### Raccourcis (Widgets)
-- ⚡ Boutons d'ajout rapide pour transactions récurrentes
-- 🎯 Un tap = transaction créée immédiatement
-- 🔔 Feedback haptique et toast de confirmation
-
-### Calendrier
-- 📊 Vue par jour, mois ou année
-- 💹 Soldes et totaux par période
-- 📈 Pourcentage d'évolution mensuelle
-
-### Import/Export
-- 📤 Export CSV de toutes les transactions
-- 📥 Import CSV compatible
-- 📱 Partage natif iOS
-
-### Notifications
-- 🔔 Rappel hebdomadaire automatique (dimanche 20h)
-- ⚙️ Permissions gérées proprement
-
----
-
-## 📱 Captures d'écran
-
-*À venir*
-
----
-
-## 👤 Guide Utilisateur
-
-### Premiers pas
-
-1. **Créer un compte**
-   - Lancez l'application
-   - Tapez sur "Ajouter un compte" 
-   - Entrez un nom (l'icône est choisie automatiquement)
-   - Personnalisez le style si souhaité
-
-2. **Ajouter une transaction**
-   - Tapez sur l'onglet `+` en bas à droite
-   - Choisissez Revenu ou Dépense
-   - Entrez le montant et un commentaire
-   - Cochez "Potentielle" si c'est une dépense future
-
-3. **Utiliser les raccourcis**
-   - Sur l'écran d'accueil, tapez "Ajouter Widget"
-   - Configurez montant, commentaire et icône
-   - Un simple tap sur le widget créera la transaction
-
-### Actions rapides
-
-| Action | Geste |
-|--------|-------|
-| Supprimer transaction | Swipe gauche → 🗑️ |
-| Valider transaction potentielle | Swipe droite → ✅ |
-| Changer de compte | Tap sur l'icône profil |
-| Voir toutes les transactions | Tap sur le solde total |
-| Voir le mois en cours | Tap sur la carte "Solde du mois" |
-
-### Conseils
-- Les transactions **potentielles** n'affectent pas votre solde actuel
-- Le pourcentage affiché compare le mois actuel au précédent
-- Supprimez un raccourci via un appui long → "Supprimer"
-
----
-
-## 🛠 Documentation Développeur
-
-### Prérequis
-
-- Xcode 15.0+
-- iOS 16.0+ SDK
-- Swift 5.9+
-
-### Configuration du projet
-
-```bash
-# Cloner le repository
-git clone <repository-url>
-cd CashMaster
-
-# Ouvrir dans Xcode
-open Finoria.xcodeproj
+```
+┌──────────────┐     observe      ┌─────────────────┐
+│    Views     │ ◀─────────────── │ AccountsManager │
+│  (SwiftUI)   │                  │ (ObservableObj) │
+└──────────────┘ ───────────────▶ └─────────────────┘
+                   appelle méthodes        │
+                                           │ délègue
+                                           ▼
+                                  ┌─────────────────┐
+                                  │    Services     │
+                                  │ (Calcul, CSV)   │
+                                  └─────────────────┘
 ```
 
-### Structure du projet
+**Principe fondamental** : Toute modification passe par `AccountsManager`, qui :
+1. Délègue le travail aux services spécialisés
+2. Notifie SwiftUI via `@Published`
+3. Persiste les données via `UserDefaults`
+
+### Structure des Dossiers
 
 ```
 CashMaster-app/
-├── CashMasterApp.swift       # Point d'entrée
-├── Models/                   # Couche données
-│   ├── AccountsManager.swift # 🔑 Source de vérité
-│   ├── Account.swift
-│   ├── Transaction.swift
-│   ├── TransactionManager.swift
-│   └── WidgetShortcut.swift
-└── Views/                    # Couche présentation
-    ├── ContentView.swift     # TabView racine
-    ├── Account/              # Vues comptes
-    ├── TabView/              # Onglets principaux
-    └── Widget/               # Raccourcis & toasts
+├── Models/      → Données (Account, Transaction, AccountsManager)
+├── Services/    → Logique métier (CalculationService, CSVService)
+├── Extensions/  → Utilitaires (DateFormatting, StylableEnum)
+└── Views/       → Interface utilisateur (SwiftUI)
 ```
 
-> 📄 Voir [STRUCTURE_APP.md](STRUCTURE_APP.md) pour l'arborescence complète.
+📚 Pour une documentation technique détaillée, voir [STRUCTURE_APP.md](STRUCTURE_APP.md).
 
 ---
 
-## 🏗 Architecture
+## 📐 Principes de Développement
 
-### Pattern : Observable + Single Source of Truth
-
-L'application utilise un pattern **Observable** centré sur `AccountsManager` comme **unique source de vérité** pour toutes les données.
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    AccountsManager                      │
-│                  (ObservableObject)                     │
-│                                                         │
-│  📊 Données:                                            │
-│  • accounts: [Account]                                  │
-│  • transactionManagers: [UUID: TransactionManager]      │
-│  • selectedAccountId: UUID?                             │
-│                                                         │
-│  💾 Persistance:                                        │
-│  • save() → UserDefaults                                │
-│  • load() ← UserDefaults                                │
-│                                                         │
-│  📢 Notification:                                       │
-│  • objectWillChange.send() → SwiftUI refresh            │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Pourquoi ce pattern ?
-
-#### Avantages
-- **Simplicité** : Une seule classe à observer
-- **Cohérence** : Impossible d'avoir des données désynchronisées
-- **Debugging facile** : Un seul point de mutation
-- **Persistance centralisée** : Sauvegarde automatique à chaque changement
-
-#### Alternative considérée : Dependency Injection
-Un pattern DI pur avec des protocoles (`AccountRepositoryProtocol`, etc.) serait plus testable mais ajouterait de la complexité pour une app de cette taille.
-
-### Règle d'or
-
-> ⚠️ **Toute modification de données DOIT passer par `AccountsManager`**
+### 1. Nommage (Anglais, camelCase)
 
 ```swift
-// ✅ CORRECT
-accountsManager.ajouterTransaction(transaction)
+// ✅ Correct
+func addTransaction(_ transaction: Transaction)
+func totalForMonth(_ month: Int, year: Int) -> Double
+var selectedAccountId: UUID?
 
-// ❌ INCORRECT (l'UI ne sera pas mise à jour)
-transactionManager.transactions.append(transaction)
+// ❌ À éviter
+func ajouterTransaction(_ transaction: Transaction)
+func total_for_month(_ month: Int, year: Int) -> Double
+var selected_account_id: UUID?
 ```
 
-### Injection de dépendances
+### 2. Responsabilité Unique (SRP)
+
+| Classe | Responsabilité UNIQUE |
+|--------|----------------------|
+| `AccountsManager` | Orchestration et état global |
+| `TransactionManager` | Opérations CRUD par compte |
+| `CalculationService` | Calculs financiers purs |
+| `CSVService` | Import/Export fichiers |
+| Vues | Affichage uniquement |
+
+### 3. Immutabilité des Transactions
+
+Les transactions sont des **structs immuables**. Pour modifier :
 
 ```swift
-// ContentView.swift - Création de l'instance racine
-@StateObject private var accountsManager = AccountsManager()
+// ❌ INTERDIT (Transaction est un struct)
+transaction.amount = 50.0
 
-// Sous-vues - Réception par observation
-@ObservedObject var accountsManager: AccountsManager
+// ✅ CORRECT (crée une nouvelle instance)
+let updated = transaction.modified(amount: 50.0)
+accountsManager.updateTransaction(updated)
 ```
 
-### Cycle de vie des données
+### 4. Protocoles Génériques
 
+Pour éviter la duplication, les enums de style conforment à `StylableEnum` :
+
+```swift
+protocol StylableEnum: CaseIterable, Identifiable, Hashable {
+    var icon: String { get }
+    var color: Color { get }
+    var label: String { get }
+}
+
+// Utilisable avec le composant générique
+StylePickerGrid<AccountStyle>(selectedStyle: $style)
+StylePickerGrid<ShortcutStyle>(selectedStyle: $style)
 ```
-App Launch
-    │
-    ▼
-AccountsManager.init()
-    │
-    ├─► load() → Décode UserDefaults
-    │
-    └─► Restaure selectedAccountId
+
+---
+
+## 🔧 Guide de Maintenance
+
+### Ajouter un Nouveau Type de Transaction
+
+1. **Modifier l'enum** dans [Transaction.swift](CashMaster-app/Models/Transaction.swift) :
+```swift
+enum TransactionType: String, Codable, CaseIterable {
+    case income, expense
+    case newType  // ← Ajouter ici
+}
+```
+
+2. **Mettre à jour l'icône/couleur** si nécessaire dans les vues.
+
+### Ajouter un Nouveau Style de Compte
+
+1. **Modifier l'enum** dans [Account.swift](CashMaster-app/Models/Account.swift) :
+```swift
+enum AccountStyle: String, Codable, CaseIterable, StylableEnum {
+    // ... cases existants
+    case newStyle  // ← Ajouter ici
     
-User Action (ex: ajouter transaction)
-    │
-    ▼
-accountsManager.ajouterTransaction(tx)
-    │
-    ├─► transactionManagers[id].ajouter(tx)
-    ├─► save() → Encode → UserDefaults
-    └─► objectWillChange.send() → UI refresh
-```
-
-### Modèles de données
-
-#### Transaction (Classe)
-```swift
-class Transaction: Identifiable, Codable, Equatable {
-    var id: UUID
-    var amount: Double      // + revenu, - dépense
-    var comment: String
-    var potentiel: Bool     // true = future
-    var date: Date?         // nil si potentielle
+    var icon: String {
+        switch self {
+        // ... cases existants
+        case .newStyle: return "star.fill"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        // ... cases existants
+        case .newStyle: return .orange
+        }
+    }
+    
+    var label: String {
+        switch self {
+        // ... cases existants
+        case .newStyle: return "Nouveau"
+        }
+    }
 }
 ```
 
-> 💡 `Transaction` est une **classe** (pas struct) pour permettre la mutation in-place via `valider()`.
+2. **C'est tout !** Le `StylePickerGrid` affichera automatiquement le nouveau style.
 
-#### TransactionManager (Non-Observable)
+### Ajouter une Nouvelle Vue
+
+1. Créer le fichier dans le dossier approprié (`Views/` ou sous-dossier)
+2. Injecter `AccountsManager` via `@EnvironmentObject`
+3. Pour modifier des données, toujours appeler les méthodes d'`AccountsManager`
+
 ```swift
-class TransactionManager {
-    let accountName: String
-    var transactions: [Transaction]
-    var widgetShortcuts: [WidgetShortcut]
+struct NouvelleVue: View {
+    @EnvironmentObject var accountsManager: AccountsManager
+    
+    var body: some View {
+        Button("Ajouter") {
+            // ✅ Passe par le manager
+            accountsManager.addTransaction(transaction)
+        }
+    }
 }
 ```
 
-> ⚠️ `TransactionManager` n'est **PAS** `ObservableObject`. Seul `AccountsManager` émet les notifications SwiftUI.
+### Ajouter un Nouveau Service
 
-### Conventions de code
+1. Créer un fichier dans `Services/`
+2. Utiliser des **fonctions statiques** pures (sans état)
+3. Appeler depuis `AccountsManager`, jamais directement depuis les vues
 
-#### Nommage (Swift API Design Guidelines)
-- **Types** : UpperCamelCase (`AccountsManager`, `TransactionType`)
-- **Propriétés/Méthodes** : lowerCamelCase (`selectedAccountId`, `ajouterTransaction`)
-- **Enum cases** : lowerCamelCase (`income`, `expense`)
-- **Verbes en français** pour les méthodes métier (`ajouter`, `supprimer`, `valider`)
-
-#### Organisation des fichiers
 ```swift
-// MARK: - Données publiées
-// MARK: - Init
-// MARK: - Gestion des comptes
-// MARK: - Gestion des transactions
-// MARK: - Persistance
-// MARK: - Export/Import CSV
+// Services/NewService.swift
+struct NewService {
+    static func calculate(_ data: [Transaction]) -> Double {
+        // Logique pure, sans effets de bord
+    }
+}
+
+// Dans AccountsManager
+func useNewService() {
+    let result = NewService.calculate(transactions)
+    // ...
+}
 ```
 
-### Tests
+---
+
+## 📱 Stack Technique
+
+| Composant | Technologie |
+|-----------|-------------|
+| **Plateforme** | iOS 16+ |
+| **Langage** | Swift 5.9+ |
+| **UI** | SwiftUI (100%) |
+| **État** | `@Published`, `@ObservedObject`, `@State` |
+| **Navigation** | `NavigationStack`, `navigationDestination` |
+| **Persistance** | `UserDefaults` + `Codable` (JSON) |
+| **Notifications** | `UNUserNotificationCenter` |
+| **Dépendances** | **Aucune** (100% natif Apple) |
+
+---
+
+## 🚀 Développement Local
+
+### Prérequis
+
+- macOS 13+ (Ventura ou ultérieur)
+- Xcode 15+
+- iOS Simulator ou appareil physique iOS 16+
+
+### Lancer le Projet
 
 ```bash
-# Exécuter les tests unitaires
-xcodebuild test -scheme Finoria -destination 'platform=iOS Simulator,name=iPhone 15'
+# Ouvrir dans Xcode
+open Finoria.xcodeproj
+
+# Compiler et lancer
+Cmd + R
 ```
 
-Les tests sont localisés dans :
-- `CashMaster-appTests/` : Tests unitaires
-- `CashMaster-appUITests/` : Tests d'interface
+### Structure des Schémas Xcode
+
+| Schéma | Cible |
+|--------|-------|
+| `Finoria` | Application principale |
+| `CashMaster-appTests` | Tests unitaires |
+| `CashMaster-appUITests` | Tests d'interface |
 
 ---
 
-## 📦 Installation
+## 📋 Checklist de Qualité
 
-### Via Xcode
+Avant chaque commit, vérifier :
 
-1. Clonez le repository
-2. Ouvrez `Finoria.xcodeproj`
-3. Sélectionnez un simulateur ou appareil
-4. `Cmd + R` pour lancer
-
-### Configuration requise
-
-| Composant | Version minimum |
-|-----------|----------------|
-| iOS | 16.0 |
-| Xcode | 15.0 |
-| Swift | 5.9 |
+- [ ] ✅ Toutes les fonctions sont nommées en **anglais camelCase**
+- [ ] ✅ Aucune modification directe de transaction (utiliser `modified()`)
+- [ ] ✅ Toutes les modifications de données passent par `AccountsManager`
+- [ ] ✅ Les nouveaux enums de style conforment à `StylableEnum`
+- [ ] ✅ Pas de code dupliqué (extraire en service ou extension)
+- [ ] ✅ Les vues n'ont **aucune logique métier** (déléguer aux services)
 
 ---
 
-## 🤝 Contribution
+## 📊 Métriques Post-Refactoring
 
-Les contributions sont les bienvenues ! Veuillez :
-
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add AmazingFeature'`)
-4. Push la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
-### Standards de code
-- Suivre les [Swift API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
-- Documenter les méthodes publiques
-- Ajouter des tests pour les nouvelles fonctionnalités
+| Métrique | Avant | Après | Amélioration |
+|----------|-------|-------|--------------|
+| Lignes AccountsManager | ~500 | ~260 | **-48%** |
+| Fichiers de code mort | 3 | 0 | ✅ Supprimés |
+| Fonctions dupliquées | ~15 | 0 | ✅ Centralisées |
+| Nommage anglais | ~40% | 100% | ✅ Harmonisé |
 
 ---
 
-## 📄 Licence
+## 📚 Documentation
 
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
----
-
-## 👨‍💻 Auteur
-
-**Godefroy REYNAUD** - Développeur iOS
+| Document | Description |
+|----------|-------------|
+| [STRUCTURE_APP.md](STRUCTURE_APP.md) | Architecture technique détaillée (AI-Ready) |
+| Ce fichier | Manuel de référence et guide de maintenance |
 
 ---
 
-<p align="center">
-  Fait avec ❤️ et SwiftUI
-</p>
+## 📜 Licence
+
+Projet personnel — Tous droits réservés.
+
+---
+
+*Finoria v2.0 — Développé avec ❤️ en Swift*
