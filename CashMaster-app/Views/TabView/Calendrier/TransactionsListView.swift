@@ -16,7 +16,7 @@ struct TransactionsListView: View {
 	
 	var body: some View {
 		List {
-			ForEach(accountsManager.validatedTransactions(year: year, month: month)) { transaction in
+			ForEach(accountsManager.validatedTransactions(year: year, month: month).sorted { ($0.date ?? Date.distantPast) > ($1.date ?? Date.distantPast) }) { transaction in
 				TransactionRow(transaction: transaction)
 					.contentShape(Rectangle())
 					.onTapGesture {

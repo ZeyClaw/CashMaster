@@ -29,9 +29,9 @@ struct AddWidgetShortcutView: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				CurrencyTextField("Montant", amount: $amount)
-
 				Section {
+					CurrencyTextField("Montant", amount: $amount)
+
 					TextField("Commentaire", text: $comment)
 						.onChange(of: comment) { _, newValue in
 							if newValue.count > maxCommentLength {

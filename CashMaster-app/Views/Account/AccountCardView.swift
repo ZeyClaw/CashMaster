@@ -37,7 +37,7 @@ struct AccountCardView: View {
 				}
 			}
 			
-			Spacer(minLength: 8)
+			Spacer(minLength: 1)
 			
 			// Solde
 			VStack(alignment: .trailing, spacing: 2) {
