@@ -37,7 +37,6 @@
 		F8388E932F356B670081F2F9 /* FutureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E922F356B670081F2F9 /* FutureTabView.swift */; };
 		F8388E972F356BB10081F2F9 /* TransactionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E952F356BB10081F2F9 /* TransactionRow.swift */; };
 		F8388E982F356BB10081F2F9 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E962F356BB10081F2F9 /* AddTransactionView.swift */; };
-		F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
 		F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */; };
@@ -101,7 +100,6 @@
 		F8388E922F356B670081F2F9 /* FutureTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTabView.swift; sourceTree = "<group>"; };
 		F8388E952F356BB10081F2F9 /* TransactionRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRow.swift; sourceTree = "<group>"; };
 		F8388E962F356BB10081F2F9 /* AddTransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
-		F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -188,7 +186,6 @@
 				F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
 				F800A3ED2E4E01F700918507 /* NoAccountView.swift */,
-				F83D42D22CBFB59B003C51D2 /* AddTransactionView.swift */,
 				F810E3152E46086500C2DFA9 /* Account */,
 				F810E3162E46088500C2DFA9 /* Widget */,
 				F810E3072E43EAC800C2DFA9 /* TabView */,
@@ -469,7 +466,6 @@
 			files = (
 				F8388E772F350F150081F2F9 /* AllTransactionsView.swift in Sources */,
 				F800A3EE2E4E01F700918507 /* NoAccountView.swift in Sources */,
-				F83D42D32CBFB59B003C51D2 /* AddTransactionView.swift in Sources */,
 				F8388E8C2F3563CC0081F2F9 /* StylableEnum.swift in Sources */,
 				F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */,
 				F8B818F92F06A7A7002D02F2 /* DocumentPicker.swift in Sources */,
