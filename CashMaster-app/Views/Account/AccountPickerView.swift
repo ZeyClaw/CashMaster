@@ -13,6 +13,8 @@ struct AccountPickerView: View {
 	
 	@State private var showingAddAccount = false
 	@State private var accountToEdit: Account? = nil
+	@State private var accountToReset: Account? = nil
+	@State private var showingResetConfirmation = false
 	
 	var body: some View {
 		NavigationStack {
@@ -36,6 +38,13 @@ struct AccountPickerView: View {
 								accountToEdit = account
 							} label: {
 								Label("Modifier", systemImage: "pencil")
+							}
+							
+							Button(role: .destructive) {
+								accountToReset = account
+								showingResetConfirmation = true
+							} label: {
+								Label("Réinitialiser", systemImage: "arrow.counterclockwise")
 							}
 							
 							Button(role: .destructive) {
@@ -98,6 +107,16 @@ struct AccountPickerView: View {
 			}
 			.sheet(item: $accountToEdit) { account in
 				AddAccountSheet(accountsManager: accountsManager, accountToEdit: account)
+			}
+			.alert("Réinitialiser ce compte ?", isPresented: $showingResetConfirmation) {
+				Button("Réinitialiser", role: .destructive) {
+					if let account = accountToReset {
+						accountsManager.resetAccount(account)
+					}
+				}
+				Button("Annuler", role: .cancel) { }
+			} message: {
+				Text("Toutes les transactions de ce compte seront supprimées. Cette action est irréversible.")
 			}
 		}
 	}

@@ -87,6 +87,12 @@ class AccountsManager: ObservableObject {
 		objectWillChange.send()
 	}
 	
+	func resetAccount(_ account: Account) {
+		transactionManagers[account.id]?.transactions.removeAll()
+		save()
+		objectWillChange.send()
+	}
+	
 	func getAllAccounts() -> [Account] {
 		accounts.sorted { $0.name < $1.name }
 	}

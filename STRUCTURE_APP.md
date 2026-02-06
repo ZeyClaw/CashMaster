@@ -114,6 +114,7 @@ CashMaster-app/
 │  • addAccount()        → ajoute un compte                       │
 │  • deleteAccount()     → supprime un compte                     │
 │  • updateAccount()     → modifie un compte existant             │
+│  • resetAccount()      → supprime toutes les transactions       │
 │  • addWidgetShortcut() → ajoute un raccourci                    │
 │  • deleteWidgetShortcut() → supprime un raccourci               │
 │  • updateWidgetShortcut() → modifie un raccourci existant       │

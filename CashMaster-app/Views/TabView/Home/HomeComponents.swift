@@ -34,7 +34,7 @@ struct BalanceHeaderContent: View {
 			if let totalCurrent = totalCurrent {
 				Text("\(totalCurrent, specifier: "%.2f") €")
 					.font(.system(size: 48, weight: .bold))
-					.foregroundStyle(.primary)
+					.foregroundStyle(totalCurrent < 0 ? .red : .primary)
 					.tracking(-1)
 			}
 			

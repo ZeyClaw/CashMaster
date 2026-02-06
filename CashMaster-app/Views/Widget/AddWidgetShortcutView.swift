@@ -14,11 +14,15 @@ struct AddWidgetShortcutView: View {
 	// Raccourci à éditer (nil = nouveau raccourci)
 	var shortcutToEdit: WidgetShortcut? = nil
 	
+	// MARK: - Limites
+	private let maxCommentLength = 15
+	
 	@State private var amount: Double?
 	@State private var comment = ""
 	@State private var type: TransactionType = .income
 	@State private var selectedStyle: ShortcutStyle = .income
 	@State private var showError = false
+	@State private var hasManuallySelectedStyle = false
 	
 	private var isEditMode: Bool { shortcutToEdit != nil }
 	
@@ -27,13 +31,23 @@ struct AddWidgetShortcutView: View {
 			Form {
 				CurrencyTextField("Montant", amount: $amount)
 
-				TextField("Commentaire", text: $comment)
-					.onChange(of: comment) { _, newValue in
-						// Ne pas auto-deviner le style en mode édition
-						if !isEditMode {
-							selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
+				Section {
+					TextField("Commentaire", text: $comment)
+						.onChange(of: comment) { _, newValue in
+							if newValue.count > maxCommentLength {
+								comment = String(newValue.prefix(maxCommentLength))
+							}
+							// Ne pas auto-deviner le style si mode édition ou sélection manuelle
+							if !isEditMode && !hasManuallySelectedStyle {
+								selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
+							}
 						}
+				} footer: {
+					HStack {
+						Spacer()
+						Text("\(comment.count)/\(maxCommentLength)")
 					}
+				}
 				
 				Picker("Type", selection: $type) {
 					ForEach(TransactionType.allCases) { t in
@@ -42,15 +56,17 @@ struct AddWidgetShortcutView: View {
 				}
 				.pickerStyle(.segmented)
 				.onChange(of: type) { _, newValue in
-					// Met à jour le style si c'est le style par défaut (seulement si pas en mode édition)
-					if !isEditMode && (selectedStyle == .income || selectedStyle == .expense) {
+					// Met à jour le style si c'est le style par défaut (seulement si pas en mode édition et pas de sélection manuelle)
+					if !isEditMode && !hasManuallySelectedStyle && (selectedStyle == .income || selectedStyle == .expense) {
 						selectedStyle = newValue == .income ? .income : .expense
 					}
 				}
 				
 				// MARK: - Sélecteur d'icône
 				Section("Icône") {
-					StylePickerGrid(selectedStyle: $selectedStyle, columns: 5)
+					StylePickerGrid(selectedStyle: $selectedStyle, columns: 5) {
+						hasManuallySelectedStyle = true
+					}
 				}
 				
 				// Bouton supprimer en mode édition

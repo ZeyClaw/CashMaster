@@ -109,7 +109,7 @@ private struct ShortcutCard: View {
 					}
 				}
 				
-				Spacer()
+				Spacer(minLength: 4)
 			}
 			.padding(12)
 			.background(Color(UIColor.secondarySystemGroupedBackground))

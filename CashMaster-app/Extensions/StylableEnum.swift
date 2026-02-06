@@ -30,10 +30,12 @@ extension StylableEnum {
 struct StylePickerGrid<Style: StylableEnum>: View {
 	@Binding var selectedStyle: Style
 	let columns: Int
+	var onManualSelection: (() -> Void)? = nil
 	
-	init(selectedStyle: Binding<Style>, columns: Int = 4) {
+	init(selectedStyle: Binding<Style>, columns: Int = 4, onManualSelection: (() -> Void)? = nil) {
 		self._selectedStyle = selectedStyle
 		self.columns = columns
+		self.onManualSelection = onManualSelection
 	}
 	
 	var body: some View {
@@ -41,6 +43,7 @@ struct StylePickerGrid<Style: StylableEnum>: View {
 			ForEach(Array(Style.allCases), id: \.id) { style in
 				Button {
 					selectedStyle = style
+					onManualSelection?()
 				} label: {
 					VStack(spacing: 6) {
 						ZStack {

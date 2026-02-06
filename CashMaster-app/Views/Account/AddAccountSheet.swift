@@ -15,9 +15,14 @@ struct AddAccountSheet: View {
 	// Compte à éditer (nil = nouveau compte)
 	var accountToEdit: Account? = nil
 	
+	// MARK: - Limites
+	private let maxNameLength = 15
+	private let maxDetailLength = 20
+	
 	@State private var name = ""
 	@State private var detail = ""
 	@State private var style: AccountStyle = .bank
+	@State private var hasManuallySelectedStyle = false
 	
 	private var isEditMode: Bool { accountToEdit != nil }
 	
@@ -30,19 +35,37 @@ struct AddAccountSheet: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				Section("Informations") {
+				Section {
 					TextField("Nom du compte", text: $name)
 						.onChange(of: name) { _, newValue in
-							// Ne pas auto-deviner le style en mode édition si l'utilisateur a déjà un style personnalisé
-							if !isEditMode {
+							if newValue.count > maxNameLength {
+								name = String(newValue.prefix(maxNameLength))
+							}
+							// Ne pas auto-deviner le style si mode édition ou sélection manuelle
+							if !isEditMode && !hasManuallySelectedStyle {
 								style = AccountStyle.guessFrom(name: newValue)
 							}
 						}
 					TextField("Détail (optionnel)", text: $detail)
+						.onChange(of: detail) { _, newValue in
+							if newValue.count > maxDetailLength {
+								detail = String(newValue.prefix(maxDetailLength))
+							}
+						}
+				} header: {
+					Text("Informations")
+				} footer: {
+					HStack {
+						Text("\(name.count)/\(maxNameLength)")
+						Spacer()
+						Text("\(detail.count)/\(maxDetailLength)")
+					}
 				}
 				
 				Section("Icône") {
-					StylePickerGrid(selectedStyle: $style, columns: 4)
+					StylePickerGrid(selectedStyle: $style, columns: 4) {
+						hasManuallySelectedStyle = true
+					}
 				}
 				
 				// Aperçu
