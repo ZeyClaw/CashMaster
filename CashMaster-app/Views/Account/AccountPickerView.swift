@@ -12,6 +12,7 @@ struct AccountPickerView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	
 	@State private var showingAddAccount = false
+	@State private var accountToEdit: Account? = nil
 	
 	var body: some View {
 		NavigationStack {
@@ -29,6 +30,19 @@ struct AccountPickerView: View {
 						.onTapGesture {
 							accountsManager.selectedAccountId = account.id
 							dismiss()
+						}
+						.contextMenu {
+							Button {
+								accountToEdit = account
+							} label: {
+								Label("Modifier", systemImage: "pencil")
+							}
+							
+							Button(role: .destructive) {
+								accountsManager.deleteAccount(account)
+							} label: {
+								Label("Supprimer", systemImage: "trash")
+							}
 						}
 						.swipeActions(edge: .trailing, allowsFullSwipe: true) {
 							Button(role: .destructive) {
@@ -81,6 +95,9 @@ struct AccountPickerView: View {
 				AddAccountSheet(accountsManager: accountsManager) {
 					dismiss()
 				}
+			}
+			.sheet(item: $accountToEdit) { account in
+				AddAccountSheet(accountsManager: accountsManager, accountToEdit: account)
 			}
 		}
 	}

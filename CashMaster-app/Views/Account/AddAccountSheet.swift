@@ -12,12 +12,18 @@ struct AddAccountSheet: View {
 	@ObservedObject var accountsManager: AccountsManager
 	var onAccountCreated: (() -> Void)?
 	
+	// Compte à éditer (nil = nouveau compte)
+	var accountToEdit: Account? = nil
+	
 	@State private var name = ""
 	@State private var detail = ""
 	@State private var style: AccountStyle = .bank
 	
-	init(accountsManager: AccountsManager, onAccountCreated: (() -> Void)? = nil) {
+	private var isEditMode: Bool { accountToEdit != nil }
+	
+	init(accountsManager: AccountsManager, accountToEdit: Account? = nil, onAccountCreated: (() -> Void)? = nil) {
 		self.accountsManager = accountsManager
+		self.accountToEdit = accountToEdit
 		self.onAccountCreated = onAccountCreated
 	}
 	
@@ -27,7 +33,10 @@ struct AddAccountSheet: View {
 				Section("Informations") {
 					TextField("Nom du compte", text: $name)
 						.onChange(of: name) { _, newValue in
-							style = AccountStyle.guessFrom(name: newValue)
+							// Ne pas auto-deviner le style en mode édition si l'utilisateur a déjà un style personnalisé
+							if !isEditMode {
+								style = AccountStyle.guessFrom(name: newValue)
+							}
 						}
 					TextField("Détail (optionnel)", text: $detail)
 				}
@@ -46,6 +55,24 @@ struct AddAccountSheet: View {
 					.listRowInsets(EdgeInsets())
 					.listRowBackground(Color.clear)
 				}
+				
+				// Bouton supprimer en mode édition
+				if isEditMode {
+					Section {
+						Button(role: .destructive) {
+							if let account = accountToEdit {
+								accountsManager.deleteAccount(account)
+								dismiss()
+							}
+						} label: {
+							HStack {
+								Spacer()
+								Label("Supprimer le compte", systemImage: "trash")
+								Spacer()
+							}
+						}
+					}
+				}
 			}
 			.scrollContentBackground(.hidden)
 			.background(
@@ -54,7 +81,7 @@ struct AddAccountSheet: View {
 				})
 				.ignoresSafeArea()
 			)
-			.navigationTitle("Nouveau compte")
+			.navigationTitle(isEditMode ? "Modifier le compte" : "Nouveau compte")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Annuler") {
@@ -62,23 +89,37 @@ struct AddAccountSheet: View {
 					}
 				}
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Créer") {
-						createAccount()
+					Button(isEditMode ? "OK" : "Créer") {
+						saveAccount()
 					}
 					.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+				}
+			}
+			.onAppear {
+				if let account = accountToEdit {
+					name = account.name
+					detail = account.detail
+					style = account.style
 				}
 			}
 		}
 	}
 	
-	private func createAccount() {
+	private func saveAccount() {
 		let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !trimmed.isEmpty else { return }
 		
-		let account = Account(name: trimmed, detail: detail, style: style)
-		accountsManager.addAccount(account)
-		accountsManager.selectedAccountId = account.id
+		if let existingAccount = accountToEdit {
+			// Mode édition: créer un compte modifié avec le même ID
+			let updatedAccount = Account(id: existingAccount.id, name: trimmed, detail: detail, style: style)
+			accountsManager.updateAccount(updatedAccount)
+		} else {
+			// Mode création: nouveau compte
+			let account = Account(name: trimmed, detail: detail, style: style)
+			accountsManager.addAccount(account)
+			accountsManager.selectedAccountId = account.id
+			onAccountCreated?()
+		}
 		dismiss()
-		onAccountCreated?()
 	}
 }

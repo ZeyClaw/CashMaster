@@ -13,6 +13,7 @@ struct HomeView: View {
 	
 	// MARK: - State
 	@State private var showingAddWidgetSheet = false
+	@State private var shortcutToEdit: WidgetShortcut? = nil
 	@State private var shortcutToDelete: WidgetShortcut? = nil
 	@State private var showingDeleteConfirmation = false
 	@State private var toasts: [ToastData] = []
@@ -93,6 +94,9 @@ struct HomeView: View {
 						onShortcutTap: { shortcut in
 							executeShortcut(shortcut)
 						},
+						onShortcutEdit: { shortcut in
+							shortcutToEdit = shortcut
+						},
 						onShortcutDelete: { shortcut in
 							shortcutToDelete = shortcut
 							showingDeleteConfirmation = true
@@ -109,6 +113,9 @@ struct HomeView: View {
 		}
 		.sheet(isPresented: $showingAddWidgetSheet) {
 			AddWidgetShortcutView(accountsManager: accountsManager)
+		}
+		.sheet(item: $shortcutToEdit) { shortcut in
+			AddWidgetShortcutView(accountsManager: accountsManager, shortcutToEdit: shortcut)
 		}
 		.alert("Supprimer ce raccourci ?", isPresented: $showingDeleteConfirmation) {
 			Button("Supprimer", role: .destructive) {

@@ -49,8 +49,8 @@ CashMaster-app/
     │
     ├── Account/                    # Vues liées aux comptes
     │   ├── AccountCardView.swift   # Carte visuelle d'un compte
-    │   ├── AccountPickerView.swift # Sélecteur de compte (sheet)
-    │   └── AddAccountSheet.swift   # Formulaire création compte
+    │   ├── AccountPickerView.swift # Sélecteur de compte (sheet) + appui long pour modifier
+    │   └── AddAccountSheet.swift   # Formulaire création/édition compte
     │
     ├── Transactions/               # Vues liées aux transactions
     │   ├── AddTransactionView.swift # Formulaire ajout/édition
@@ -60,7 +60,7 @@ CashMaster-app/
     │   └── CurrencyTextField.swift # Champ montant avec €
     │
     ├── Widget/                     # Raccourcis rapides
-    │   ├── AddWidgetShortcutView.swift
+    │   ├── AddWidgetShortcutView.swift # Formulaire création/édition raccourci
     │   └── Toast/                  # Notifications visuelles
     │       ├── ToastCard.swift
     │       ├── ToastData.swift
@@ -110,6 +110,13 @@ CashMaster-app/
 │                                                                 │
 │  • addTransaction()    → délègue à TransactionManager           │
 │  • deleteTransaction() → délègue à TransactionManager           │
+│  • updateTransaction() → délègue à TransactionManager           │
+│  • addAccount()        → ajoute un compte                       │
+│  • deleteAccount()     → supprime un compte                     │
+│  • updateAccount()     → modifie un compte existant             │
+│  • addWidgetShortcut() → ajoute un raccourci                    │
+│  • deleteWidgetShortcut() → supprime un raccourci               │
+│  • updateWidgetShortcut() → modifie un raccourci existant       │
 │  • totalForMonth()     → délègue à CalculationService           │
 │  • generateCSV()       → délègue à CSVService                   │
 │                                                                 │

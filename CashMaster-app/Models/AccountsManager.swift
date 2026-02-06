@@ -80,6 +80,13 @@ class AccountsManager: ObservableObject {
 		objectWillChange.send()
 	}
 	
+	func updateAccount(_ account: Account) {
+		guard let index = accounts.firstIndex(where: { $0.id == account.id }) else { return }
+		accounts[index] = account
+		save()
+		objectWillChange.send()
+	}
+	
 	func getAllAccounts() -> [Account] {
 		accounts.sorted { $0.name < $1.name }
 	}
@@ -219,6 +226,14 @@ class AccountsManager: ObservableObject {
 	func deleteWidgetShortcut(_ shortcut: WidgetShortcut) {
 		guard let accountId = selectedAccountId else { return }
 		transactionManagers[accountId]?.widgetShortcuts.removeAll { $0.id == shortcut.id }
+		save()
+		objectWillChange.send()
+	}
+	
+	func updateWidgetShortcut(_ shortcut: WidgetShortcut) {
+		guard let accountId = selectedAccountId,
+			  let index = transactionManagers[accountId]?.widgetShortcuts.firstIndex(where: { $0.id == shortcut.id }) else { return }
+		transactionManagers[accountId]?.widgetShortcuts[index] = shortcut
 		save()
 		objectWillChange.send()
 	}

@@ -12,6 +12,7 @@ import UIKit  // Pour le retour haptique
 struct ShortcutsGridView: View {
 	let shortcuts: [WidgetShortcut]
 	let onShortcutTap: (WidgetShortcut) -> Void
+	let onShortcutEdit: (WidgetShortcut) -> Void
 	let onShortcutDelete: (WidgetShortcut) -> Void
 	let onAddTap: () -> Void
 	
@@ -26,6 +27,7 @@ struct ShortcutsGridView: View {
 					ShortcutCard(
 						shortcut: shortcut,
 						onTap: { onShortcutTap(shortcut) },
+						onEdit: { onShortcutEdit(shortcut) },
 						onDelete: { onShortcutDelete(shortcut) }
 					)
 				}
@@ -69,6 +71,7 @@ private struct ShortcutsHeader: View {
 private struct ShortcutCard: View {
 	let shortcut: WidgetShortcut
 	let onTap: () -> Void
+	let onEdit: () -> Void
 	let onDelete: () -> Void
 	
 	var body: some View {
@@ -115,6 +118,10 @@ private struct ShortcutCard: View {
 		}
 		.buttonStyle(PlainButtonStyle())
 		.contextMenu {
+			Button(action: onEdit) {
+				Label("Modifier", systemImage: "pencil")
+			}
+			
 			Button(role: .destructive, action: onDelete) {
 				Label("Supprimer", systemImage: "trash")
 			}
@@ -129,6 +136,7 @@ private struct ShortcutCard: View {
 			WidgetShortcut(amount: 30, comment: "Essence", type: .expense, style: .fuel)
 		],
 		onShortcutTap: { _ in },
+		onShortcutEdit: { _ in },
 		onShortcutDelete: { _ in },
 		onAddTap: {}
 	)

@@ -11,11 +11,16 @@ struct AddWidgetShortcutView: View {
 	@Environment(\.dismiss) var dismiss
 	@ObservedObject var accountsManager: AccountsManager
 	
+	// Raccourci à éditer (nil = nouveau raccourci)
+	var shortcutToEdit: WidgetShortcut? = nil
+	
 	@State private var amount: Double?
 	@State private var comment = ""
 	@State private var type: TransactionType = .income
 	@State private var selectedStyle: ShortcutStyle = .income
 	@State private var showError = false
+	
+	private var isEditMode: Bool { shortcutToEdit != nil }
 	
 	var body: some View {
 		NavigationStack {
@@ -24,8 +29,10 @@ struct AddWidgetShortcutView: View {
 
 				TextField("Commentaire", text: $comment)
 					.onChange(of: comment) { _, newValue in
-						// Met à jour automatiquement le style selon le commentaire
-						selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
+						// Ne pas auto-deviner le style en mode édition
+						if !isEditMode {
+							selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
+						}
 					}
 				
 				Picker("Type", selection: $type) {
@@ -35,8 +42,8 @@ struct AddWidgetShortcutView: View {
 				}
 				.pickerStyle(.segmented)
 				.onChange(of: type) { _, newValue in
-					// Met à jour le style si c'est le style par défaut
-					if selectedStyle == .income || selectedStyle == .expense {
+					// Met à jour le style si c'est le style par défaut (seulement si pas en mode édition)
+					if !isEditMode && (selectedStyle == .income || selectedStyle == .expense) {
 						selectedStyle = newValue == .income ? .income : .expense
 					}
 				}
@@ -45,26 +52,33 @@ struct AddWidgetShortcutView: View {
 				Section("Icône") {
 					StylePickerGrid(selectedStyle: $selectedStyle, columns: 5)
 				}
+				
+				// Bouton supprimer en mode édition
+				if isEditMode {
+					Section {
+						Button(role: .destructive) {
+							if let shortcut = shortcutToEdit {
+								accountsManager.deleteWidgetShortcut(shortcut)
+								dismiss()
+							}
+						} label: {
+							HStack {
+								Spacer()
+								Label("Supprimer le raccourci", systemImage: "trash")
+								Spacer()
+							}
+						}
+					}
+				}
 			}
-			.navigationTitle("Nouveau widget")
+			.navigationTitle(isEditMode ? "Modifier le raccourci" : "Nouveau widget")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Annuler") { dismiss() }
 				}
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Ajouter") {
-						guard let amount = amount, amount > 0 else {
-							showError = true
-							return
-						}
-						let shortcut = WidgetShortcut(
-							amount: amount,
-							comment: comment,
-							type: type,
-							style: selectedStyle
-						)
-						accountsManager.addWidgetShortcut(shortcut)
-						dismiss()
+					Button(isEditMode ? "OK" : "Ajouter") {
+						saveShortcut()
 					}
 				}
 			}
@@ -73,6 +87,43 @@ struct AddWidgetShortcutView: View {
 			} message: {
 				Text("Veuillez entrer un montant positif valide.")
 			}
+			.onAppear {
+				if let shortcut = shortcutToEdit {
+					amount = shortcut.amount
+					comment = shortcut.comment
+					type = shortcut.type
+					selectedStyle = shortcut.style
+				}
+			}
 		}
+	}
+	
+	private func saveShortcut() {
+		guard let amount = amount, amount > 0 else {
+			showError = true
+			return
+		}
+		
+		if let existingShortcut = shortcutToEdit {
+			// Mode édition: créer un raccourci modifié avec le même ID
+			let updatedShortcut = WidgetShortcut(
+				id: existingShortcut.id,
+				amount: amount,
+				comment: comment,
+				type: type,
+				style: selectedStyle
+			)
+			accountsManager.updateWidgetShortcut(updatedShortcut)
+		} else {
+			// Mode création: nouveau raccourci
+			let shortcut = WidgetShortcut(
+				amount: amount,
+				comment: comment,
+				type: type,
+				style: selectedStyle
+			)
+			accountsManager.addWidgetShortcut(shortcut)
+		}
+		dismiss()
 	}
 }
