@@ -1,5 +1,5 @@
 //
-//  PotentiellesTabView.swift
+//  FutureTabView.swift
 //  CashMaster
 //
 //  Created by Godefroy REYNAUD on 01/01/2026.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-/// Vue principale de l'onglet Potentielles avec toolbar
-struct PotentiellesTabView: View {
+/// Main view for the Future/Potential transactions tab with toolbar
+struct FutureTabView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	@State private var showingAccountPicker = false
 	
@@ -16,7 +16,7 @@ struct PotentiellesTabView: View {
 		NavigationStack {
 			if accountsManager.selectedAccountId != nil {
 				PotentialTransactionsView(accountsManager: accountsManager)
-					.navigationTitle("Potentielles")
+					.navigationTitle("À venir")
 					.toolbar {
 						ToolbarItem(placement: .navigationBarTrailing) {
 							Button {
@@ -51,5 +51,5 @@ struct PotentiellesTabView: View {
 }
 
 #Preview {
-	PotentiellesTabView(accountsManager: AccountsManager())
+	FutureTabView(accountsManager: AccountsManager())
 }

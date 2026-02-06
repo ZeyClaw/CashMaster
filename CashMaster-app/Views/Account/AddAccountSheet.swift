@@ -76,7 +76,7 @@ struct AddAccountSheet: View {
 		guard !trimmed.isEmpty else { return }
 		
 		let account = Account(name: trimmed, detail: detail, style: style)
-		accountsManager.ajouterCompte(account)
+		accountsManager.addAccount(account)
 		accountsManager.selectedAccountId = account.id
 		dismiss()
 		onAccountCreated?()

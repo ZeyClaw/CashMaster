@@ -19,7 +19,7 @@ struct MonthsView: View {
 			List {
 				// Tri du plus récent (décembre) au plus ancien (janvier)
 				ForEach((1...12).reversed(), id: \.self) { month in
-					let total = accountsManager.totalPourMois(month, year: year)
+					let total = accountsManager.totalForMonth(month, year: year)
 					if total != 0 {
 						NavigationLink(value: CalendrierRoute.transactions(month: month, year: year)) {
 							HStack {

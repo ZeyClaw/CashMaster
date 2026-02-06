@@ -35,7 +35,7 @@ struct ContentView: View {
 			
 			// Onglet Potentielles
 			Tab(value: TabItem.potentielles) {
-				PotentiellesTabView(accountsManager: accountsManager)
+				FutureTabView(accountsManager: accountsManager)
 			} label: {
 				Label("Potentielles", systemImage: "clock.arrow.circlepath")
 			}

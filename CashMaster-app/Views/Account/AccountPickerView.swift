@@ -19,8 +19,8 @@ struct AccountPickerView: View {
 					ForEach(accountsManager.getAllAccounts()) { account in
 						AccountCardView(
 							account: account,
-							solde: accountsManager.totalNonPotentiel(for: account),
-							futur: accountsManager.totalNonPotentiel(for: account) + accountsManager.totalPotentiel(for: account)
+							solde: accountsManager.totalNonPotential(for: account),
+							futur: accountsManager.totalNonPotential(for: account) + accountsManager.totalPotential(for: account)
 						)
 						.listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
 						.listRowBackground(Color.clear)

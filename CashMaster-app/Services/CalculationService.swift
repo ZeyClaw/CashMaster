@@ -7,33 +7,33 @@
 
 import Foundation
 
-/// Service responsable de tous les calculs financiers.
-/// Prend des données en entrée et retourne des résultats calculés.
-/// Ne modifie jamais les données sources.
+/// Service responsible for all financial calculations.
+/// Takes data as input and returns calculated results.
+/// Never modifies source data.
 struct CalculationService {
 	
-	// MARK: - Totaux par compte
+	// MARK: - Account Totals
 	
-	/// Calcule le total des transactions non potentielles (validées)
-	static func totalNonPotentiel(transactions: [Transaction]) -> Double {
+	/// Calculates the total of non-potential (validated) transactions
+	static func totalNonPotential(transactions: [Transaction]) -> Double {
 		transactions
 			.filter { !$0.potentiel }
 			.map { $0.amount }
 			.reduce(0, +)
 	}
 	
-	/// Calcule le total des transactions potentielles (futures)
-	static func totalPotentiel(transactions: [Transaction]) -> Double {
+	/// Calculates the total of potential (future) transactions
+	static func totalPotential(transactions: [Transaction]) -> Double {
 		transactions
 			.filter { $0.potentiel }
 			.map { $0.amount }
 			.reduce(0, +)
 	}
 	
-	// MARK: - Regroupements temporels
+	// MARK: - Time Groupings
 	
-	/// Retourne les années distinctes présentes dans les transactions validées
-	static func anneesDisponibles(transactions: [Transaction]) -> [Int] {
+	/// Returns distinct years present in validated transactions
+	static func availableYears(transactions: [Transaction]) -> [Int] {
 		let validatedTransactions = transactions.filter { !$0.potentiel }
 		let years = validatedTransactions.compactMap { tx -> Int? in
 			guard let date = tx.date else { return nil }
@@ -42,16 +42,16 @@ struct CalculationService {
 		return Array(Set(years)).sorted()
 	}
 	
-	/// Calcule le total pour une année donnée
-	static func totalPourAnnee(_ year: Int, transactions: [Transaction]) -> Double {
+	/// Calculates the total for a given year
+	static func totalForYear(_ year: Int, transactions: [Transaction]) -> Double {
 		transactions
 			.filter { !$0.potentiel && Calendar.current.component(.year, from: $0.date ?? Date()) == year }
 			.map { $0.amount }
 			.reduce(0, +)
 	}
 	
-	/// Calcule le total pour un mois et une année donnés
-	static func totalPourMois(_ month: Int, year: Int, transactions: [Transaction]) -> Double {
+	/// Calculates the total for a given month and year
+	static func totalForMonth(_ month: Int, year: Int, transactions: [Transaction]) -> Double {
 		transactions
 			.filter {
 				guard !$0.potentiel, let date = $0.date else { return false }
@@ -62,19 +62,19 @@ struct CalculationService {
 			.reduce(0, +)
 	}
 	
-	// MARK: - Pourcentages
+	// MARK: - Percentages
 	
-	/// Calcule le pourcentage de changement entre le mois actuel et le mois précédent
-	/// - Parameter transactions: Liste des transactions à analyser
-	/// - Returns: Le pourcentage de changement, ou nil si pas assez de données
-	static func pourcentageChangementMois(transactions: [Transaction]) -> Double? {
+	/// Calculates the percentage change between current month and previous month
+	/// - Parameter transactions: List of transactions to analyze
+	/// - Returns: The percentage change, or nil if not enough data
+	static func monthlyChangePercentage(transactions: [Transaction]) -> Double? {
 		let calendar = Calendar.current
 		let now = Date()
 		
 		let currentMonth = calendar.component(.month, from: now)
 		let currentYear = calendar.component(.year, from: now)
 		
-		// Calcul du mois précédent
+		// Calculate previous month
 		let previousMonth: Int
 		let previousYear: Int
 		if currentMonth == 1 {
@@ -85,22 +85,22 @@ struct CalculationService {
 			previousYear = currentYear
 		}
 		
-		let currentTotal = totalPourMois(currentMonth, year: currentYear, transactions: transactions)
-		let previousTotal = totalPourMois(previousMonth, year: previousYear, transactions: transactions)
+		let currentTotal = totalForMonth(currentMonth, year: currentYear, transactions: transactions)
+		let previousTotal = totalForMonth(previousMonth, year: previousYear, transactions: transactions)
 		
-		// Si le mois précédent est à 0, on ne peut pas calculer de pourcentage
+		// If previous month is 0, we can't calculate a percentage
 		guard previousTotal != 0 else { return nil }
 		return ((currentTotal - previousTotal) / abs(previousTotal)) * 100
 	}
 	
-	// MARK: - Filtres de transactions
+	// MARK: - Transaction Filters
 	
-	/// Retourne toutes les transactions potentielles
+	/// Returns all potential transactions
 	static func potentialTransactions(from transactions: [Transaction]) -> [Transaction] {
 		transactions.filter { $0.potentiel }
 	}
 	
-	/// Retourne toutes les transactions validées, optionnellement filtrées par année et/ou mois
+	/// Returns all validated transactions, optionally filtered by year and/or month
 	static func validatedTransactions(
 		from transactions: [Transaction],
 		year: Int? = nil,
@@ -123,3 +123,4 @@ struct CalculationService {
 		return result
 	}
 }
+

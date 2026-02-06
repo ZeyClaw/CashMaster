@@ -71,13 +71,13 @@ private struct CalendrierYearsContentView: View {
 	
 	var body: some View {
 		List {
-			ForEach(accountsManager.anneesDisponibles().reversed(), id: \.self) { year in
+			ForEach(accountsManager.availableYears().reversed(), id: \.self) { year in
 				NavigationLink(value: CalendrierRoute.months(year: year)) {
 					HStack {
 						Text("\(year)")
 						Spacer()
-						Text("\(accountsManager.totalPourAnnee(year), specifier: "%.2f") €")
-							.foregroundStyle(accountsManager.totalPourAnnee(year) >= 0 ? .green : .red)
+						Text("\(accountsManager.totalForYear(year), specifier: "%.2f") €")
+							.foregroundStyle(accountsManager.totalForYear(year) >= 0 ? .green : .red)
 					}
 				}
 			}
@@ -92,9 +92,9 @@ private struct CalendrierMonthsContentView: View {
 	
 	private var monthsWithData: [(id: String, year: Int, month: Int, total: Double)] {
 		var result: [(id: String, year: Int, month: Int, total: Double)] = []
-		for year in accountsManager.anneesDisponibles().reversed() {
+		for year in accountsManager.availableYears().reversed() {
 			for month in (1...12).reversed() {
-				let total = accountsManager.totalPourMois(month, year: year)
+				let total = accountsManager.totalForMonth(month, year: year)
 				if total != 0 {
 					// ID unique combinant année et mois
 					let id = "\(year)-\(month)"

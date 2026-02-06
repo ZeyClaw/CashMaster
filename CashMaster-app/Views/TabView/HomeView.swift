@@ -21,18 +21,18 @@ struct HomeView: View {
 	
 	private var totalCurrent: Double? {
 		guard let selectedAccount = accountsManager.selectedAccount else { return nil }
-		return accountsManager.totalNonPotentiel(for: selectedAccount)
+		return accountsManager.totalNonPotential(for: selectedAccount)
 	}
 	
-	private var totalPotentiel: Double? {
+	private var totalPotential: Double? {
 		guard let selectedAccount = accountsManager.selectedAccount else { return nil }
-		return accountsManager.totalPotentiel(for: selectedAccount)
+		return accountsManager.totalPotential(for: selectedAccount)
 	}
 	
 	private var currentMonthSolde: Double {
 		let month = Calendar.current.component(.month, from: Date())
 		let year = Calendar.current.component(.year, from: Date())
-		return accountsManager.totalPourMois(month, year: year)
+		return accountsManager.totalForMonth(month, year: year)
 	}
 	
 	private var currentMonth: Int {
@@ -54,7 +54,7 @@ struct HomeView: View {
 						BalanceHeaderContent(
 							accountName: accountsManager.selectedAccount?.name,
 							totalCurrent: totalCurrent,
-							percentageChange: accountsManager.pourcentageChangementMois()
+							percentageChange: accountsManager.monthlyChangePercentage()
 						)
 					}
 					.buttonStyle(PlainButtonStyle())
@@ -80,7 +80,7 @@ struct HomeView: View {
 								icon: "cart",
 								iconColor: .orange,
 								title: "À venir",
-								value: totalPotentiel
+								value: totalPotential
 							)
 						}
 						.buttonStyle(PlainButtonStyle())
@@ -129,7 +129,7 @@ struct HomeView: View {
 			potentiel: false,
 			date: Date()
 		)
-		accountsManager.ajouterTransaction(transaction)
+		accountsManager.addTransaction(transaction)
 		addToast(message: "Transaction ajoutée 💸")
 	}
 	

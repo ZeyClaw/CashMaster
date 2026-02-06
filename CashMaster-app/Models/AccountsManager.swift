@@ -7,15 +7,15 @@
 
 import Foundation
 
-//  Classe centrale de gestion des comptes et transactions.
+//  Central class for managing accounts and transactions.
 //
-//  Très important : toutes les modifications de comptes/transactions DOIVENT passer
-//  par cette classe.
-//  Pourquoi ?
-//  - C'est elle qui appelle `objectWillChange.send()` après chaque mise à jour
-//    afin que SwiftUI rafraîchisse automatiquement l'interface.
-//  - Si tu modifies directement un `Transaction` ou un `TransactionManager` sans passer par ici,
-//    l'UI ne sera pas informée et l'affichage ne se mettra pas à jour.
+//  IMPORTANT: All account/transaction modifications MUST go through
+//  this class.
+//  Why?
+//  - It calls `objectWillChange.send()` after each update
+//    so SwiftUI automatically refreshes the interface.
+//  - If you modify a `Transaction` or `TransactionManager` directly without going through here,
+//    the UI will not be notified and the display won't update.
 class AccountsManager: ObservableObject {
 	
 	// MARK: - Données publiées
@@ -58,9 +58,9 @@ class AccountsManager: ObservableObject {
 		var widgetShortcuts: [WidgetShortcut]
 	}
 
-	// MARK: - Gestion des comptes
+	// MARK: - Account Management
 	
-	func ajouterCompte(_ account: Account) {
+	func addAccount(_ account: Account) {
 		guard !accounts.contains(where: { $0.id == account.id }) else { return }
 		accounts.append(account)
 		transactionManagers[account.id] = TransactionManager(accountName: account.name)
@@ -84,33 +84,33 @@ class AccountsManager: ObservableObject {
 		accounts.sorted { $0.name < $1.name }
 	}
 	
-	// MARK: - Gestion des transactions
+	// MARK: - Transaction Management
 	
-	func ajouterTransaction(_ transaction: Transaction) {
+	func addTransaction(_ transaction: Transaction) {
 		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.ajouter(transaction)
+		transactionManagers[accountId]?.add(transaction)
 		save()
 		objectWillChange.send()
 	}
 	
-	func supprimerTransaction(_ transaction: Transaction) {
+	func deleteTransaction(_ transaction: Transaction) {
 		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.supprimer(transaction)
+		transactionManagers[accountId]?.remove(transaction)
 		save()
 		objectWillChange.send()
 	}
 	
-	func validerTransaction(_ transaction: Transaction) {
+	func validateTransaction(_ transaction: Transaction) {
 		guard let accountId = selectedAccountId else { return }
 		let validatedTransaction = transaction.validated(at: Date())
-		transactionManagers[accountId]?.mettreAJour(validatedTransaction)
+		transactionManagers[accountId]?.update(validatedTransaction)
 		save()
 		objectWillChange.send()
 	}
 	
-	func mettreAJourTransaction(_ transaction: Transaction) {
+	func updateTransaction(_ transaction: Transaction) {
 		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.mettreAJour(transaction)
+		transactionManagers[accountId]?.update(transaction)
 		save()
 		objectWillChange.send()
 	}
@@ -120,37 +120,37 @@ class AccountsManager: ObservableObject {
 		return transactionManagers[accountId]?.transactions ?? []
 	}
 	
-	// MARK: - Totaux (délégués à CalculationService)
+	// MARK: - Totals (delegated to CalculationService)
 	
-	func totalNonPotentiel(for account: Account) -> Double {
+	func totalNonPotential(for account: Account) -> Double {
 		let txs = transactionManagers[account.id]?.transactions ?? []
-		return CalculationService.totalNonPotentiel(transactions: txs)
+		return CalculationService.totalNonPotential(transactions: txs)
 	}
 	
-	func totalPotentiel(for account: Account) -> Double {
+	func totalPotential(for account: Account) -> Double {
 		let txs = transactionManagers[account.id]?.transactions ?? []
-		return CalculationService.totalPotentiel(transactions: txs)
+		return CalculationService.totalPotential(transactions: txs)
 	}
 	
-	// MARK: - Regroupements (délégués à CalculationService)
+	// MARK: - Groupings (delegated to CalculationService)
 	
-	func anneesDisponibles() -> [Int] {
-		CalculationService.anneesDisponibles(transactions: transactions())
+	func availableYears() -> [Int] {
+		CalculationService.availableYears(transactions: transactions())
 	}
 	
-	func totalPourAnnee(_ year: Int) -> Double {
-		CalculationService.totalPourAnnee(year, transactions: transactions())
+	func totalForYear(_ year: Int) -> Double {
+		CalculationService.totalForYear(year, transactions: transactions())
 	}
 	
-	func totalPourMois(_ month: Int, year: Int) -> Double {
-		CalculationService.totalPourMois(month, year: year, transactions: transactions())
+	func totalForMonth(_ month: Int, year: Int) -> Double {
+		CalculationService.totalForMonth(month, year: year, transactions: transactions())
 	}
 	
-	func pourcentageChangementMois() -> Double? {
-		CalculationService.pourcentageChangementMois(transactions: transactions())
+	func monthlyChangePercentage() -> Double? {
+		CalculationService.monthlyChangePercentage(transactions: transactions())
 	}
 	
-	// MARK: - Filtres (délégués à CalculationService)
+	// MARK: - Filters (delegated to CalculationService)
 	
 	func potentialTransactions() -> [Transaction] {
 		CalculationService.potentialTransactions(from: transactions())
@@ -160,10 +160,10 @@ class AccountsManager: ObservableObject {
 		CalculationService.validatedTransactions(from: transactions(), year: year, month: month)
 	}
 	
-	// MARK: - Persistance
+	// MARK: - Persistence
 	
-	/// Sauvegarde publique (pour les modifications de transaction)
-	func sauvegarder() {
+	/// Public save (for transaction modifications)
+	func saveData() {
 		save()
 		objectWillChange.send()
 	}
@@ -223,31 +223,31 @@ class AccountsManager: ObservableObject {
 		objectWillChange.send()
 	}
 	
-	// MARK: - Export/Import CSV (délégués à CSVService)
+	// MARK: - CSV Export/Import (delegated to CSVService)
 	
-	/// Génère un fichier CSV contenant toutes les transactions du compte sélectionné
-	/// - Returns: URL temporaire du fichier CSV généré, ou nil si erreur
+	/// Generates a CSV file containing all transactions from the selected account
+	/// - Returns: Temporary URL of the generated CSV file, or nil if error
 	func generateCSV() -> URL? {
 		guard let account = selectedAccount else {
-			print("❌ Aucun compte sélectionné pour l'export")
+			print("❌ No account selected for export")
 			return nil
 		}
 		return CSVService.generateCSV(transactions: transactions(), accountName: account.name)
 	}
 	
-	/// Importe des transactions depuis un fichier CSV
-	/// - Parameter url: URL du fichier CSV à importer
-	/// - Returns: Nombre de transactions importées
+	/// Imports transactions from a CSV file
+	/// - Parameter url: URL of the CSV file to import
+	/// - Returns: Number of imported transactions
 	func importCSV(from url: URL) -> Int {
 		guard selectedAccountId != nil else {
-			print("❌ Aucun compte sélectionné")
+			print("❌ No account selected")
 			return 0
 		}
 		
 		let importedTransactions = CSVService.importCSV(from: url)
 		
 		for transaction in importedTransactions {
-			ajouterTransaction(transaction)
+			addTransaction(transaction)
 		}
 		
 		return importedTransactions.count

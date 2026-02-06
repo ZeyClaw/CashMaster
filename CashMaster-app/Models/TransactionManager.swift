@@ -26,35 +26,37 @@ class TransactionManager {
 		self.accountName = accountName
 	}
 	
-	// MARK: - Gestion basique
+	// MARK: - Basic Operations
 	
-	func ajouter(_ transaction: Transaction) {
+	func add(_ transaction: Transaction) {
 		transactions.append(transaction)
 	}
 	
-	func supprimer(_ transaction: Transaction) {
+	func remove(_ transaction: Transaction) {
 		transactions.removeAll { $0.id == transaction.id }
 	}
 	
-	/// Met à jour une transaction existante (recherche par ID)
-	func mettreAJour(_ transaction: Transaction) {
+	/// Updates an existing transaction (search by ID)
+	func update(_ transaction: Transaction) {
 		if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
 			transactions[index] = transaction
 		}
 	}
 	
-	// MARK: - Totaux
-	func totalNonPotentiel() -> Double {
-		sommeTransactions(filtre: { !$0.potentiel })
+	// MARK: - Totals
+	
+	func totalNonPotential() -> Double {
+		sumTransactions(filter: { !$0.potentiel })
 	}
 	
-	func totalPotentiel() -> Double {
-		sommeTransactions(filtre: { $0.potentiel })
+	func totalPotential() -> Double {
+		sumTransactions(filter: { $0.potentiel })
 	}
 	
-	// MARK: - Privé
-	private func sommeTransactions(filtre: (Transaction) -> Bool) -> Double {
-		transactions.filter(filtre).map { $0.amount }.reduce(0, +)
+	// MARK: - Private
+	
+	private func sumTransactions(filter: (Transaction) -> Bool) -> Double {
+		transactions.filter(filter).map { $0.amount }.reduce(0, +)
 	}
 }
 
