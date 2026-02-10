@@ -43,7 +43,9 @@ struct AllTransactionsView: View {
 							}
 							.swipeActions(edge: .trailing, allowsFullSwipe: true) {
 								Button(role: .destructive) {
-									accountsManager.deleteTransaction(transaction)
+									withAnimation {
+										accountsManager.deleteTransaction(transaction)
+									}
 								} label: {
 									Label("Supprimer", systemImage: "trash")
 								}
