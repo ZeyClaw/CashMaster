@@ -24,6 +24,8 @@ struct AddTransactionView: View {
 	@State private var transactionType: TransactionType = .expense
 	@State private var transactionDate: Date = Date()
 	@State private var isPotentiel: Bool = false
+	@State private var selectedCategory: TransactionCategory = .expense
+	@State private var hasManuallySelectedCategory = false
 	@State private var showingErrorAlert = false
 	@State private var errorMessage = ""
 	
@@ -39,6 +41,11 @@ struct AddTransactionView: View {
 						}
 					}
 					.pickerStyle(.segmented)
+					.onChange(of: transactionType) { _, newValue in
+						if !isEditMode && !hasManuallySelectedCategory && (selectedCategory == .income || selectedCategory == .expense) {
+							selectedCategory = newValue == .income ? .income : .expense
+						}
+					}
 				}
 				
 				Section {
@@ -49,6 +56,9 @@ struct AddTransactionView: View {
 							if newValue.count > maxCommentLength {
 								transactionComment = String(newValue.prefix(maxCommentLength))
 							}
+							if !isEditMode && !hasManuallySelectedCategory {
+								selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: transactionType)
+							}
 						}
 				} header: {
 					Text("Détails")
@@ -56,6 +66,12 @@ struct AddTransactionView: View {
 					HStack {
 						Spacer()
 						Text("\(transactionComment.count)/\(maxCommentLength)")
+					}
+				}
+				
+				Section("Catégorie") {
+					StylePickerGrid(selectedStyle: $selectedCategory, columns: 5) {
+						hasManuallySelectedCategory = true
 					}
 				}
 				
@@ -107,6 +123,7 @@ struct AddTransactionView: View {
 					transactionType = t.amount >= 0 ? .income : .expense
 					isPotentiel = t.potentiel
 					transactionDate = t.date ?? Date()
+					selectedCategory = t.category ?? (t.amount >= 0 ? .income : .expense)
 				}
 			}
 		}
@@ -135,7 +152,8 @@ struct AddTransactionView: View {
 				amount: finalAmount,
 				comment: finalComment,
 				potentiel: isPotentiel,
-				date: finalDate
+				date: finalDate,
+				category: selectedCategory
 			)
 			accountsManager.updateTransaction(updatedTransaction)
 		} else {
@@ -144,7 +162,8 @@ struct AddTransactionView: View {
 				amount: finalAmount,
 				comment: finalComment,
 				potentiel: isPotentiel,
-				date: finalDate
+				date: finalDate,
+				category: selectedCategory
 			))
 		}
 		dismiss()

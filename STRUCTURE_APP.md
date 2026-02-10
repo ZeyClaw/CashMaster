@@ -1,6 +1,6 @@
 # 📁 STRUCTURE_APP.md — Architecture Technique de Finoria
 
-> **Version**: 2.1  
+> **Version**: 2.2  
 > **Dernière mise à jour**: Février 2026  
 > **Statut**: Production-Ready, AI-Ready  
 
@@ -30,10 +30,11 @@ CashMaster-app/
 ├── 🧩 Models/                      # DONNÉES - Structures de données
 │   ├── Account.swift               # Modèle compte + AccountStyle enum
 │   ├── AccountsManager.swift       # 🔑 SINGLE SOURCE OF TRUTH
-│   ├── RecurringTransaction.swift  # Transaction récurrente + RecurringStyle + RecurrenceFrequency
+│   ├── RecurringTransaction.swift  # Transaction récurrente + RecurrenceFrequency
 │   ├── Transaction.swift           # Struct immuable + TransactionType enum
+│   ├── TransactionCategory.swift   # 🏷️ Catégorie unifiée (transactions, raccourcis, récurrences)
 │   ├── TransactionManager.swift    # Gestionnaire par compte (non observable)
-│   └── WidgetShortcut.swift        # Raccourci + ShortcutStyle enum
+│   └── WidgetShortcut.swift        # Raccourci rapide
 │
 ├── ⚙️ Services/                    # LOGIQUE MÉTIER - Fonctions pures
 │   ├── CalculationService.swift    # Tous les calculs financiers
@@ -41,7 +42,7 @@ CashMaster-app/
 │
 ├── 🔧 Extensions/                  # UTILITAIRES - Code réutilisable
 │   ├── DateFormatting.swift        # Extension Date (noms de mois)
-│   └── StylableEnum.swift          # Protocole + composants génériques
+│   └── StylableEnum.swift          # Protocole + composants génériques + compactAmount()
 │
 └── 🖼️ Views/                       # INTERFACE - Composants SwiftUI
     ├── ContentView.swift           # TabView principal (3 onglets)
@@ -124,13 +125,15 @@ CashMaster-app/
 │  • deleteWidgetShortcut() → supprime un raccourci               │
 │  • updateWidgetShortcut() → modifie un raccourci existant       │
 │  • addRecurringTransaction() → ajoute une récurrence            │
-│  • deleteRecurringTransaction() → supprime une récurrence      │
-│  • updateRecurringTransaction() → modifie une récurrence       │
+│  • deleteRecurringTransaction() → supprime récurrence + txs liées│
+│  • updateRecurringTransaction() → modifie + regénère txs liées  │
 │  • processRecurringTransactions() → génère les transactions    │
 │  • totalForMonth()     → délègue à CalculationService           │
 │  • generateCSV()       → délègue à CSVService                   │
 │                                                                 │
 │  ⚡ Après chaque modification: objectWillChange.send()          │
+│  🔄 Récurrences: traitées au lancement, retour premier plan,   │
+│     et après ajout/modification de récurrence                   │
 └─────────────────────────────────────────────────────────────────┘
                               │
               ┌───────────────┼───────────────┐
@@ -199,9 +202,10 @@ transactionManager.add(transaction)  // L'UI ne se met pas à jour !
 │                            │    CSVService    │ (I/O fichiers)  │
 │                            └─────────────────┘                  │
 │                                                                 │
-│  AddAccountSheet ────────▶ StylePickerGrid<AccountStyle>        │
-│  AddWidgetShortcutView ──▶ StylePickerGrid<ShortcutStyle>       │
-│  AddRecurringTransactionView ▶ StylePickerGrid<RecurringStyle>  │
+│  AddAccountSheet ────────▶ StylePickerGrid<AccountStyle>              │
+│  AddWidgetShortcutView ──▶ StylePickerGrid<TransactionCategory>      │
+│  AddRecurringTransactionView ▶ StylePickerGrid<TransactionCategory>    │
+│  AddTransactionView ─────▶ StylePickerGrid<TransactionCategory>      │
 │                                      │                          │
 │                                      ▼                          │
 │                              StylableEnum.swift                 │
@@ -223,9 +227,9 @@ transactionManager.add(transaction)  // L'UI ne se met pas à jour !
 | Model | Dépend de | Utilisé par |
 |-------|-----------|-------------|
 | `Account` | `AccountStyle` | `AccountsManager`, Vues |
-| `Transaction` | `TransactionType` | Services, `AccountsManager`, Vues |
-| `WidgetShortcut` | `ShortcutStyle`, `TransactionType` | `AccountsManager`, Vues |
-| `RecurringTransaction` | `RecurringStyle`, `RecurrenceFrequency`, `TransactionType` | `AccountsManager`, Vues |
+| `Transaction` | `TransactionType`, `TransactionCategory` | Services, `AccountsManager`, Vues |
+| `WidgetShortcut` | `TransactionCategory`, `TransactionType` | `AccountsManager`, Vues |
+| `RecurringTransaction` | `TransactionCategory`, `RecurrenceFrequency`, `TransactionType` | `AccountsManager`, Vues |
 
 ---
 
@@ -276,10 +280,12 @@ enum CalendrierRoute: Hashable {
 ```swift
 struct Transaction: Identifiable, Codable {
     let id: UUID
-    let amount: Double      // Positif = revenu, Négatif = dépense
+    let amount: Double                    // Positif = revenu, Négatif = dépense
     let comment: String
-    let potentiel: Bool     // true = future, false = validée
-    let date: Date?         // nil si potentielle
+    let potentiel: Bool                   // true = future, false = validée
+    let date: Date?                       // nil si potentielle
+    let category: TransactionCategory?    // Catégorie unifiée (optionnel pour rétrocompat)
+    let recurringTransactionId: UUID?     // Lien vers la récurrence source
     
     // Méthodes d'immutabilité
     func validated(at date: Date) -> Transaction  // Crée une copie validée
@@ -307,9 +313,11 @@ protocol StylableEnum {
     var label: String { get }
 }
 
-// AccountStyle: bank, savings, investment, card, cash, piggy, wallet, business
-// ShortcutStyle: fuel, shopping, family, party, income, expense, food, transport, health, gift
-// RecurringStyle: rent, salary, subscription, insurance, loan, utilities, savings, transport, phone, other
+// AccountStyle (comptes uniquement): bank, savings, investment, card, cash, piggy, wallet, business
+// TransactionCategory (transactions + raccourcis + récurrences):
+//   salary, income, rent, utilities, subscription, phone, insurance,
+//   food, shopping, fuel, transport, loan, savings, family, health,
+//   gift, party, expense, other
 ```
 
 ### RecurringTransaction (Struct)
@@ -320,7 +328,7 @@ struct RecurringTransaction: Identifiable, Codable {
     let amount: Double
     let comment: String
     let type: TransactionType
-    let style: RecurringStyle
+    let category: TransactionCategory
     let frequency: RecurrenceFrequency  // .daily, .weekly, .monthly, .yearly
     let startDate: Date
     var lastGeneratedDate: Date?  // Pour éviter les doublons
@@ -331,10 +339,20 @@ struct RecurringTransaction: Identifiable, Codable {
 
 ### Logique de Récurrence
 
-> Au lancement de l'app, `processRecurringTransactions()` :
+> `processRecurringTransactions()` est appelé :
+> - Au **lancement** de l'app
+> - Quand l'app **revient au premier plan** (scenePhase .active)
+> - Après chaque **ajout** d'une récurrence
+> - Après chaque **modification** d'une récurrence
+>
+> Il effectue les actions suivantes :
 > 1. Génère les transactions futures (à < 1 mois) comme **transactions potentielles**
-> 2. Valide automatiquement les transactions dont la date est **aujourd'hui ou passée**
-> 3. Met à jour `lastGeneratedDate` pour éviter les doublons
+> 2. Vérifie les doublons via `recurringTransactionId` avant d'ajouter
+> 3. Valide automatiquement les transactions dont la date est **aujourd'hui ou passée**
+> 4. Met à jour `lastGeneratedDate` pour éviter les regénérations
+>
+> Lors de la **suppression** d'une récurrence : les transactions potentielles liées sont supprimées.
+> Lors de la **modification** d'une récurrence : les transactions potentielles liées sont supprimées puis regénérées.
 
 ---
 
@@ -385,9 +403,13 @@ Chaque fichier Swift suit cette structure :
 3. **Calculs** : `totalForMonth()` retourne-t-il les bonnes valeurs ?
 4. **Immutabilité** : `Transaction.modified()` crée-t-elle bien une copie ?
 5. **UI Update** : L'interface se rafraîchit-elle après chaque modification ?
-6. **Récurrences** : Les transactions sont-elles générées correctement au lancement ?
-7. **Doublons** : `lastGeneratedDate` empêche-t-elle les doublons de récurrence ?
+6. **Récurrences** : Les transactions sont-elles générées correctement ?
+7. **Doublons** : `recurringTransactionId` + `lastGeneratedDate` empêchent-ils les doublons ?
+8. **Suppression récurrence** : Les transactions potentielles liées sont-elles supprimées ?
+9. **Modification récurrence** : Les transactions potentielles sont-elles regénérées ?
+10. **Catégories** : `TransactionCategory` est-elle correctement partagée entre transactions, raccourcis et récurrences ?
+11. **Rétrocompatibilité** : Les anciennes données (sans catégorie) se chargent-elles correctement ?
 
 ---
 
-*Document généré le 10 février 2026 — Finoria v2.1*
+*Document généré le 10 février 2026 — Finoria v2.2*

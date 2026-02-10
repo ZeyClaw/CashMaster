@@ -78,15 +78,8 @@ private struct RecurringCard: View {
 			onEdit()
 		} label: {
 			HStack(spacing: 12) {
-				// Icône colorée
-				ZStack {
-					Circle()
-						.fill(recurring.style.color.opacity(0.15))
-						.frame(width: 40, height: 40)
-					Image(systemName: recurring.style.icon)
-						.font(.system(size: 18))
-						.foregroundStyle(recurring.style.color)
-				}
+				// Icône colorée (composant réutilisable)
+				StyleIconView(style: recurring.category, size: 40)
 				
 				// Texte
 				VStack(alignment: .leading, spacing: 2) {
@@ -131,42 +124,13 @@ private struct RecurringCard: View {
 	}
 }
 
-// MARK: - Formatage compact (réutilisé depuis ShortcutsGridView)
-
-private func compactAmount(_ value: Double) -> String {
-	let thresholds: [(limit: Double, divisor: Double, suffix: String)] = [
-		(1_000_000_000, 1_000_000_000, "G"),
-		(1_000_000, 1_000_000, "M"),
-		(1_000, 1_000, "k")
-	]
-	
-	for t in thresholds where value >= t.limit {
-		let reduced = value / t.divisor
-		if reduced == reduced.rounded(.down) {
-			return String(format: "%.0f%@", reduced, t.suffix)
-		} else if (reduced * 10).rounded() == (reduced * 10) {
-			return String(format: "%.1f%@", reduced, t.suffix)
-		} else {
-			return String(format: "%.2f%@", reduced, t.suffix)
-		}
-	}
-	
-	if value == value.rounded(.down) {
-		return String(format: "%.0f", value)
-	} else if (value * 10).rounded() == (value * 10) {
-		return String(format: "%.1f", value)
-	} else {
-		return String(format: "%.2f", value)
-	}
-}
-
 // MARK: - Preview
 
 #Preview {
 	RecurringTransactionsGridView(
 		recurringTransactions: [
-			RecurringTransaction(amount: 750, comment: "Loyer", type: .expense, style: .rent, frequency: .monthly),
-			RecurringTransaction(amount: 2500, comment: "Salaire", type: .income, style: .salary, frequency: .monthly)
+			RecurringTransaction(amount: 750, comment: "Loyer", type: .expense, category: .rent, frequency: .monthly),
+			RecurringTransaction(amount: 2500, comment: "Salaire", type: .income, category: .salary, frequency: .monthly)
 		],
 		onEdit: { _ in },
 		onDelete: { _ in },

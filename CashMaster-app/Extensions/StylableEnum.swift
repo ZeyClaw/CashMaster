@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Protocole unifiant les enums qui ont une représentation visuelle (icône, couleur, label)
-/// Utilisé par AccountStyle et ShortcutStyle pour factoriser le code
+/// Utilisé par AccountStyle et TransactionCategory pour factoriser le code
 protocol StylableEnum: RawRepresentable, CaseIterable, Identifiable, Codable where RawValue == String {
 	/// Nom de l'icône SF Symbol
 	var icon: String { get }
@@ -93,5 +93,36 @@ struct StyleIconView<Style: StylableEnum>: View {
 				.font(.system(size: size * 0.45))
 				.foregroundStyle(style.color)
 		}
+	}
+}
+
+// MARK: - Formatage compact des montants
+
+/// Formate un montant de manière compacte pour tenir dans un espace restreint.
+/// Réduit progressivement la précision : 2 850,00 € → 2 850 € → 2,85k € → 2,9k € → 3k €
+func compactAmount(_ value: Double) -> String {
+	let thresholds: [(limit: Double, divisor: Double, suffix: String)] = [
+		(1_000_000_000, 1_000_000_000, "G"),
+		(1_000_000, 1_000_000, "M"),
+		(1_000, 1_000, "k")
+	]
+	
+	for t in thresholds where value >= t.limit {
+		let reduced = value / t.divisor
+		if reduced == reduced.rounded(.down) {
+			return String(format: "%.0f%@", reduced, t.suffix)
+		} else if (reduced * 10).rounded() == (reduced * 10) {
+			return String(format: "%.1f%@", reduced, t.suffix)
+		} else {
+			return String(format: "%.2f%@", reduced, t.suffix)
+		}
+	}
+	
+	if value == value.rounded(.down) {
+		return String(format: "%.0f", value)
+	} else if (value * 10).rounded() == (value * 10) {
+		return String(format: "%.1f", value)
+	} else {
+		return String(format: "%.2f", value)
 	}
 }

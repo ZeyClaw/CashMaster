@@ -20,9 +20,9 @@ struct AddWidgetShortcutView: View {
 	@State private var amount: Double?
 	@State private var comment = ""
 	@State private var type: TransactionType = .income
-	@State private var selectedStyle: ShortcutStyle = .income
+	@State private var selectedCategory: TransactionCategory = .income
 	@State private var showError = false
-	@State private var hasManuallySelectedStyle = false
+	@State private var hasManuallySelectedCategory = false
 	
 	private var isEditMode: Bool { shortcutToEdit != nil }
 	
@@ -37,9 +37,9 @@ struct AddWidgetShortcutView: View {
 							if newValue.count > maxCommentLength {
 								comment = String(newValue.prefix(maxCommentLength))
 							}
-							// Ne pas auto-deviner le style si mode édition ou sélection manuelle
-							if !isEditMode && !hasManuallySelectedStyle {
-								selectedStyle = ShortcutStyle.guessFrom(comment: newValue, type: type)
+							// Ne pas auto-deviner la catégorie si mode édition ou sélection manuelle
+							if !isEditMode && !hasManuallySelectedCategory {
+								selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: type)
 							}
 						}
 				} footer: {
@@ -56,16 +56,16 @@ struct AddWidgetShortcutView: View {
 				}
 				.pickerStyle(.segmented)
 				.onChange(of: type) { _, newValue in
-					// Met à jour le style si c'est le style par défaut (seulement si pas en mode édition et pas de sélection manuelle)
-					if !isEditMode && !hasManuallySelectedStyle && (selectedStyle == .income || selectedStyle == .expense) {
-						selectedStyle = newValue == .income ? .income : .expense
+					// Met à jour la catégorie si c'est la catégorie par défaut (seulement si pas en mode édition et pas de sélection manuelle)
+					if !isEditMode && !hasManuallySelectedCategory && (selectedCategory == .income || selectedCategory == .expense) {
+						selectedCategory = newValue == .income ? .income : .expense
 					}
 				}
 				
-				// MARK: - Sélecteur d'icône
-				Section("Icône") {
-					StylePickerGrid(selectedStyle: $selectedStyle, columns: 5) {
-						hasManuallySelectedStyle = true
+				// MARK: - Sélecteur de catégorie
+				Section("Catégorie") {
+					StylePickerGrid(selectedStyle: $selectedCategory, columns: 5) {
+						hasManuallySelectedCategory = true
 					}
 				}
 				
@@ -108,7 +108,7 @@ struct AddWidgetShortcutView: View {
 					amount = shortcut.amount
 					comment = shortcut.comment
 					type = shortcut.type
-					selectedStyle = shortcut.style
+					selectedCategory = shortcut.category
 				}
 			}
 		}
@@ -127,7 +127,7 @@ struct AddWidgetShortcutView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				style: selectedStyle
+				category: selectedCategory
 			)
 			accountsManager.updateWidgetShortcut(updatedShortcut)
 		} else {
@@ -136,7 +136,7 @@ struct AddWidgetShortcutView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				style: selectedStyle
+				category: selectedCategory
 			)
 			accountsManager.addWidgetShortcut(shortcut)
 		}

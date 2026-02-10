@@ -12,6 +12,7 @@ struct ContentView: View {
 	@StateObject private var accountsManager = AccountsManager()
 	@State private var showingAddTransactionSheet = false
 	@State private var tabSelection: TabItem = .home
+	@Environment(\.scenePhase) private var scenePhase
 	
 	enum TabItem: Hashable {
 		case home, calendrier, potentielles, add
@@ -72,6 +73,12 @@ struct ContentView: View {
 			}
 			// Générer les transactions récurrentes à venir / valider celles du jour
 			accountsManager.processRecurringTransactions()
+		}
+		.onChange(of: scenePhase) { _, newPhase in
+			// Retraiter les récurrences quand l'app revient au premier plan (couvre le cas "chaque jour")
+			if newPhase == .active {
+				accountsManager.processRecurringTransactions()
+			}
 		}
 	}
 }

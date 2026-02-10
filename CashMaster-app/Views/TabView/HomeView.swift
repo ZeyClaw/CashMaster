@@ -165,7 +165,8 @@ struct HomeView: View {
 			amount: shortcut.type == .income ? shortcut.amount : -shortcut.amount,
 			comment: shortcut.comment,
 			potentiel: false,
-			date: Date()
+			date: Date(),
+			category: shortcut.category
 		)
 		accountsManager.addTransaction(transaction)
 		addToast(message: "Transaction ajoutée 💸")

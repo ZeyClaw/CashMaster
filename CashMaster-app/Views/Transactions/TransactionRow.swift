@@ -10,8 +10,16 @@ import SwiftUI
 struct TransactionRow: View {
 	let transaction: Transaction
 	
+	/// Catégorie affichée : celle de la transaction, ou une par défaut basée sur le montant
+	private var displayCategory: TransactionCategory {
+		transaction.category ?? (transaction.amount >= 0 ? .income : .expense)
+	}
+	
 	var body: some View {
-		HStack {
+		HStack(spacing: 12) {
+			// Icône catégorie à gauche
+			StyleIconView(style: displayCategory, size: 36)
+			
 			VStack(alignment: .leading) {
 				Text(transaction.comment)
 					.font(.body)

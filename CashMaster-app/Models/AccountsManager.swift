@@ -305,10 +305,17 @@ class AccountsManager: ObservableObject {
 		transactionManagers[accountId]?.recurringTransactions.append(recurring)
 		save()
 		objectWillChange.send()
+		// Générer immédiatement les transactions à venir
+		processRecurringTransactions()
 	}
 	
 	func deleteRecurringTransaction(_ recurring: RecurringTransaction) {
 		guard let accountId = selectedAccountId else { return }
+		// Supprimer les transactions potentielles liées à cette récurrence
+		transactionManagers[accountId]?.transactions.removeAll {
+			$0.recurringTransactionId == recurring.id && $0.potentiel
+		}
+		// Supprimer la récurrence elle-même
 		transactionManagers[accountId]?.recurringTransactions.removeAll { $0.id == recurring.id }
 		save()
 		objectWillChange.send()
@@ -317,14 +324,24 @@ class AccountsManager: ObservableObject {
 	func updateRecurringTransaction(_ recurring: RecurringTransaction) {
 		guard let accountId = selectedAccountId,
 			  let index = transactionManagers[accountId]?.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
-		transactionManagers[accountId]?.recurringTransactions[index] = recurring
+		// Supprimer les transactions potentielles liées à cette récurrence
+		transactionManagers[accountId]?.transactions.removeAll {
+			$0.recurringTransactionId == recurring.id && $0.potentiel
+		}
+		// Mettre à jour avec lastGeneratedDate remise à nil pour regénérer
+		var updatedRecurring = recurring
+		updatedRecurring.lastGeneratedDate = nil
+		transactionManagers[accountId]?.recurringTransactions[index] = updatedRecurring
 		save()
 		objectWillChange.send()
+		// Regénérer les transactions à venir
+		processRecurringTransactions()
 	}
 	
 	/// Génère automatiquement les transactions potentielles pour les récurrences à venir (< 1 mois)
-	/// et valide celles dont la date est aujourd'hui.
-	/// Appelé au lancement de l'app.
+	/// et valide celles dont la date est aujourd'hui ou passée.
+	/// Appelé au lancement de l'app, après chaque ajout/modification de récurrence,
+	/// et quand l'app revient au premier plan.
 	func processRecurringTransactions() {
 		let calendar = Calendar.current
 		let now = Date()
@@ -340,8 +357,16 @@ class AccountsManager: ObservableObject {
 				let pending = recurring.pendingTransactions()
 				
 				for entry in pending {
-					manager.add(entry.transaction)
-					updated = true
+					// Vérifier qu'une transaction n'existe pas déjà pour cette date et récurrence
+					let alreadyExists = manager.transactions.contains { tx in
+						tx.recurringTransactionId == recurring.id &&
+						tx.date != nil &&
+						calendar.isDate(tx.date!, inSameDayAs: entry.date)
+					}
+					if !alreadyExists {
+						manager.add(entry.transaction)
+						updated = true
+					}
 				}
 				
 				// Mettre à jour la dernière date générée

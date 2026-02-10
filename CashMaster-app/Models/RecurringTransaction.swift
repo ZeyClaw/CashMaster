@@ -37,94 +37,6 @@ enum RecurrenceFrequency: String, Codable, CaseIterable, Identifiable {
 	}
 }
 
-// MARK: - Style des transactions récurrentes
-
-enum RecurringStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
-	case rent       // Loyer
-	case salary     // Salaire
-	case subscription // Abonnement
-	case insurance  // Assurance
-	case loan       // Prêt/Crédit
-	case utilities  // Charges
-	case savings    // Épargne
-	case transport  // Transport
-	case phone      // Téléphone/Internet
-	case other      // Autre
-	
-	var id: String { rawValue }
-	
-	var icon: String {
-		switch self {
-		case .rent:         return "house.fill"
-		case .salary:       return "briefcase.fill"
-		case .subscription: return "play.rectangle.fill"
-		case .insurance:    return "shield.fill"
-		case .loan:         return "percent"
-		case .utilities:    return "bolt.fill"
-		case .savings:      return "banknote.fill"
-		case .transport:    return "car.fill"
-		case .phone:        return "iphone"
-		case .other:        return "repeat"
-		}
-	}
-	
-	var color: Color {
-		switch self {
-		case .rent:         return .orange
-		case .salary:       return .green
-		case .subscription: return .purple
-		case .insurance:    return .blue
-		case .loan:         return .red
-		case .utilities:    return .yellow
-		case .savings:      return .mint
-		case .transport:    return .cyan
-		case .phone:        return .indigo
-		case .other:        return .gray
-		}
-	}
-	
-	var label: String {
-		switch self {
-		case .rent:         return "Loyer"
-		case .salary:       return "Salaire"
-		case .subscription: return "Abonnement"
-		case .insurance:    return "Assurance"
-		case .loan:         return "Crédit"
-		case .utilities:    return "Charges"
-		case .savings:      return "Épargne"
-		case .transport:    return "Transport"
-		case .phone:        return "Téléphone"
-		case .other:        return "Autre"
-		}
-	}
-	
-	/// Devine le style par défaut selon le commentaire
-	static func guessFrom(comment: String, type: TransactionType) -> RecurringStyle {
-		let text = comment.lowercased()
-		if text.contains("loyer") || text.contains("appartement") || text.contains("maison") {
-			return .rent
-		} else if text.contains("salaire") || text.contains("paie") || text.contains("travail") {
-			return .salary
-		} else if text.contains("netflix") || text.contains("spotify") || text.contains("abonnement") || text.contains("abo") {
-			return .subscription
-		} else if text.contains("assurance") || text.contains("mutuelle") {
-			return .insurance
-		} else if text.contains("crédit") || text.contains("prêt") || text.contains("emprunt") {
-			return .loan
-		} else if text.contains("edf") || text.contains("eau") || text.contains("gaz") || text.contains("électricité") || text.contains("charge") {
-			return .utilities
-		} else if text.contains("épargne") || text.contains("livret") || text.contains("économie") {
-			return .savings
-		} else if text.contains("voiture") || text.contains("transport") || text.contains("train") || text.contains("essence") {
-			return .transport
-		} else if text.contains("téléphone") || text.contains("internet") || text.contains("mobile") || text.contains("forfait") {
-			return .phone
-		} else {
-			return type == .income ? .salary : .other
-		}
-	}
-}
-
 // MARK: - Modèle RecurringTransaction
 
 struct RecurringTransaction: Identifiable, Codable, Equatable {
@@ -132,18 +44,25 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
 	let amount: Double
 	let comment: String
 	let type: TransactionType
-	let style: RecurringStyle
+	let category: TransactionCategory
 	let frequency: RecurrenceFrequency
 	let startDate: Date
 	/// Date de la dernière transaction générée (pour éviter les doublons)
 	var lastGeneratedDate: Date?
+	
+	// MARK: - CodingKeys (rétrocompatibilité: décode "style" comme "category")
+	
+	enum CodingKeys: String, CodingKey {
+		case id, amount, comment, type, frequency, startDate, lastGeneratedDate
+		case category = "style"
+	}
 	
 	init(
 		id: UUID = UUID(),
 		amount: Double,
 		comment: String,
 		type: TransactionType,
-		style: RecurringStyle? = nil,
+		category: TransactionCategory? = nil,
 		frequency: RecurrenceFrequency = .monthly,
 		startDate: Date = Date(),
 		lastGeneratedDate: Date? = nil
@@ -152,7 +71,7 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
 		self.amount = amount
 		self.comment = comment
 		self.type = type
-		self.style = style ?? RecurringStyle.guessFrom(comment: comment, type: type)
+		self.category = category ?? TransactionCategory.guessFrom(comment: comment, type: type)
 		self.frequency = frequency
 		self.startDate = startDate
 		self.lastGeneratedDate = lastGeneratedDate
@@ -225,7 +144,9 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
 					amount: finalAmount,
 					comment: comment,
 					potentiel: !isToday,
-					date: date
+					date: date,
+					category: category,
+					recurringTransactionId: self.id
 				)
 				return (date: date, transaction: transaction)
 			}

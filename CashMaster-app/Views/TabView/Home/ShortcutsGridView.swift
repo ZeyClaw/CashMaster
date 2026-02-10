@@ -66,39 +66,6 @@ private struct ShortcutsHeader: View {
 	}
 }
 
-// MARK: - Formatage compact des montants
-
-/// Formate un montant de manière compacte pour tenir dans un espace restreint.
-/// Réduit progressivement la précision : 2 850,00 € → 2 850 € → 2,85k € → 2,9k € → 3k €
-private func compactAmount(_ value: Double) -> String {
-	let thresholds: [(limit: Double, divisor: Double, suffix: String)] = [
-		(1_000_000_000, 1_000_000_000, "G"),
-		(1_000_000, 1_000_000, "M"),
-		(1_000, 1_000, "k")
-	]
-	
-	// Pour les grands nombres, utiliser les suffixes
-	for t in thresholds where value >= t.limit {
-		let reduced = value / t.divisor
-		if reduced == reduced.rounded(.down) {
-			return String(format: "%.0f%@", reduced, t.suffix)
-		} else if (reduced * 10).rounded() == (reduced * 10) {
-			return String(format: "%.1f%@", reduced, t.suffix)
-		} else {
-			return String(format: "%.2f%@", reduced, t.suffix)
-		}
-	}
-	
-	// Nombres < 1000 : supprimer les décimales inutiles
-	if value == value.rounded(.down) {
-		return String(format: "%.0f", value)
-	} else if (value * 10).rounded() == (value * 10) {
-		return String(format: "%.1f", value)
-	} else {
-		return String(format: "%.2f", value)
-	}
-}
-
 // MARK: - Carte de raccourci
 
 private struct ShortcutCard: View {
@@ -115,15 +82,8 @@ private struct ShortcutCard: View {
 			onTap()
 		} label: {
 			HStack(spacing: 12) {
-				// Icône colorée
-				ZStack {
-					Circle()
-						.fill(shortcut.style.color.opacity(0.15))
-						.frame(width: 40, height: 40)
-					Image(systemName: shortcut.style.icon)
-						.font(.system(size: 18))
-						.foregroundStyle(shortcut.style.color)
-				}
+				// Icône colorée (composant réutilisable)
+				StyleIconView(style: shortcut.category, size: 40)
 				
 				// Texte
 				VStack(alignment: .leading, spacing: 2) {
@@ -167,8 +127,8 @@ private struct ShortcutCard: View {
 #Preview {
 	ShortcutsGridView(
 		shortcuts: [
-			WidgetShortcut(amount: 50, comment: "Courses", type: .expense, style: .shopping),
-			WidgetShortcut(amount: 30, comment: "Essence", type: .expense, style: .fuel)
+			WidgetShortcut(amount: 50, comment: "Courses", type: .expense, category: .shopping),
+			WidgetShortcut(amount: 30, comment: "Essence", type: .expense, category: .fuel)
 		],
 		onShortcutTap: { _ in },
 		onShortcutEdit: { _ in },

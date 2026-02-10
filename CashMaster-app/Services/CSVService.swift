@@ -36,7 +36,7 @@ struct CSVService {
 		}
 		
 		// Construction du CSV
-		var csvText = "Date,Type,Montant,Commentaire,Statut\n"
+		var csvText = "Date,Type,Montant,Commentaire,Statut,Catégorie\n"
 		
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "dd/MM/yyyy"
@@ -48,8 +48,9 @@ struct CSVService {
 			let amount = String(format: "%.2f", abs(transaction.amount))
 			let comment = transaction.comment.replacingOccurrences(of: ",", with: ";")
 			let status = transaction.potentiel ? "Potentielle" : "Validée"
+			let category = transaction.category?.label ?? ""
 			
-			csvText += "\(dateString),\(type),\(amount),\(comment),\(status)\n"
+			csvText += "\(dateString),\(type),\(amount),\(comment),\(status),\(category)\n"
 		}
 		
 		// Sauvegarde dans un fichier temporaire
@@ -134,11 +135,19 @@ struct CSVService {
 				let statutString = columns[4].trimmingCharacters(in: .whitespacesAndNewlines)
 				let isPotentielle = (statutString == "Potentielle")
 				
+				// Parse Catégorie (optionnel, colonne 6 si présente)
+				var category: TransactionCategory? = nil
+				if columns.count >= 6 {
+					let categoryLabel = columns[5].trimmingCharacters(in: .whitespacesAndNewlines)
+					category = TransactionCategory.allCases.first { $0.label == categoryLabel }
+				}
+				
 				let transaction = Transaction(
 					amount: amount,
 					comment: comment,
 					potentiel: isPotentielle,
-					date: isPotentielle ? nil : (date ?? Date())
+					date: isPotentielle ? nil : (date ?? Date()),
+					category: category
 				)
 				
 				importedTransactions.append(transaction)

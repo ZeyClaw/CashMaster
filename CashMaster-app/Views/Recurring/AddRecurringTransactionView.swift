@@ -21,11 +21,11 @@ struct AddRecurringTransactionView: View {
 	@State private var amount: Double?
 	@State private var comment = ""
 	@State private var type: TransactionType = .expense
-	@State private var selectedStyle: RecurringStyle = .other
+	@State private var selectedCategory: TransactionCategory = .other
 	@State private var frequency: RecurrenceFrequency = .monthly
 	@State private var startDate: Date = Date()
 	@State private var showError = false
-	@State private var hasManuallySelectedStyle = false
+	@State private var hasManuallySelectedCategory = false
 	
 	private var isEditMode: Bool { recurringToEdit != nil }
 	
@@ -43,8 +43,8 @@ struct AddRecurringTransactionView: View {
 							if newValue.count > maxCommentLength {
 								comment = String(newValue.prefix(maxCommentLength))
 							}
-							if !isEditMode && !hasManuallySelectedStyle {
-								selectedStyle = RecurringStyle.guessFrom(comment: newValue, type: type)
+							if !isEditMode && !hasManuallySelectedCategory {
+								selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: type)
 							}
 						}
 				} footer: {
@@ -62,8 +62,8 @@ struct AddRecurringTransactionView: View {
 				}
 				.pickerStyle(.segmented)
 				.onChange(of: type) { _, newValue in
-					if !isEditMode && !hasManuallySelectedStyle && (selectedStyle == .salary || selectedStyle == .other) {
-						selectedStyle = newValue == .income ? .salary : .other
+					if !isEditMode && !hasManuallySelectedCategory && (selectedCategory == .salary || selectedCategory == .other) {
+						selectedCategory = newValue == .income ? .salary : .other
 					}
 				}
 				
@@ -80,9 +80,9 @@ struct AddRecurringTransactionView: View {
 				}
 				
 				// MARK: - Sélecteur d'icône
-				Section("Icône") {
-					StylePickerGrid(selectedStyle: $selectedStyle, columns: 5) {
-						hasManuallySelectedStyle = true
+				Section("Catégorie") {
+					StylePickerGrid(selectedStyle: $selectedCategory, columns: 5) {
+						hasManuallySelectedCategory = true
 					}
 				}
 				
@@ -121,11 +121,11 @@ struct AddRecurringTransactionView: View {
 				Text("Veuillez entrer un montant positif valide.")
 			}
 			.onAppear {
-				if let recurring = recurringToEdit {
+			if let recurring = recurringToEdit {
 					amount = recurring.amount
 					comment = recurring.comment
 					type = recurring.type
-					selectedStyle = recurring.style
+					selectedCategory = recurring.category
 					frequency = recurring.frequency
 					startDate = recurring.startDate
 				}
@@ -147,7 +147,7 @@ struct AddRecurringTransactionView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				style: selectedStyle,
+				category: selectedCategory,
 				frequency: frequency,
 				startDate: startDate,
 				lastGeneratedDate: existing.lastGeneratedDate
@@ -158,7 +158,7 @@ struct AddRecurringTransactionView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				style: selectedStyle,
+				category: selectedCategory,
 				frequency: frequency,
 				startDate: startDate
 			)
