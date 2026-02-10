@@ -37,6 +37,9 @@
 		F8388E932F356B670081F2F9 /* FutureTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E922F356B670081F2F9 /* FutureTabView.swift */; };
 		F8388E972F356BB10081F2F9 /* TransactionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E952F356BB10081F2F9 /* TransactionRow.swift */; };
 		F8388E982F356BB10081F2F9 /* AddTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E962F356BB10081F2F9 /* AddTransactionView.swift */; };
+		F8388E9C2F3BC5F90081F2F9 /* RecurringTransactionsGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E9A2F3BC5F90081F2F9 /* RecurringTransactionsGridView.swift */; };
+		F8388E9D2F3BC5F90081F2F9 /* AddRecurringTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E9B2F3BC5F90081F2F9 /* AddRecurringTransactionView.swift */; };
+		F8388E9F2F3BC61C0081F2F9 /* RecurringTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388E9E2F3BC61C0081F2F9 /* RecurringTransaction.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
 		F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */; };
@@ -100,6 +103,9 @@
 		F8388E922F356B670081F2F9 /* FutureTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTabView.swift; sourceTree = "<group>"; };
 		F8388E952F356BB10081F2F9 /* TransactionRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionRow.swift; sourceTree = "<group>"; };
 		F8388E962F356BB10081F2F9 /* AddTransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddTransactionView.swift; sourceTree = "<group>"; };
+		F8388E9A2F3BC5F90081F2F9 /* RecurringTransactionsGridView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecurringTransactionsGridView.swift; sourceTree = "<group>"; };
+		F8388E9B2F3BC5F90081F2F9 /* AddRecurringTransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddRecurringTransactionView.swift; sourceTree = "<group>"; };
+		F8388E9E2F3BC61C0081F2F9 /* RecurringTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecurringTransaction.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -156,6 +162,7 @@
 		F810E3042E43EA7B00C2DFA9 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F8388E9E2F3BC61C0081F2F9 /* RecurringTransaction.swift */,
 				F8388E722F349A380081F2F9 /* Account.swift */,
 				F842F8C52CBD3AD3007D1A54 /* Transaction.swift */,
 				F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */,
@@ -181,6 +188,7 @@
 		F810E3082E43EADA00C2DFA9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F8388E992F3BC5F90081F2F9 /* Recurring */,
 				F8388E942F356BB10081F2F9 /* Transactions */,
 				F8388E8D2F3563DD0081F2F9 /* Components */,
 				F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */,
@@ -267,6 +275,15 @@
 				F8388E962F356BB10081F2F9 /* AddTransactionView.swift */,
 			);
 			path = Transactions;
+			sourceTree = "<group>";
+		};
+		F8388E992F3BC5F90081F2F9 /* Recurring */ = {
+			isa = PBXGroup;
+			children = (
+				F8388E9A2F3BC5F90081F2F9 /* RecurringTransactionsGridView.swift */,
+				F8388E9B2F3BC5F90081F2F9 /* AddRecurringTransactionView.swift */,
+			);
+			path = Recurring;
 			sourceTree = "<group>";
 		};
 		F8B79A622CAEC5E4002D88AE = {
@@ -465,9 +482,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8388E772F350F150081F2F9 /* AllTransactionsView.swift in Sources */,
+				F8388E9D2F3BC5F90081F2F9 /* AddRecurringTransactionView.swift in Sources */,
 				F800A3EE2E4E01F700918507 /* NoAccountView.swift in Sources */,
 				F8388E8C2F3563CC0081F2F9 /* StylableEnum.swift in Sources */,
 				F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */,
+				F8388E9C2F3BC5F90081F2F9 /* RecurringTransactionsGridView.swift in Sources */,
 				F8B818F92F06A7A7002D02F2 /* DocumentPicker.swift in Sources */,
 				F8388E732F349A380081F2F9 /* Account.swift in Sources */,
 				F810E30E2E45331900C2DFA9 /* HomeView.swift in Sources */,
@@ -496,6 +515,7 @@
 				F810E2FF2E43DFC300C2DFA9 /* PotentialTransactionsView.swift in Sources */,
 				F8388E862F355B600081F2F9 /* ShortcutsGridView.swift in Sources */,
 				F8388E802F35532D0081F2F9 /* CalculationService.swift in Sources */,
+				F8388E9F2F3BC61C0081F2F9 /* RecurringTransaction.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
 				F810E30C2E44D4F100C2DFA9 /* AccountPickerView.swift in Sources */,
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
