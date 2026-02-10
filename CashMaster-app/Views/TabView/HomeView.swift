@@ -13,9 +13,13 @@ struct HomeView: View {
 	
 	// MARK: - State
 	@State private var showingAddWidgetSheet = false
+	@State private var showingAddRecurringSheet = false
 	@State private var shortcutToEdit: WidgetShortcut? = nil
 	@State private var shortcutToDelete: WidgetShortcut? = nil
 	@State private var showingDeleteConfirmation = false
+	@State private var recurringToEdit: RecurringTransaction? = nil
+	@State private var recurringToDelete: RecurringTransaction? = nil
+	@State private var showingDeleteRecurringConfirmation = false
 	@State private var toasts: [ToastData] = []
 	
 	// MARK: - Computed Properties
@@ -103,6 +107,19 @@ struct HomeView: View {
 						},
 						onAddTap: { showingAddWidgetSheet = true }
 					)
+					
+					// Grille de transactions récurrentes
+					RecurringTransactionsGridView(
+						recurringTransactions: accountsManager.getRecurringTransactions(),
+						onEdit: { recurring in
+							recurringToEdit = recurring
+						},
+						onDelete: { recurring in
+							recurringToDelete = recurring
+							showingDeleteRecurringConfirmation = true
+						},
+						onAddTap: { showingAddRecurringSheet = true }
+					)
 				}
 				.padding(.vertical)
 			}
@@ -117,10 +134,24 @@ struct HomeView: View {
 		.sheet(item: $shortcutToEdit) { shortcut in
 			AddWidgetShortcutView(accountsManager: accountsManager, shortcutToEdit: shortcut)
 		}
+		.sheet(isPresented: $showingAddRecurringSheet) {
+			AddRecurringTransactionView(accountsManager: accountsManager)
+		}
+		.sheet(item: $recurringToEdit) { recurring in
+			AddRecurringTransactionView(accountsManager: accountsManager, recurringToEdit: recurring)
+		}
 		.alert("Supprimer ce raccourci ?", isPresented: $showingDeleteConfirmation) {
 			Button("Supprimer", role: .destructive) {
 				if let shortcut = shortcutToDelete {
 					accountsManager.deleteWidgetShortcut(shortcut)
+				}
+			}
+			Button("Annuler", role: .cancel) { }
+		}
+		.alert("Supprimer cette récurrence ?", isPresented: $showingDeleteRecurringConfirmation) {
+			Button("Supprimer", role: .destructive) {
+				if let recurring = recurringToDelete {
+					accountsManager.deleteRecurringTransaction(recurring)
 				}
 			}
 			Button("Annuler", role: .cancel) { }

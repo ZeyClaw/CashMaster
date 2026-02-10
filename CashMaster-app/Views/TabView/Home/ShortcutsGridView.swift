@@ -66,6 +66,39 @@ private struct ShortcutsHeader: View {
 	}
 }
 
+// MARK: - Formatage compact des montants
+
+/// Formate un montant de manière compacte pour tenir dans un espace restreint.
+/// Réduit progressivement la précision : 2 850,00 € → 2 850 € → 2,85k € → 2,9k € → 3k €
+private func compactAmount(_ value: Double) -> String {
+	let thresholds: [(limit: Double, divisor: Double, suffix: String)] = [
+		(1_000_000_000, 1_000_000_000, "G"),
+		(1_000_000, 1_000_000, "M"),
+		(1_000, 1_000, "k")
+	]
+	
+	// Pour les grands nombres, utiliser les suffixes
+	for t in thresholds where value >= t.limit {
+		let reduced = value / t.divisor
+		if reduced == reduced.rounded(.down) {
+			return String(format: "%.0f%@", reduced, t.suffix)
+		} else if (reduced * 10).rounded() == (reduced * 10) {
+			return String(format: "%.1f%@", reduced, t.suffix)
+		} else {
+			return String(format: "%.2f%@", reduced, t.suffix)
+		}
+	}
+	
+	// Nombres < 1000 : supprimer les décimales inutiles
+	if value == value.rounded(.down) {
+		return String(format: "%.0f", value)
+	} else if (value * 10).rounded() == (value * 10) {
+		return String(format: "%.1f", value)
+	} else {
+		return String(format: "%.2f", value)
+	}
+}
+
 // MARK: - Carte de raccourci
 
 private struct ShortcutCard: View {
@@ -103,14 +136,15 @@ private struct ShortcutCard: View {
 						Text(shortcut.type == .income ? "+" : "−")
 							.font(.system(size: 14, weight: .bold))
 							.foregroundStyle(shortcut.type == .income ? .green : .red)
-						Text("\(shortcut.amount, specifier: "%.2f") €")
+						Text("\(compactAmount(shortcut.amount)) €")
 							.font(.system(size: 14, weight: .bold))
 							.foregroundStyle(.primary)
 							.lineLimit(1)
+							.minimumScaleFactor(0.8)
 					}
 				}
 				
-				Spacer(minLength: 0)
+				Spacer(minLength: 1)
 			}
 			.padding(12)
 			.background(Color(UIColor.secondarySystemGroupedBackground))

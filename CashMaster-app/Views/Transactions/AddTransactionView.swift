@@ -42,14 +42,7 @@ struct AddTransactionView: View {
 				}
 				
 				Section {
-					TextField("Montant", value: $montant, format: .number.precision(.fractionLength(0...2)))
-						.keyboardType(.decimalPad)
-						.overlay(
-							Text("€")
-								.foregroundColor(.gray) // Couleur grise pour le symbole
-								.padding(.trailing, 16), // Espacement à droite
-							alignment: .trailing // Alignement à droite
-						)
+					CurrencyTextField("Montant", amount: $montant)
 
 					TextField("Commentaire", text: $transactionComment)
 						.onChange(of: transactionComment) { _, newValue in

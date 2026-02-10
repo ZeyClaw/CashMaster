@@ -70,6 +70,8 @@ struct ContentView: View {
 			if accountsManager.selectedAccountId == nil {
 				accountsManager.selectedAccountId = accountsManager.getAllAccounts().first?.id
 			}
+			// Générer les transactions récurrentes à venir / valider celles du jour
+			accountsManager.processRecurringTransactions()
 		}
 	}
 }

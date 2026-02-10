@@ -56,6 +56,23 @@ class AccountsManager: ObservableObject {
 		var account: Account
 		var transactions: [Transaction]
 		var widgetShortcuts: [WidgetShortcut]
+		var recurringTransactions: [RecurringTransaction]
+		
+		// Rétrocompatibilité : si la clé n'existe pas dans les anciennes données
+		init(from decoder: Decoder) throws {
+			let container = try decoder.container(keyedBy: CodingKeys.self)
+			account = try container.decode(Account.self, forKey: .account)
+			transactions = try container.decode([Transaction].self, forKey: .transactions)
+			widgetShortcuts = try container.decode([WidgetShortcut].self, forKey: .widgetShortcuts)
+			recurringTransactions = try container.decodeIfPresent([RecurringTransaction].self, forKey: .recurringTransactions) ?? []
+		}
+		
+		init(account: Account, transactions: [Transaction], widgetShortcuts: [WidgetShortcut], recurringTransactions: [RecurringTransaction]) {
+			self.account = account
+			self.transactions = transactions
+			self.widgetShortcuts = widgetShortcuts
+			self.recurringTransactions = recurringTransactions
+		}
 	}
 
 	// MARK: - Account Management
@@ -186,7 +203,8 @@ class AccountsManager: ObservableObject {
 			AccountData(
 				account: account,
 				transactions: transactionManagers[account.id]?.transactions ?? [],
-				widgetShortcuts: transactionManagers[account.id]?.widgetShortcuts ?? []
+				widgetShortcuts: transactionManagers[account.id]?.widgetShortcuts ?? [],
+				recurringTransactions: transactionManagers[account.id]?.recurringTransactions ?? []
 			)
 		}
 		if let data = try? JSONEncoder().encode(dataArray) {
@@ -208,6 +226,7 @@ class AccountsManager: ObservableObject {
 			let manager = TransactionManager(accountName: entry.account.name)
 			manager.transactions = entry.transactions
 			manager.widgetShortcuts = entry.widgetShortcuts
+			manager.recurringTransactions = entry.recurringTransactions
 			loadedManagers[entry.account.id] = manager
 		}
 		
@@ -272,6 +291,79 @@ class AccountsManager: ObservableObject {
 		}
 		
 		return importedTransactions.count
+	}
+	
+	// MARK: - Recurring Transactions
+	
+	func getRecurringTransactions() -> [RecurringTransaction] {
+		guard let accountId = selectedAccountId else { return [] }
+		return transactionManagers[accountId]?.recurringTransactions ?? []
+	}
+	
+	func addRecurringTransaction(_ recurring: RecurringTransaction) {
+		guard let accountId = selectedAccountId else { return }
+		transactionManagers[accountId]?.recurringTransactions.append(recurring)
+		save()
+		objectWillChange.send()
+	}
+	
+	func deleteRecurringTransaction(_ recurring: RecurringTransaction) {
+		guard let accountId = selectedAccountId else { return }
+		transactionManagers[accountId]?.recurringTransactions.removeAll { $0.id == recurring.id }
+		save()
+		objectWillChange.send()
+	}
+	
+	func updateRecurringTransaction(_ recurring: RecurringTransaction) {
+		guard let accountId = selectedAccountId,
+			  let index = transactionManagers[accountId]?.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
+		transactionManagers[accountId]?.recurringTransactions[index] = recurring
+		save()
+		objectWillChange.send()
+	}
+	
+	/// Génère automatiquement les transactions potentielles pour les récurrences à venir (< 1 mois)
+	/// et valide celles dont la date est aujourd'hui.
+	/// Appelé au lancement de l'app.
+	func processRecurringTransactions() {
+		let calendar = Calendar.current
+		let now = Date()
+		let startOfToday = calendar.startOfDay(for: now)
+		
+		for account in accounts {
+			guard let manager = transactionManagers[account.id] else { continue }
+			
+			var updated = false
+			
+			for i in manager.recurringTransactions.indices {
+				let recurring = manager.recurringTransactions[i]
+				let pending = recurring.pendingTransactions()
+				
+				for entry in pending {
+					manager.add(entry.transaction)
+					updated = true
+				}
+				
+				// Mettre à jour la dernière date générée
+				if let lastDate = pending.map({ $0.date }).max() {
+					manager.recurringTransactions[i].lastGeneratedDate = lastDate
+				}
+			}
+			
+			// Valider les transactions potentielles dont la date prévue est passée
+			for i in manager.transactions.indices {
+				let tx = manager.transactions[i]
+				if tx.potentiel, let date = tx.date, calendar.startOfDay(for: date) <= startOfToday {
+					manager.transactions[i] = tx.validated(at: date)
+					updated = true
+				}
+			}
+			
+			if updated {
+				save()
+				objectWillChange.send()
+			}
+		}
 	}
 }
 

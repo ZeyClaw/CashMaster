@@ -21,6 +21,7 @@ class TransactionManager {
 	var transactions: [Transaction] = []
 	
 	var widgetShortcuts: [WidgetShortcut] = []
+	var recurringTransactions: [RecurringTransaction] = []
 	
 	init(accountName: String) {
 		self.accountName = accountName

@@ -23,6 +23,7 @@
 | Export CSV | Exportez vos données pour analyse externe |
 | Import CSV | Restaurez vos données depuis un fichier |
 | Raccourcis rapides | Ajoutez des transactions récurrentes en un tap |
+| Transactions récurrentes | Automatisez vos dépenses/revenus périodiques (loyer, salaire, abonnements...) |
 
 ---
 
@@ -53,7 +54,7 @@
 
 ```
 CashMaster-app/
-├── Models/      → Données (Account, Transaction, AccountsManager)
+├── Models/      → Données (Account, Transaction, RecurringTransaction, AccountsManager)
 ├── Services/    → Logique métier (CalculationService, CSVService)
 ├── Extensions/  → Utilitaires (DateFormatting, StylableEnum)
 └── Views/       → Interface utilisateur (SwiftUI)
@@ -291,4 +292,4 @@ Projet personnel — Tous droits réservés.
 
 ---
 
-*Finoria v2.0 — Développé avec ❤️ en Swift*
+*Finoria v2.1 — Développé avec ❤️ en Swift*
