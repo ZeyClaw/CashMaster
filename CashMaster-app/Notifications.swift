@@ -59,15 +59,20 @@ struct NotificationManager {
 
 	
 	// Fonction pour programmer une notification hebdomadaire si elle n'existe pas déjà
+	// Vérifie aussi que le contenu est à jour (ex: renommage de l'app)
 	func scheduleWeeklyNotificationIfNeeded() {
 		UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-			// Vérifie si une notification avec cet identifiant existe déjà
-			let notificationExists = requests.contains { $0.identifier == self.notificationIdentifier }
-			
-			if !notificationExists {
-				self.scheduleWeeklyNotification()
+			if let existing = requests.first(where: { $0.identifier == self.notificationIdentifier }) {
+				// Si le titre ne correspond plus (ex: ancien nom "CashMaster"), on réinitialise
+				if existing.content.title != "Rappel - Finoria" {
+					print("Notification obsolète détectée, reprogrammation...")
+					self.resetNotifications()
+					self.scheduleWeeklyNotification()
+				} else {
+					print("La notification hebdomadaire est déjà programmée.")
+				}
 			} else {
-				print("La notification hebdomadaire est déjà programmée.")
+				self.scheduleWeeklyNotification()
 			}
 		}
 	}

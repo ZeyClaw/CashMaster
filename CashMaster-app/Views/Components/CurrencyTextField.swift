@@ -23,8 +23,7 @@ struct CurrencyTextField: View {
 			.keyboardType(.decimalPad)
 			.overlay(
 				Text("€")
-					.foregroundColor(.gray)
-					.padding(.trailing, 16),
+					.foregroundColor(.gray),
 				alignment: .trailing
 			)
 	}

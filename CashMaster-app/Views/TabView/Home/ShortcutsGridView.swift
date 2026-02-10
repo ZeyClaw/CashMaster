@@ -106,10 +106,11 @@ private struct ShortcutCard: View {
 						Text("\(shortcut.amount, specifier: "%.2f") €")
 							.font(.system(size: 14, weight: .bold))
 							.foregroundStyle(.primary)
+							.lineLimit(1)
 					}
 				}
 				
-				Spacer(minLength: 1)
+				Spacer(minLength: 0)
 			}
 			.padding(12)
 			.background(Color(UIColor.secondarySystemGroupedBackground))
