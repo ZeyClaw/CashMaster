@@ -36,6 +36,7 @@ struct AnalysesView: View {
 	@State private var selectedMonth: Int
 	@State private var selectedYear: Int
 	@State private var selectedSlice: TransactionCategory?
+	@State private var showingCategoryDetail: TransactionCategory?
 	
 	init(accountsManager: AccountsManager) {
 		self.accountsManager = accountsManager
@@ -184,43 +185,69 @@ struct AnalysesView: View {
 				.foregroundStyle(item.category.color)
 				.opacity(selectedSlice == nil || selectedSlice == item.category ? 1 : 0.4)
 			}
+			.chartAngleSelection(value: $chartAngleSelection)
 			.chartBackground { _ in
-				// Montant total au centre du donut
+				// Montant total ou détail catégorie au centre du donut
 				VStack(spacing: 2) {
-					Text(totalAmount, format: .currency(code: "EUR"))
-						.font(.title2.weight(.bold))
-						.minimumScaleFactor(0.6)
-					Text(analysisType == .expenses ? "dépensés" : "gagnés")
-						.font(.caption)
-						.foregroundStyle(.secondary)
+					if let selected = selectedSlice,
+					   let data = categoryData.first(where: { $0.category == selected }) {
+						StyleIconView(style: selected, size: 28)
+						Text(data.total, format: .currency(code: "EUR"))
+							.font(.title3.weight(.bold))
+							.minimumScaleFactor(0.6)
+						Text(selected.label)
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					} else {
+						Text(totalAmount, format: .currency(code: "EUR"))
+							.font(.title2.weight(.bold))
+							.minimumScaleFactor(0.6)
+						Text(analysisType == .expenses ? "dépensés" : "gagnés")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
 				}
 			}
 			.frame(height: 240)
+			.onChange(of: chartAngleSelection) { _, newValue in
+				withAnimation(.easeInOut(duration: 0.2)) {
+					selectedSlice = findCategory(for: newValue)
+				}
+			}
 		}
 		.padding()
 		.background(Color(.secondarySystemGroupedBackground))
 		.clipShape(RoundedRectangle(cornerRadius: 16))
 	}
 	
+	/// Trouve la catégorie correspondant à une valeur angulaire du graphique
+	private func findCategory(for value: Double?) -> TransactionCategory? {
+		guard let value else { return nil }
+		var cumulative: Double = 0
+		for item in categoryData {
+			cumulative += item.total
+			if value <= cumulative {
+				return item.category
+			}
+		}
+		return nil
+	}
+	
+	/// Valeur angulaire sélectionnée sur le graphique
+	@State private var chartAngleSelection: Double?
+	
 	/// Liste détaillée par catégorie
 	private var categoryList: some View {
 		VStack(spacing: 0) {
 			ForEach(categoryData) { item in
-				CategoryBreakdownRow(
-					item: item,
-					totalAmount: totalAmount,
-					isSelected: selectedSlice == item.category
-				)
-				.contentShape(Rectangle())
-				.onTapGesture {
-					withAnimation(.easeInOut(duration: 0.2)) {
-						if selectedSlice == item.category {
-							selectedSlice = nil
-						} else {
-							selectedSlice = item.category
-						}
-					}
+				NavigationLink(value: item.category) {
+					CategoryBreakdownRow(
+						item: item,
+						totalAmount: totalAmount,
+						isSelected: selectedSlice == item.category
+					)
 				}
+				.buttonStyle(PlainButtonStyle())
 				
 				if item.id != categoryData.last?.id {
 					Divider()

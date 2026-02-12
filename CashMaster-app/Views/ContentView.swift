@@ -15,7 +15,7 @@ struct ContentView: View {
 	@Environment(\.scenePhase) private var scenePhase
 	
 	enum TabItem: Hashable {
-		case home, analyses, calendrier, potentielles, add
+		case home, analyses, calendrier, futur, add
 	}
 	
 	var body: some View {
@@ -41,11 +41,11 @@ struct ContentView: View {
 				Label("Calendrier", systemImage: "calendar")
 			}
 			
-			// Onglet Potentielles
-			Tab(value: TabItem.potentielles) {
+			// Onglet Futur
+			Tab(value: TabItem.futur) {
 				FutureTabView(accountsManager: accountsManager)
 			} label: {
-				Label("Potentielles", systemImage: "clock.arrow.circlepath")
+				Label("Futur", systemImage: "clock.arrow.circlepath")
 			}
 			
 			// Bouton Ajouter avec role search (séparé visuellement à droite)

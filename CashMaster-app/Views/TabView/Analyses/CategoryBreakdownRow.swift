@@ -43,6 +43,11 @@ struct CategoryBreakdownRow: View {
 					.font(.caption)
 					.foregroundStyle(.secondary)
 			}
+			
+			// Chevron de navigation
+			Image(systemName: "chevron.right")
+				.font(.caption.weight(.semibold))
+				.foregroundStyle(.tertiary)
 		}
 		.padding(.horizontal, 16)
 		.padding(.vertical, 10)

@@ -16,7 +16,7 @@ struct FutureTabView: View {
 		NavigationStack {
 			if accountsManager.selectedAccountId != nil {
 				PotentialTransactionsView(accountsManager: accountsManager)
-					.navigationTitle("À venir")
+					.navigationTitle("Futur")
 					.toolbar {
 						ToolbarItem(placement: .navigationBarTrailing) {
 							Button {

@@ -1,6 +1,6 @@
 # 📁 STRUCTURE_APP.md — Architecture Technique de Finoria
 
-> **Version**: 2.3  
+> **Version**: 2.4  
 > **Dernière mise à jour**: Février 2026  
 > **Statut**: Production-Ready, AI-Ready  
 
@@ -75,8 +75,8 @@ CashMaster-app/
     └── TabView/                    # Les 4 onglets principaux
         ├── HomeTabView.swift       # Wrapper onglet Accueil
         ├── HomeView.swift          # Contenu Accueil
-        ├── FutureTabView.swift     # Wrapper onglet À venir
-        ├── PotentialTransactionsView.swift
+        ├── FutureTabView.swift     # Wrapper onglet Futur
+        ├── PotentialTransactionsView.swift # Transactions futures (confirmation récurrences)
         │
         ├── Home/                   # Composants de l'accueil
         │   ├── HomeComponents.swift
@@ -85,7 +85,8 @@ CashMaster-app/
         ├── Analyses/               # Onglet Analyses (camembert par catégorie)
         │   ├── AnalysesTabView.swift       # Wrapper onglet Analyses
         │   ├── AnalysesView.swift          # Vue principale (graphique + détails)
-        │   └── CategoryBreakdownRow.swift  # Ligne détaillée par catégorie
+        │   ├── CategoryBreakdownRow.swift  # Ligne détaillée par catégorie
+        │   └── CategoryTransactionsView.swift # Détail transactions d'une catégorie
         │
         └── Calendrier/             # Navigation temporelle
             ├── CalendrierMainView.swift
@@ -256,11 +257,12 @@ ContentView (TabView)
 │
 ├── Tab 2: AnalysesTabView
 │   └── NavigationStack
-│       └── AnalysesView (racine)
-│           ├── Segmented Control: Dépenses / Revenus
-│           ├── Navigation mensuelle (< Mois Année >)
-│           ├── Graphique camembert (Swift Charts SectorMark)
-│           └── Liste détaillée par catégorie (CategoryBreakdownRow)
+│       ├── AnalysesView (racine)
+│       │   ├── Segmented Control: Dépenses / Revenus
+│       │   ├── Navigation mensuelle (< Mois Année >)
+│       │   ├── Graphique camembert interactif (tap slice = sélection)
+│       │   └── Liste détaillée par catégorie (CategoryBreakdownRow)
+│       └── → CategoryTransactionsView (tap catégorie = transactions groupées par jour)
 │
 ├── Tab 3: CalendrierMainView
 │   └── NavigationStack + Segmented Control
@@ -270,10 +272,10 @@ ContentView (TabView)
 │       └── Mode "Mois" → CalendrierMonthsContentView
 │           └── → TransactionsListView (tap mois)
 │
-└── Tab 4: FutureTabView
+└── Tab 4: FutureTabView ("Futur")
     └── NavigationStack
         └── PotentialTransactionsView
-            └── [Swipe: Valider / Supprimer]
+            └── [Swipe: Valider / Supprimer + confirmation si récurrence]
 ```
 
 ### Routes de Navigation (Calendrier)
@@ -426,7 +428,10 @@ Chaque fichier Swift suit cette structure :
 11. **Rétrocompatibilité** : Les anciennes données (sans catégorie) se chargent-elles correctement ?
 12. **Analyses** : Le graphique camembert affiche-t-il la bonne répartition par catégorie ?
 13. **Navigation temporelle Analyses** : La navigation mois par mois fonctionne-t-elle correctement ?
+14. **Interaction graphique** : Le tap sur une tranche du camembert sélectionne-t-il la bonne catégorie ?
+15. **Détail catégorie** : Le tap sur une catégorie affiche-t-il les transactions groupées par jour ?
+16. **Confirmation récurrence** : Supprimer/valider une transaction récurrente demande-t-il confirmation ?
 
 ---
 
-*Document généré le 12 février 2026 — Finoria v2.3*
+*Document généré le 12 février 2026 — Finoria v2.4*
