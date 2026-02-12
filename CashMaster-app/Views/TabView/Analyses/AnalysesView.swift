@@ -43,40 +43,53 @@ struct AnalysesView: View {
 	@State private var analysisType: AnalysisType = .expenses
 	@State private var selectedSlice: TransactionCategory?
 	
-	/// Index de page dans le TabView carousel (0 = mois courant, négatif = mois passés)
-	/// On utilise un range large pour permettre le scroll infini vers le passé.
-	/// L'index 0 correspond au mois courant.
-	@State private var currentPageIndex: Int = 0
+	/// Mois et année actuellement sélectionnés
+	@State private var selectedMonth: Int
+	@State private var selectedYear: Int
 	
-	/// Mois/année courants (pour calculer les limites)
-	private let referenceMonth: Int
-	private let referenceYear: Int
-	
-	/// Nombre de mois dans le passé accessibles
-	private let maxPastMonths = 120 // 10 ans en arrière
+	/// Mois/année courants (pour limiter la navigation au présent)
+	private let currentMonth: Int
+	private let currentYear: Int
 	
 	init(accountsManager: AccountsManager) {
 		self.accountsManager = accountsManager
 		let now = Date()
 		let calendar = Calendar.current
-		self.referenceMonth = calendar.component(.month, from: now)
-		self.referenceYear = calendar.component(.year, from: now)
+		let m = calendar.component(.month, from: now)
+		let y = calendar.component(.year, from: now)
+		self.currentMonth = m
+		self.currentYear = y
+		self._selectedMonth = State(initialValue: m)
+		self._selectedYear = State(initialValue: y)
 	}
 	
-	// MARK: - Calcul mois/année depuis l'index de page
+	// MARK: - Navigation mensuelle
 	
-	/// Retourne (month, year) pour un index de page donné (0 = mois courant, -1 = mois dernier, etc.)
-	private func monthYear(for pageIndex: Int) -> (month: Int, year: Int) {
-		// Total de mois depuis un point de référence
-		let totalMonths = (referenceYear * 12 + referenceMonth - 1) + pageIndex
-		let year = totalMonths / 12
-		let month = (totalMonths % 12) + 1
-		return (month, year)
+	/// Indique si on peut avancer au mois suivant (pas au-delà du mois courant)
+	private var canGoNext: Bool {
+		!(selectedMonth == currentMonth && selectedYear == currentYear)
 	}
 	
-	/// Mois et année actuellement sélectionnés
-	private var selectedMonth: Int { monthYear(for: currentPageIndex).month }
-	private var selectedYear: Int { monthYear(for: currentPageIndex).year }
+	/// Recule d'un mois
+	private func goToPreviousMonth() {
+		if selectedMonth == 1 {
+			selectedMonth = 12
+			selectedYear -= 1
+		} else {
+			selectedMonth -= 1
+		}
+	}
+	
+	/// Avance d'un mois (limité au mois courant)
+	private func goToNextMonth() {
+		guard canGoNext else { return }
+		if selectedMonth == 12 {
+			selectedMonth = 1
+			selectedYear += 1
+		} else {
+			selectedMonth += 1
+		}
+	}
 	
 	// MARK: - Données calculées
 	
@@ -142,36 +155,16 @@ struct AnalysesView: View {
 	// MARK: - Body
 	
 	var body: some View {
-		TabView(selection: $currentPageIndex) {
-			ForEach((-maxPastMonths)...0, id: \.self) { pageIndex in
-				monthPage(for: pageIndex)
-					.tag(pageIndex)
-			}
-		}
-		.tabViewStyle(.page(indexDisplayMode: .never))
-		.onChange(of: currentPageIndex) { _ in
-			selectedSlice = nil
-		}
-		.onChange(of: analysisType) { _ in
-			selectedSlice = nil
-		}
-	}
-	
-	// MARK: - Page d'un mois
-	
-	/// Contenu complet pour un mois donné (identifié par son pageIndex)
-	private func monthPage(for pageIndex: Int) -> some View {
-		let (month, year) = monthYear(for: pageIndex)
-		let catData = categoryData(month: month, year: year)
-		let total = totalAmount(month: month, year: year)
-		let chartData = chartDisplayData(month: month, year: year)
-		let dispTotal = displayTotal(month: month, year: year)
+		let catData = categoryData(month: selectedMonth, year: selectedYear)
+		let total = totalAmount(month: selectedMonth, year: selectedYear)
+		let chartData = chartDisplayData(month: selectedMonth, year: selectedYear)
+		let dispTotal = displayTotal(month: selectedMonth, year: selectedYear)
 		
-		return List {
-			// Section contrôles
+		List {
+			// Section contrôles + navigation mois
 			Section {
 				segmentedControl
-				monthLabel(month: month, year: year)
+				monthNavigator
 			}
 			
 			if catData.isEmpty {
@@ -187,7 +180,7 @@ struct AnalysesView: View {
 				// Section détail par catégorie
 				Section {
 					ForEach(catData) { item in
-						NavigationLink(value: CategoryDetailRoute(category: item.category, month: month, year: year)) {
+						NavigationLink(value: CategoryDetailRoute(category: item.category, month: selectedMonth, year: selectedYear)) {
 							CategoryBreakdownRow(item: item, totalAmount: total, isSelected: selectedSlice == item.category)
 						}
 						.listRowBackground(
@@ -200,6 +193,9 @@ struct AnalysesView: View {
 			}
 		}
 		.listStyle(.insetGrouped)
+		.onChange(of: analysisType) { _ in
+			selectedSlice = nil
+		}
 	}
 	
 	// MARK: - Composants
@@ -214,11 +210,46 @@ struct AnalysesView: View {
 		.pickerStyle(.segmented)
 	}
 	
-	/// Label du mois courant dans la page
-	private func monthLabel(month: Int, year: Int) -> some View {
-		Text("\(monthName(month: month, year: year)) \(String(year))")
-			.font(.title3.weight(.semibold))
-			.frame(maxWidth: .infinity, alignment: .center)
+	/// Navigateur de mois (< Mois Année >) avec boutons chevron
+	private var monthNavigator: some View {
+		HStack {
+			Button {
+				withAnimation(.easeInOut(duration: 0.2)) {
+					goToPreviousMonth()
+					selectedSlice = nil
+				}
+			} label: {
+				Image(systemName: "chevron.left")
+					.font(.body.weight(.semibold))
+					.foregroundStyle(.blue)
+					.frame(width: 44, height: 44)
+					.contentShape(Rectangle())
+			}
+			.buttonStyle(PlainButtonStyle())
+			
+			Spacer()
+			
+			Text("\(monthName(month: selectedMonth, year: selectedYear)) \(String(selectedYear))")
+				.font(.title3.weight(.semibold))
+				.contentTransition(.numericText())
+			
+			Spacer()
+			
+			Button {
+				withAnimation(.easeInOut(duration: 0.2)) {
+					goToNextMonth()
+					selectedSlice = nil
+				}
+			} label: {
+				Image(systemName: "chevron.right")
+					.font(.body.weight(.semibold))
+					.foregroundStyle(canGoNext ? .blue : .gray.opacity(0.3))
+					.frame(width: 44, height: 44)
+					.contentShape(Rectangle())
+			}
+			.buttonStyle(PlainButtonStyle())
+			.disabled(!canGoNext)
+		}
 	}
 	
 	/// État vide quand aucune transaction

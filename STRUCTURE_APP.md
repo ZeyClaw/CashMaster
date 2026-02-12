@@ -261,7 +261,7 @@ ContentView (TabView)
 │   └── NavigationStack
 │       ├── AnalysesView (racine)
 │       │   ├── Segmented Control: Dépenses / Revenus
-│       │   ├── Navigation mensuelle (< Mois Année >)
+│       │   ├── Navigation mensuelle (chevrons < Mois Année >)
 │       │   ├── Graphique camembert interactif (tap slice = sélection)
 │       │   └── Liste détaillée par catégorie (CategoryBreakdownRow)
 │       └── → CategoryTransactionsView (tap catégorie = transactions groupées par jour)
@@ -432,10 +432,12 @@ Chaque fichier Swift suit cette structure :
 10. **Catégories** : `TransactionCategory` est-elle correctement partagée entre transactions, raccourcis et récurrences ?
 11. **Rétrocompatibilité** : Les anciennes données (sans catégorie) se chargent-elles correctement ?
 12. **Analyses** : Le graphique camembert affiche-t-il la bonne répartition par catégorie ?
-13. **Navigation temporelle Analyses** : La navigation mois par mois fonctionne-t-elle correctement ?
+13. **Navigation temporelle Analyses** : La navigation mois par mois par chevrons fonctionne-t-elle correctement ?
 14. **Interaction graphique** : Le tap sur une tranche du camembert sélectionne-t-il la bonne catégorie ?
 15. **Détail catégorie** : Le tap sur une catégorie affiche-t-il les transactions groupées par jour ?
 16. **Confirmation récurrence** : Supprimer/valider une transaction récurrente demande-t-il confirmation ?
+17. **Carte récurrence** : Le tap sur une carte ouvre-t-il toujours l'édition (même en pause) ?
+18. **Réactivation rapide** : Le bouton pause sur la carte permet-il de réactiver la récurrence ?
 
 ---
 
