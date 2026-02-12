@@ -193,7 +193,7 @@ struct AnalysesView: View {
 			}
 		}
 		.listStyle(.insetGrouped)
-		.onChange(of: analysisType) { _ in
+		.onChange(of: analysisType) {
 			selectedSlice = nil
 		}
 	}

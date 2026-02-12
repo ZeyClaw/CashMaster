@@ -15,43 +15,50 @@ struct PotentialTransactionsView: View {
 	@State private var showDeleteConfirmation = false
 	@State private var showValidateConfirmation = false
 	
+	// MARK: - Transactions séparées
+	
+	/// Transactions récurrentes futures, triées par date décroissante (plus récente en haut)
+	private var recurringTransactions: [Transaction] {
+		accountsManager.potentialTransactions()
+			.filter { $0.recurringTransactionId != nil }
+			.sorted { ($0.date ?? Date.distantPast) > ($1.date ?? Date.distantPast) }
+	}
+	
+	/// Transactions futures normales, triées par ordre d'ajout inversé (dernière ajoutée en haut)
+	private var normalTransactions: [Transaction] {
+		accountsManager.potentialTransactions()
+			.filter { $0.recurringTransactionId == nil }
+			.reversed()
+	}
+	
+	// MARK: - Body
+	
 	var body: some View {
 		List {
-			if accountsManager.potentialTransactions().isEmpty {
+			if recurringTransactions.isEmpty && normalTransactions.isEmpty {
 				Text("Aucune transaction potentielle")
 					.foregroundStyle(.secondary)
 			} else {
-				ForEach(accountsManager.potentialTransactions()) { transaction in
-					TransactionRow(transaction: transaction)
-						.contentShape(Rectangle())
-						.onTapGesture {
-							transactionToEdit = transaction
+				// Section récurrences
+				if !recurringTransactions.isEmpty {
+					Section {
+						ForEach(recurringTransactions) { transaction in
+							transactionRow(for: transaction)
 						}
-						.swipeActions(edge: .trailing, allowsFullSwipe: true) {
-							Button(role: .destructive) {
-								if transaction.recurringTransactionId != nil {
-									transactionToDelete = transaction
-									showDeleteConfirmation = true
-								} else {
-									accountsManager.deleteTransaction(transaction)
-								}
-							} label: {
-								Label("Supprimer", systemImage: "trash")
-							}
+					} header: {
+						Text("Transactions récurrentes")
+					}
+				}
+				
+				// Section futures normales
+				if !normalTransactions.isEmpty {
+					Section {
+						ForEach(normalTransactions) { transaction in
+							transactionRow(for: transaction)
 						}
-						.swipeActions(edge: .leading, allowsFullSwipe: true) {
-							Button {
-								if transaction.recurringTransactionId != nil {
-									transactionToValidate = transaction
-									showValidateConfirmation = true
-								} else {
-									accountsManager.validateTransaction(transaction)
-								}
-							} label: {
-								Label("Valider", systemImage: "checkmark.circle")
-							}
-							.tint(.green)
-						}
+					} header: {
+						Text("Futures")
+					}
 				}
 			}
 		}
@@ -85,5 +92,41 @@ struct PotentialTransactionsView: View {
 		} message: {
 			Text("Cette transaction a été générée par une récurrence. La valider maintenant l'ajoutera à votre solde actuel.")
 		}
+	}
+	
+	// MARK: - Composants
+	
+	/// Ligne de transaction réutilisable avec swipe actions
+	private func transactionRow(for transaction: Transaction) -> some View {
+		TransactionRow(transaction: transaction)
+			.contentShape(Rectangle())
+			.onTapGesture {
+				transactionToEdit = transaction
+			}
+			.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+				Button(role: .destructive) {
+					if transaction.recurringTransactionId != nil {
+						transactionToDelete = transaction
+						showDeleteConfirmation = true
+					} else {
+						accountsManager.deleteTransaction(transaction)
+					}
+				} label: {
+					Label("Supprimer", systemImage: "trash")
+				}
+			}
+			.swipeActions(edge: .leading, allowsFullSwipe: true) {
+				Button {
+					if transaction.recurringTransactionId != nil {
+						transactionToValidate = transaction
+						showValidateConfirmation = true
+					} else {
+						accountsManager.validateTransaction(transaction)
+					}
+				} label: {
+					Label("Valider", systemImage: "checkmark.circle")
+				}
+				.tint(.green)
+			}
 	}
 }

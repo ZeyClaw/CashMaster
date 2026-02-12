@@ -277,6 +277,8 @@ ContentView (TabView)
 └── Tab 4: FutureTabView ("Futur")
     └── NavigationStack
         └── PotentialTransactionsView
+            ├── Section "Transactions récurrentes" (groupées par jour, plus récente en haut)
+            ├── Section "Futures" (dernière ajoutée en haut)
             └── [Swipe: Valider / Supprimer + confirmation si récurrence]
 ```
 
@@ -438,6 +440,8 @@ Chaque fichier Swift suit cette structure :
 16. **Confirmation récurrence** : Supprimer/valider une transaction récurrente demande-t-il confirmation ?
 17. **Carte récurrence** : Le tap sur une carte ouvre-t-il toujours l'édition (même en pause) ?
 18. **Réactivation rapide** : Le bouton pause sur la carte permet-il de réactiver la récurrence ?
+19. **Sections Futur** : Les transactions récurrentes et futures normales sont-elles bien séparées en deux sections ?
+20. **Tri sections Futur** : Récurrentes triées par date décroissante, normales par ordre d'ajout inversé ?
 
 ---
 

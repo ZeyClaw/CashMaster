@@ -41,11 +41,11 @@ struct AccountCardView: View {
 			
 			// Solde
 			VStack(alignment: .trailing, spacing: 2) {
-				Text("\(solde, specifier: "%.2f") €")
+				Text("\(solde < 0 ? "-" : "")\(compactAmount(abs(solde))) €")
 					.font(.title3.bold())
 					.foregroundColor(solde >= 0 ? .primary : .red)
 				if futur != solde {
-					Text("→ \(futur, specifier: "%.2f") €")
+					Text("→ \(futur < 0 ? "-" : "")\(compactAmount(abs(futur))) €")
 						.font(.caption)
 						.foregroundColor(futur >= 0 ? .secondary : .red.opacity(0.7))
 				}
