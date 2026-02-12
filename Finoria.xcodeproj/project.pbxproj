@@ -44,6 +44,7 @@
 		F8388EA62F3DE67B0081F2F9 /* CategoryBreakdownRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EA32F3DE67B0081F2F9 /* CategoryBreakdownRow.swift */; };
 		F8388EA72F3DE67B0081F2F9 /* AnalysesTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EA42F3DE67B0081F2F9 /* AnalysesTabView.swift */; };
 		F8388EA82F3DE67B0081F2F9 /* AnalysesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EA52F3DE67B0081F2F9 /* AnalysesView.swift */; };
+		F8388EAA2F3DF5470081F2F9 /* CategoryTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EA92F3DF5470081F2F9 /* CategoryTransactionsView.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
 		F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */; };
@@ -114,6 +115,7 @@
 		F8388EA32F3DE67B0081F2F9 /* CategoryBreakdownRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryBreakdownRow.swift; sourceTree = "<group>"; };
 		F8388EA42F3DE67B0081F2F9 /* AnalysesTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysesTabView.swift; sourceTree = "<group>"; };
 		F8388EA52F3DE67B0081F2F9 /* AnalysesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysesView.swift; sourceTree = "<group>"; };
+		F8388EA92F3DF5470081F2F9 /* CategoryTransactionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryTransactionsView.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -299,6 +301,7 @@
 		F8388EA22F3DE67B0081F2F9 /* Analyses */ = {
 			isa = PBXGroup;
 			children = (
+				F8388EA92F3DF5470081F2F9 /* CategoryTransactionsView.swift */,
 				F8388EA32F3DE67B0081F2F9 /* CategoryBreakdownRow.swift */,
 				F8388EA42F3DE67B0081F2F9 /* AnalysesTabView.swift */,
 				F8388EA52F3DE67B0081F2F9 /* AnalysesView.swift */,
@@ -544,6 +547,7 @@
 				F8388EA62F3DE67B0081F2F9 /* CategoryBreakdownRow.swift in Sources */,
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
 				F800A3F72E5C72F200918507 /* ToastCard.swift in Sources */,
+				F8388EAA2F3DF5470081F2F9 /* CategoryTransactionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
