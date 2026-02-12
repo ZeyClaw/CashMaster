@@ -133,6 +133,8 @@ CashMaster-app/
 │  • addRecurringTransaction() → ajoute une récurrence            │
 │  • deleteRecurringTransaction() → supprime récurrence + txs liées│
 │  • updateRecurringTransaction() → modifie + regénère txs liées  │
+│  • pauseRecurringTransaction() → pause + supprime txs potentielles│
+│  • resumeRecurringTransaction() → réactive (sans rattrapage)     │
 │  • processRecurringTransactions() → génère les transactions    │
 │  • totalForMonth()     → délègue à CalculationService           │
 │  • generateCSV()       → délègue à CSVService                   │
@@ -348,6 +350,7 @@ struct RecurringTransaction: Identifiable, Codable {
     let frequency: RecurrenceFrequency  // .daily, .weekly, .monthly, .yearly
     let startDate: Date
     var lastGeneratedDate: Date?  // Pour éviter les doublons
+    var isPaused: Bool            // true = en pause, aucune transaction générée
     
     func pendingTransactions() -> [(date: Date, transaction: Transaction)]
 }
@@ -369,6 +372,8 @@ struct RecurringTransaction: Identifiable, Codable {
 >
 > Lors de la **suppression** d'une récurrence : les transactions potentielles liées sont supprimées.
 > Lors de la **modification** d'une récurrence : les transactions potentielles liées sont supprimées puis regénérées.
+> Lors de la **mise en pause** : les transactions potentielles liées sont supprimées, `isPaused = true`.
+> Lors de la **réactivation** : `isPaused = false`, `lastGeneratedDate` = hier (pas de rattrapage rétroactif).
 
 ---
 

@@ -44,6 +44,7 @@ struct AnalysesView: View {
 	@State private var selectedMonth: Int
 	@State private var selectedYear: Int
 	@State private var selectedSlice: TransactionCategory?
+	@State private var slideDirection: Edge = .trailing
 	
 	init(accountsManager: AccountsManager) {
 		self.accountsManager = accountsManager
@@ -169,38 +170,49 @@ struct AnalysesView: View {
 	private var monthNavigator: some View {
 		HStack {
 			Button {
-				withAnimation { goToPreviousMonth() }
+				slideDirection = .leading
+				withAnimation(.easeInOut(duration: 0.3)) { goToPreviousMonth() }
 			} label: {
 				Image(systemName: "chevron.left")
 					.font(.title3.weight(.semibold))
 					.foregroundStyle(.primary)
+					.frame(width: 44, height: 44)
+					.contentShape(Rectangle())
 			}
+			.buttonStyle(.plain)
 			
 			Spacer()
 			
 			Text("\(monthName) \(String(selectedYear))")
 				.font(.title3.weight(.semibold))
+				.id("\(selectedMonth)-\(selectedYear)")
+				.transition(.push(from: slideDirection))
 			
 			Spacer()
 			
 			Button {
-				withAnimation { goToNextMonth() }
+				slideDirection = .trailing
+				withAnimation(.easeInOut(duration: 0.3)) { goToNextMonth() }
 			} label: {
 				Image(systemName: "chevron.right")
 					.font(.title3.weight(.semibold))
 					.foregroundStyle(isCurrentMonth ? .tertiary : .primary)
+					.frame(width: 44, height: 44)
+					.contentShape(Rectangle())
 			}
+			.buttonStyle(.plain)
 			.disabled(isCurrentMonth)
 		}
-		.contentShape(Rectangle())
-		.gesture(
+		.simultaneousGesture(
 			DragGesture(minimumDistance: 30)
 				.onEnded { value in
 					guard abs(value.translation.width) > abs(value.translation.height) else { return }
 					if value.translation.width > 0 {
-						withAnimation { goToPreviousMonth() }
+						slideDirection = .leading
+						withAnimation(.easeInOut(duration: 0.3)) { goToPreviousMonth() }
 					} else if !isCurrentMonth {
-						withAnimation { goToNextMonth() }
+						slideDirection = .trailing
+						withAnimation(.easeInOut(duration: 0.3)) { goToNextMonth() }
 					}
 				}
 		)
@@ -251,8 +263,6 @@ struct AnalysesView: View {
 						.foregroundStyle(.secondary)
 				}
 			}
-			.id(selectedSlice)
-			.transition(.opacity)
 		}
 		.frame(height: 240)
 		.chartOverlay { _ in

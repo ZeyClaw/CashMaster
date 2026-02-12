@@ -81,7 +81,11 @@ private struct RecurringCard: View {
 		Button {
 			let feedback = UIImpactFeedbackGenerator(style: .medium)
 			feedback.impactOccurred()
-			onEdit()
+			if recurring.isPaused {
+				onResume()
+			} else {
+				onEdit()
+			}
 		} label: {
 			HStack(spacing: 12) {
 				// Icône colorée (composant réutilisable)
@@ -105,25 +109,28 @@ private struct RecurringCard: View {
 							.minimumScaleFactor(0.8)
 					}
 					
-					HStack(spacing: 4) {
-						Text(recurring.frequency.shortLabel)
-							.font(.system(size: 10, weight: .medium))
-							.foregroundStyle(.tertiary)
-						if recurring.isPaused {
-							Image(systemName: "pause.circle.fill")
-								.font(.system(size: 10))
-								.foregroundStyle(.orange)
-						}
-					}
+					Text(recurring.frequency.shortLabel)
+						.font(.system(size: 10, weight: .medium))
+						.foregroundStyle(.tertiary)
 				}
 				
 				Spacer(minLength: 1)
 			}
 			.padding(12)
 			.background(Color(UIColor.secondarySystemGroupedBackground))
+			.overlay {
+				if recurring.isPaused {
+					RoundedRectangle(cornerRadius: 16, style: .continuous)
+						.fill(.ultraThinMaterial)
+					Image(systemName: "pause.circle.fill")
+						.font(.system(size: 36, weight: .medium))
+						.foregroundStyle(.gray)
+						.shadow(color: .black.opacity(0.15), radius: 4, y: 2)
+				}
+			}
 			.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 			.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
-			.opacity(recurring.isPaused ? 0.5 : 1)
+			.grayscale(recurring.isPaused ? 1 : 0)
 		}
 		.buttonStyle(PlainButtonStyle())
 		.contextMenu {
