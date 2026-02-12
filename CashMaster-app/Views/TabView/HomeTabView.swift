@@ -12,7 +12,6 @@ struct HomeTabView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	@State private var showingAccountPicker = false
 	@State private var showingDocumentPicker = false
-	@State private var exportButtonSourceView: UIView?
 	@State private var importedCount: Int = 0
 	@State private var showExportSuccessAlert = false
 	@State private var showExportErrorAlert = false
@@ -35,11 +34,6 @@ struct HomeTabView: View {
 									Image(systemName: "square.and.arrow.up")
 										.imageScale(.large)
 										.padding(8)
-										.background(
-											PopoverSourceView {
-												exportButtonSourceView = $0
-											}
-										)
 								}
 								
 								// Bouton Import CSV
@@ -128,20 +122,11 @@ struct HomeTabView: View {
 			topVC = presented
 		}
 		
-		if let popover = activityVC.popoverPresentationController {
-			if let sourceView = exportButtonSourceView {
-				popover.sourceView = sourceView
-				popover.sourceRect = sourceView.bounds
-			} else {
-				popover.sourceView = topVC.view
-				popover.sourceRect = CGRect(
-					x: topVC.view.bounds.midX,
-					y: 0,
-					width: 0,
-					height: 0
-				)
-			}
-		}
+		// Support iPad (popover)
+		activityVC.popoverPresentationController?.sourceView = topVC.view
+		activityVC.popoverPresentationController?.sourceRect = CGRect(
+			x: topVC.view.bounds.midX, y: 0, width: 0, height: 0
+		)
 		
 		topVC.present(activityVC, animated: true)
 	}
@@ -154,26 +139,6 @@ struct HomeTabView: View {
 			showImportSuccessAlert = true
 		} else {
 			showImportErrorAlert = true
-		}
-	}
-}
-
-private struct PopoverSourceView: UIViewRepresentable {
-	let onResolve: (UIView) -> Void
-
-	func makeUIView(context: Context) -> UIView {
-		let view = UIView(frame: .zero)
-		view.backgroundColor = .clear
-		view.isUserInteractionEnabled = false
-		DispatchQueue.main.async {
-			onResolve(view)
-		}
-		return view
-	}
-
-	func updateUIView(_ uiView: UIView, context: Context) {
-		DispatchQueue.main.async {
-			onResolve(uiView)
 		}
 	}
 }
