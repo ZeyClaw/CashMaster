@@ -13,6 +13,8 @@ struct RecurringTransactionsGridView: View {
 	let recurringTransactions: [RecurringTransaction]
 	let onEdit: (RecurringTransaction) -> Void
 	let onDelete: (RecurringTransaction) -> Void
+	let onPause: (RecurringTransaction) -> Void
+	let onResume: (RecurringTransaction) -> Void
 	let onAddTap: () -> Void
 	
 	var body: some View {
@@ -26,7 +28,9 @@ struct RecurringTransactionsGridView: View {
 					RecurringCard(
 						recurring: recurring,
 						onEdit: { onEdit(recurring) },
-						onDelete: { onDelete(recurring) }
+						onDelete: { onDelete(recurring) },
+						onPause: { onPause(recurring) },
+						onResume: { onResume(recurring) }
 					)
 				}
 			}
@@ -70,6 +74,8 @@ private struct RecurringCard: View {
 	let recurring: RecurringTransaction
 	let onEdit: () -> Void
 	let onDelete: () -> Void
+	let onPause: () -> Void
+	let onResume: () -> Void
 	
 	var body: some View {
 		Button {
@@ -99,9 +105,16 @@ private struct RecurringCard: View {
 							.minimumScaleFactor(0.8)
 					}
 					
-					Text(recurring.frequency.shortLabel)
-						.font(.system(size: 10, weight: .medium))
-						.foregroundStyle(.tertiary)
+					HStack(spacing: 4) {
+						Text(recurring.frequency.shortLabel)
+							.font(.system(size: 10, weight: .medium))
+							.foregroundStyle(.tertiary)
+						if recurring.isPaused {
+							Image(systemName: "pause.circle.fill")
+								.font(.system(size: 10))
+								.foregroundStyle(.orange)
+						}
+					}
 				}
 				
 				Spacer(minLength: 1)
@@ -110,11 +123,22 @@ private struct RecurringCard: View {
 			.background(Color(UIColor.secondarySystemGroupedBackground))
 			.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 			.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
+			.opacity(recurring.isPaused ? 0.5 : 1)
 		}
 		.buttonStyle(PlainButtonStyle())
 		.contextMenu {
 			Button(action: onEdit) {
 				Label("Modifier", systemImage: "pencil")
+			}
+			
+			if recurring.isPaused {
+				Button(action: onResume) {
+					Label("Réactiver", systemImage: "play.circle")
+				}
+			} else {
+				Button(action: onPause) {
+					Label("Mettre en pause", systemImage: "pause.circle")
+				}
 			}
 			
 			Button(role: .destructive, action: onDelete) {
@@ -130,10 +154,12 @@ private struct RecurringCard: View {
 	RecurringTransactionsGridView(
 		recurringTransactions: [
 			RecurringTransaction(amount: 750, comment: "Loyer", type: .expense, category: .rent, frequency: .monthly),
-			RecurringTransaction(amount: 2500, comment: "Salaire", type: .income, category: .salary, frequency: .monthly)
+			RecurringTransaction(amount: 2500, comment: "Salaire", type: .income, category: .salary, frequency: .monthly, isPaused: true)
 		],
 		onEdit: { _ in },
 		onDelete: { _ in },
+		onPause: { _ in },
+		onResume: { _ in },
 		onAddTap: {}
 	)
 	.padding()

@@ -89,7 +89,7 @@ struct AnalysesView: View {
 	/// Données avec taille minimale pour l'affichage du graphique (3% minimum)
 	private var chartDisplayData: [CategoryData] {
 		guard totalAmount > 0 else { return categoryData }
-		let minValue = totalAmount * 0.03
+		let minValue = totalAmount * 0.008
 		return categoryData.map {
 			CategoryData(category: $0.category, total: max($0.total, minValue), count: $0.count)
 		}
@@ -136,13 +136,21 @@ struct AnalysesView: View {
 				Section {
 					ForEach(categoryData) { item in
 						NavigationLink(value: CategoryDetailRoute(category: item.category, month: selectedMonth, year: selectedYear)) {
-							CategoryBreakdownRow(item: item, totalAmount: totalAmount)
+							CategoryBreakdownRow(item: item, totalAmount: totalAmount, isSelected: selectedSlice == item.category)
 						}
+						.listRowBackground(
+							selectedSlice == item.category
+								? item.category.color.opacity(0.12)
+								: Color(UIColor.secondarySystemGroupedBackground)
+						)
 					}
 				}
 			}
 		}
 		.listStyle(.insetGrouped)
+		.onChange(of: analysisType) { _ in
+			selectedSlice = nil
+		}
 	}
 	
 	// MARK: - Composants
@@ -161,7 +169,7 @@ struct AnalysesView: View {
 	private var monthNavigator: some View {
 		HStack {
 			Button {
-				goToPreviousMonth()
+				withAnimation { goToPreviousMonth() }
 			} label: {
 				Image(systemName: "chevron.left")
 					.font(.title3.weight(.semibold))
@@ -176,7 +184,7 @@ struct AnalysesView: View {
 			Spacer()
 			
 			Button {
-				goToNextMonth()
+				withAnimation { goToNextMonth() }
 			} label: {
 				Image(systemName: "chevron.right")
 					.font(.title3.weight(.semibold))
@@ -184,6 +192,18 @@ struct AnalysesView: View {
 			}
 			.disabled(isCurrentMonth)
 		}
+		.contentShape(Rectangle())
+		.gesture(
+			DragGesture(minimumDistance: 30)
+				.onEnded { value in
+					guard abs(value.translation.width) > abs(value.translation.height) else { return }
+					if value.translation.width > 0 {
+						withAnimation { goToPreviousMonth() }
+					} else if !isCurrentMonth {
+						withAnimation { goToNextMonth() }
+					}
+				}
+		)
 	}
 	
 	/// État vide quand aucune transaction
@@ -231,6 +251,8 @@ struct AnalysesView: View {
 						.foregroundStyle(.secondary)
 				}
 			}
+			.id(selectedSlice)
+			.transition(.opacity)
 		}
 		.frame(height: 240)
 		.chartOverlay { _ in
@@ -296,6 +318,7 @@ struct AnalysesView: View {
 	}
 	
 	private func goToPreviousMonth() {
+		selectedSlice = nil
 		if selectedMonth == 1 {
 			selectedMonth = 12
 			selectedYear -= 1
@@ -306,6 +329,7 @@ struct AnalysesView: View {
 	
 	private func goToNextMonth() {
 		guard !isCurrentMonth else { return }
+		selectedSlice = nil
 		if selectedMonth == 12 {
 			selectedMonth = 1
 			selectedYear += 1

@@ -118,6 +118,12 @@ struct HomeView: View {
 							recurringToDelete = recurring
 							showingDeleteRecurringConfirmation = true
 						},
+						onPause: { recurring in
+							withAnimation { accountsManager.pauseRecurringTransaction(recurring) }
+						},
+						onResume: { recurring in
+							withAnimation { accountsManager.resumeRecurringTransaction(recurring) }
+						},
 						onAddTap: { showingAddRecurringSheet = true }
 					)
 				}

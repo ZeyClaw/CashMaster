@@ -338,6 +338,38 @@ class AccountsManager: ObservableObject {
 		processRecurringTransactions()
 	}
 	
+	/// Met en pause une transaction récurrente : supprime ses transactions potentielles
+	/// et empêche la génération de nouvelles transactions tant que la pause est active.
+	func pauseRecurringTransaction(_ recurring: RecurringTransaction) {
+		guard let accountId = selectedAccountId,
+			  let index = transactionManagers[accountId]?.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
+		// Supprimer les transactions potentielles liées
+		transactionManagers[accountId]?.transactions.removeAll {
+			$0.recurringTransactionId == recurring.id && $0.potentiel
+		}
+		// Activer la pause
+		transactionManagers[accountId]?.recurringTransactions[index].isPaused = true
+		save()
+		objectWillChange.send()
+	}
+	
+	/// Réactive une transaction récurrente en pause.
+	/// Met à jour lastGeneratedDate à aujourd'hui pour éviter de générer
+	/// rétroactivement les occurrences manquées pendant la pause.
+	func resumeRecurringTransaction(_ recurring: RecurringTransaction) {
+		guard let accountId = selectedAccountId,
+			  let index = transactionManagers[accountId]?.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
+		// Reprendre à partir d'aujourd'hui (pas de rattrapage rétroactif)
+		let calendar = Calendar.current
+		let yesterday = calendar.date(byAdding: .day, value: -1, to: calendar.startOfDay(for: Date()))!
+		transactionManagers[accountId]?.recurringTransactions[index].isPaused = false
+		transactionManagers[accountId]?.recurringTransactions[index].lastGeneratedDate = yesterday
+		save()
+		objectWillChange.send()
+		// Regénérer les transactions à venir (à partir d'aujourd'hui)
+		processRecurringTransactions()
+	}
+	
 	/// Génère automatiquement les transactions potentielles pour les récurrences à venir (< 1 mois)
 	/// et valide celles dont la date est aujourd'hui ou passée.
 	/// Appelé au lancement de l'app, après chaque ajout/modification de récurrence,
@@ -354,6 +386,8 @@ class AccountsManager: ObservableObject {
 			
 			for i in manager.recurringTransactions.indices {
 				let recurring = manager.recurringTransactions[i]
+				// Ne pas générer de transactions pour les récurrences en pause
+				guard !recurring.isPaused else { continue }
 				let pending = recurring.pendingTransactions()
 				
 				for entry in pending {

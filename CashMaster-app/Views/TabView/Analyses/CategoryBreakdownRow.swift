@@ -11,6 +11,7 @@ import SwiftUI
 struct CategoryBreakdownRow: View {
 	let item: CategoryData
 	let totalAmount: Double
+	var isSelected: Bool = false
 	
 	/// Pourcentage de cette catégorie par rapport au total
 	private var percentage: Double {
