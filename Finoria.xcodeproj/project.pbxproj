@@ -48,6 +48,8 @@
 		F8388EAC2F3E3FC00081F2F9 /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EAB2F3E3FC00081F2F9 /* ViewModifiers.swift */; };
 		F8388EAF2F3E3FDE0081F2F9 /* RecurrenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EAD2F3E3FDD0081F2F9 /* RecurrenceEngine.swift */; };
 		F8388EB02F3E3FDE0081F2F9 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EAE2F3E3FDD0081F2F9 /* StorageService.swift */; };
+		F8388EB32F3E580C0081F2F9 /* AnalysesModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EB12F3E580C0081F2F9 /* AnalysesModels.swift */; };
+		F8388EB42F3E580C0081F2F9 /* AnalysesPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EB22F3E580C0081F2F9 /* AnalysesPieChart.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
 		F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */; };
@@ -122,6 +124,8 @@
 		F8388EAB2F3E3FC00081F2F9 /* ViewModifiers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
 		F8388EAD2F3E3FDD0081F2F9 /* RecurrenceEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecurrenceEngine.swift; sourceTree = "<group>"; };
 		F8388EAE2F3E3FDD0081F2F9 /* StorageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		F8388EB12F3E580C0081F2F9 /* AnalysesModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysesModels.swift; sourceTree = "<group>"; };
+		F8388EB22F3E580C0081F2F9 /* AnalysesPieChart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysesPieChart.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -310,6 +314,8 @@
 		F8388EA22F3DE67B0081F2F9 /* Analyses */ = {
 			isa = PBXGroup;
 			children = (
+				F8388EB12F3E580C0081F2F9 /* AnalysesModels.swift */,
+				F8388EB22F3E580C0081F2F9 /* AnalysesPieChart.swift */,
 				F8388EA92F3DF5470081F2F9 /* CategoryTransactionsView.swift */,
 				F8388EA32F3DE67B0081F2F9 /* CategoryBreakdownRow.swift */,
 				F8388EA42F3DE67B0081F2F9 /* AnalysesTabView.swift */,
@@ -532,6 +538,7 @@
 				F810E3142E46082900C2DFA9 /* AddWidgetShortcutView.swift in Sources */,
 				F8388E8F2F3563DD0081F2F9 /* CurrencyTextField.swift in Sources */,
 				F8388E932F356B670081F2F9 /* FutureTabView.swift in Sources */,
+				F8388EB32F3E580C0081F2F9 /* AnalysesModels.swift in Sources */,
 				F8B818FD2F06D137002D02F2 /* HomeTabView.swift in Sources */,
 				F8388EA72F3DE67B0081F2F9 /* AnalysesTabView.swift in Sources */,
 				F8388E8B2F3563CC0081F2F9 /* DateFormatting.swift in Sources */,
@@ -556,6 +563,7 @@
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
 				F8388EB02F3E3FDE0081F2F9 /* StorageService.swift in Sources */,
 				F810E30C2E44D4F100C2DFA9 /* AccountPickerView.swift in Sources */,
+				F8388EB42F3E580C0081F2F9 /* AnalysesPieChart.swift in Sources */,
 				F8388EA62F3DE67B0081F2F9 /* CategoryBreakdownRow.swift in Sources */,
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
 				F800A3F72E5C72F200918507 /* ToastCard.swift in Sources */,
