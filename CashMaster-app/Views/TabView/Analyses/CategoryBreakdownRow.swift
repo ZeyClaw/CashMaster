@@ -11,7 +11,6 @@ import SwiftUI
 struct CategoryBreakdownRow: View {
 	let item: CategoryData
 	let totalAmount: Double
-	let isSelected: Bool
 	
 	/// Pourcentage de cette catégorie par rapport au total
 	private var percentage: Double {
@@ -43,14 +42,6 @@ struct CategoryBreakdownRow: View {
 					.font(.caption)
 					.foregroundStyle(.secondary)
 			}
-			
-			// Chevron de navigation
-			Image(systemName: "chevron.right")
-				.font(.caption.weight(.semibold))
-				.foregroundStyle(.tertiary)
 		}
-		.padding(.horizontal, 16)
-		.padding(.vertical, 10)
-		.background(isSelected ? item.category.color.opacity(0.08) : Color.clear)
 	}
 }

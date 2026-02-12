@@ -12,12 +12,14 @@ import SwiftUI
 struct CategoryTransactionsView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	let category: TransactionCategory
+	let month: Int
+	let year: Int
 	
 	@State private var transactionToEdit: Transaction? = nil
 	
-	/// Transactions validées de cette catégorie, triées par date décroissante
+	/// Transactions validées de cette catégorie pour le mois sélectionné, triées par date décroissante
 	private var categoryTransactions: [Transaction] {
-		accountsManager.validatedTransactions(year: nil, month: nil)
+		accountsManager.validatedTransactions(year: year, month: month)
 			.filter { ($0.category ?? .other) == category }
 			.sorted { ($0.date ?? Date.distantPast) > ($1.date ?? Date.distantPast) }
 	}
@@ -101,7 +103,9 @@ struct CategoryTransactionsView: View {
 	NavigationStack {
 		CategoryTransactionsView(
 			accountsManager: AccountsManager(),
-			category: .food
+			category: .food,
+			month: 2,
+			year: 2026
 		)
 	}
 }

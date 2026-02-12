@@ -11,8 +11,6 @@ import SwiftUI
 struct AnalysesTabView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	@State private var showingAccountPicker = false
-	@State private var analysisMonth: Int = Calendar.current.component(.month, from: Date())
-	@State private var analysisYear: Int = Calendar.current.component(.year, from: Date())
 	
 	var body: some View {
 		NavigationStack {
@@ -33,10 +31,12 @@ struct AnalysesTabView: View {
 					.sheet(isPresented: $showingAccountPicker) {
 						AccountPickerView(accountsManager: accountsManager)
 					}
-					.navigationDestination(for: TransactionCategory.self) { category in
+					.navigationDestination(for: CategoryDetailRoute.self) { route in
 						CategoryTransactionsView(
 							accountsManager: accountsManager,
-							category: category
+							category: route.category,
+							month: route.month,
+							year: route.year
 						)
 					}
 			} else {

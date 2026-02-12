@@ -25,6 +25,14 @@ enum AnalysisType: String, CaseIterable {
 	case income = "Revenus"
 }
 
+// MARK: - Route de navigation vers le détail d'une catégorie
+
+struct CategoryDetailRoute: Hashable {
+	let category: TransactionCategory
+	let month: Int
+	let year: Int
+}
+
 // MARK: - Vue principale Analyses
 
 /// Vue affichant la répartition des dépenses ou revenus par catégorie
@@ -36,7 +44,6 @@ struct AnalysesView: View {
 	@State private var selectedMonth: Int
 	@State private var selectedYear: Int
 	@State private var selectedSlice: TransactionCategory?
-	@State private var showingCategoryDetail: TransactionCategory?
 	
 	init(accountsManager: AccountsManager) {
 		self.accountsManager = accountsManager
@@ -79,6 +86,20 @@ struct AnalysesView: View {
 		categoryData.reduce(0) { $0 + $1.total }
 	}
 	
+	/// Données avec taille minimale pour l'affichage du graphique (3% minimum)
+	private var chartDisplayData: [CategoryData] {
+		guard totalAmount > 0 else { return categoryData }
+		let minValue = totalAmount * 0.03
+		return categoryData.map {
+			CategoryData(category: $0.category, total: max($0.total, minValue), count: $0.count)
+		}
+	}
+	
+	/// Total des données d'affichage (pour le calcul des angles)
+	private var displayTotal: Double {
+		chartDisplayData.reduce(0) { $0 + $1.total }
+	}
+	
 	/// Nom du mois formaté
 	private var monthName: String {
 		let formatter = DateFormatter()
@@ -94,27 +115,34 @@ struct AnalysesView: View {
 	// MARK: - Body
 	
 	var body: some View {
-		ScrollView {
-			VStack(spacing: 24) {
-				// Sélecteur Dépenses / Revenus
+		List {
+			// Section contrôles
+			Section {
 				segmentedControl
-				
-				// Navigation mensuelle
 				monthNavigator
-				
-				if categoryData.isEmpty {
+			}
+			
+			if categoryData.isEmpty {
+				Section {
 					emptyStateView
-				} else {
-					// Graphique camembert
+				}
+			} else {
+				// Section graphique
+				Section {
 					pieChart
-					
-					// Détail par catégorie
-					categoryList
+				}
+				
+				// Section détail par catégorie
+				Section {
+					ForEach(categoryData) { item in
+						NavigationLink(value: CategoryDetailRoute(category: item.category, month: selectedMonth, year: selectedYear)) {
+							CategoryBreakdownRow(item: item, totalAmount: totalAmount)
+						}
+					}
 				}
 			}
-			.padding()
 		}
-		.background(Color(.systemGroupedBackground))
+		.listStyle(.insetGrouped)
 	}
 	
 	// MARK: - Composants
@@ -156,7 +184,6 @@ struct AnalysesView: View {
 			}
 			.disabled(isCurrentMonth)
 		}
-		.padding(.horizontal, 4)
 	}
 	
 	/// État vide quand aucune transaction
@@ -173,91 +200,90 @@ struct AnalysesView: View {
 		.padding(.vertical, 60)
 	}
 	
-	/// Graphique camembert avec Swift Charts
+	/// Graphique camembert avec Swift Charts et interaction tap
 	private var pieChart: some View {
-		VStack(spacing: 12) {
-			Chart(categoryData) { item in
-				SectorMark(
-					angle: .value("Montant", item.total),
-					innerRadius: .ratio(0.6),
-					angularInset: 1.5
-				)
-				.foregroundStyle(item.category.color)
-				.opacity(selectedSlice == nil || selectedSlice == item.category ? 1 : 0.4)
-			}
-			.chartAngleSelection(value: $chartAngleSelection)
-			.chartBackground { _ in
-				// Montant total ou détail catégorie au centre du donut
-				VStack(spacing: 2) {
-					if let selected = selectedSlice,
-					   let data = categoryData.first(where: { $0.category == selected }) {
-						StyleIconView(style: selected, size: 28)
-						Text(data.total, format: .currency(code: "EUR"))
-							.font(.title3.weight(.bold))
-							.minimumScaleFactor(0.6)
-						Text(selected.label)
-							.font(.caption)
-							.foregroundStyle(.secondary)
-					} else {
-						Text(totalAmount, format: .currency(code: "EUR"))
-							.font(.title2.weight(.bold))
-							.minimumScaleFactor(0.6)
-						Text(analysisType == .expenses ? "dépensés" : "gagnés")
-							.font(.caption)
-							.foregroundStyle(.secondary)
-					}
-				}
-			}
-			.frame(height: 240)
-			.onChange(of: chartAngleSelection) { _, newValue in
-				withAnimation(.easeInOut(duration: 0.2)) {
-					selectedSlice = findCategory(for: newValue)
+		Chart(chartDisplayData) { item in
+			SectorMark(
+				angle: .value("Montant", item.total),
+				innerRadius: .ratio(0.6),
+				angularInset: 1.5
+			)
+			.foregroundStyle(item.category.color)
+			.opacity(selectedSlice == nil || selectedSlice == item.category ? 1 : 0.4)
+		}
+		.chartBackground { _ in
+			VStack(spacing: 2) {
+				if let selected = selectedSlice,
+				   let data = categoryData.first(where: { $0.category == selected }) {
+					StyleIconView(style: selected, size: 28)
+					Text(data.total, format: .currency(code: "EUR"))
+						.font(.title3.weight(.bold))
+						.minimumScaleFactor(0.6)
+					Text(selected.label)
+						.font(.caption)
+						.foregroundStyle(.secondary)
+				} else {
+					Text(totalAmount, format: .currency(code: "EUR"))
+						.font(.title2.weight(.bold))
+						.minimumScaleFactor(0.6)
+					Text(analysisType == .expenses ? "dépensés" : "gagnés")
+						.font(.caption)
+						.foregroundStyle(.secondary)
 				}
 			}
 		}
-		.padding()
-		.background(Color(.secondarySystemGroupedBackground))
-		.clipShape(RoundedRectangle(cornerRadius: 16))
+		.frame(height: 240)
+		.chartOverlay { _ in
+			GeometryReader { geometry in
+				Rectangle().fill(.clear).contentShape(Rectangle())
+					.onTapGesture { location in
+						handleChartTap(at: location, in: geometry.size)
+					}
+			}
+		}
 	}
 	
-	/// Trouve la catégorie correspondant à une valeur angulaire du graphique
-	private func findCategory(for value: Double?) -> TransactionCategory? {
-		guard let value else { return nil }
+	// MARK: - Interaction graphique
+	
+	/// Gère le tap sur le graphique : sélectionne une tranche si le tap est sur l'anneau,
+	/// désélectionne sinon
+	private func handleChartTap(at location: CGPoint, in size: CGSize) {
+		let center = CGPoint(x: size.width / 2, y: size.height / 2)
+		let dx = location.x - center.x
+		let dy = location.y - center.y
+		let distance = sqrt(dx * dx + dy * dy)
+		let outerRadius = min(size.width, size.height) / 2
+		let innerRadius = outerRadius * 0.6
+		
+		guard distance >= innerRadius && distance <= outerRadius else {
+			withAnimation(.easeInOut(duration: 0.2)) {
+				selectedSlice = nil
+			}
+			return
+		}
+		
+		// Angle depuis le haut (12h), sens horaire
+		var angle = atan2(dx, -dy)
+		if angle < 0 { angle += 2 * .pi }
+		let fraction = angle / (2 * .pi)
+		let angleValue = fraction * displayTotal
+		
+		let found = findCategory(for: angleValue)
+		withAnimation(.easeInOut(duration: 0.2)) {
+			selectedSlice = (selectedSlice == found) ? nil : found
+		}
+	}
+	
+	/// Trouve la catégorie correspondant à une valeur cumulée dans le graphique
+	private func findCategory(for value: Double) -> TransactionCategory? {
 		var cumulative: Double = 0
-		for item in categoryData {
+		for item in chartDisplayData {
 			cumulative += item.total
 			if value <= cumulative {
 				return item.category
 			}
 		}
 		return nil
-	}
-	
-	/// Valeur angulaire sélectionnée sur le graphique
-	@State private var chartAngleSelection: Double?
-	
-	/// Liste détaillée par catégorie
-	private var categoryList: some View {
-		VStack(spacing: 0) {
-			ForEach(categoryData) { item in
-				NavigationLink(value: item.category) {
-					CategoryBreakdownRow(
-						item: item,
-						totalAmount: totalAmount,
-						isSelected: selectedSlice == item.category
-					)
-				}
-				.buttonStyle(PlainButtonStyle())
-				
-				if item.id != categoryData.last?.id {
-					Divider()
-						.padding(.leading, 56)
-				}
-			}
-		}
-		.padding(.vertical, 8)
-		.background(Color(.secondarySystemGroupedBackground))
-		.clipShape(RoundedRectangle(cornerRadius: 16))
 	}
 	
 	// MARK: - Navigation temporelle
