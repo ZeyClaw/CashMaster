@@ -53,7 +53,7 @@ private struct ShortcutsHeader: View {
 				HStack(spacing: 4) {
 					Image(systemName: "plus")
 						.font(.system(size: 12, weight: .bold))
-					Text("Ajouter Widget")
+					Text("Ajouter")
 						.font(.system(size: 11, weight: .bold))
 				}
 				.foregroundStyle(.blue)

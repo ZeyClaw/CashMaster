@@ -99,8 +99,14 @@ struct StyleIconView<Style: StylableEnum>: View {
 // MARK: - Formatage compact des montants
 
 /// Formate un montant de manière compacte pour tenir dans un espace restreint.
+/// Utilise la locale du système (virgule pour les français, point pour les anglophones, etc.)
 /// Réduit progressivement la précision : 2 850,00 € → 2 850 € → 2,85k € → 2,9k € → 3k €
 func compactAmount(_ value: Double) -> String {
+	let formatter = NumberFormatter()
+	formatter.locale = Locale.current
+	formatter.numberStyle = .decimal
+	formatter.usesGroupingSeparator = false
+	
 	let thresholds: [(limit: Double, divisor: Double, suffix: String)] = [
 		(1_000_000_000, 1_000_000_000, "G"),
 		(1_000_000, 1_000_000, "M"),
@@ -110,19 +116,27 @@ func compactAmount(_ value: Double) -> String {
 	for t in thresholds where value >= t.limit {
 		let reduced = value / t.divisor
 		if reduced == reduced.rounded(.down) {
-			return String(format: "%.0f%@", reduced, t.suffix)
+			formatter.minimumFractionDigits = 0
+			formatter.maximumFractionDigits = 0
 		} else if (reduced * 10).rounded() == (reduced * 10) {
-			return String(format: "%.1f%@", reduced, t.suffix)
+			formatter.minimumFractionDigits = 1
+			formatter.maximumFractionDigits = 1
 		} else {
-			return String(format: "%.2f%@", reduced, t.suffix)
+			formatter.minimumFractionDigits = 2
+			formatter.maximumFractionDigits = 2
 		}
+		return "\(formatter.string(from: NSNumber(value: reduced)) ?? "\(reduced)")\(t.suffix)"
 	}
 	
 	if value == value.rounded(.down) {
-		return String(format: "%.0f", value)
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 0
 	} else if (value * 10).rounded() == (value * 10) {
-		return String(format: "%.1f", value)
+		formatter.minimumFractionDigits = 1
+		formatter.maximumFractionDigits = 1
 	} else {
-		return String(format: "%.2f", value)
+		formatter.minimumFractionDigits = 2
+		formatter.maximumFractionDigits = 2
 	}
+	return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
 }

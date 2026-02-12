@@ -11,9 +11,7 @@ import SwiftUI
 struct HomeTabView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	@State private var showingAccountPicker = false
-	@State private var showingShareSheet = false
 	@State private var showingDocumentPicker = false
-	@State private var csvFileURL: URL?
 	@State private var importedCount: Int = 0
 	@State private var showExportSuccessAlert = false
 	@State private var showExportErrorAlert = false
@@ -31,7 +29,7 @@ struct HomeTabView: View {
 							HStack(spacing: 3) {
 								// Bouton Export CSV
 								Button {
-									exportCSV()
+									shareCSV()
 								} label: {
 									Image(systemName: "square.and.arrow.up")
 										.imageScale(.large)
@@ -61,11 +59,6 @@ struct HomeTabView: View {
 					}
 					.sheet(isPresented: $showingAccountPicker) {
 						AccountPickerView(accountsManager: accountsManager)
-					}
-					.sheet(isPresented: $showingShareSheet) {
-						if let url = csvFileURL {
-							ActivityViewController(activityItems: [url])
-						}
 					}
 					.sheet(isPresented: $showingDocumentPicker) {
 						DocumentPicker { url in
@@ -111,17 +104,31 @@ struct HomeTabView: View {
 		}
 	}
 	
-	// MARK: - Export CSV
-	private func exportCSV() {
-		if let url = accountsManager.generateCSV() {
-			csvFileURL = url
-			// Attendre un tick pour que csvFileURL soit mis à jour
-			DispatchQueue.main.async {
-				showingShareSheet = true
-			}
-		} else {
+	// MARK: - Export CSV (présentation UIKit directe pour éviter le bug de sheet blanche au 1er lancement)
+	private func shareCSV() {
+		guard let url = accountsManager.generateCSV() else {
 			showExportErrorAlert = true
+			return
 		}
+		
+		let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+		
+		guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+			  let rootVC = windowScene.windows.first?.rootViewController else { return }
+		
+		// Trouver le VC le plus haut dans la pile de présentation
+		var topVC = rootVC
+		while let presented = topVC.presentedViewController {
+			topVC = presented
+		}
+		
+		// Support iPad (popover)
+		activityVC.popoverPresentationController?.sourceView = topVC.view
+		activityVC.popoverPresentationController?.sourceRect = CGRect(
+			x: topVC.view.bounds.midX, y: 0, width: 0, height: 0
+		)
+		
+		topVC.present(activityVC, animated: true)
 	}
 	
 	// MARK: - Import CSV
@@ -134,20 +141,6 @@ struct HomeTabView: View {
 			showImportErrorAlert = true
 		}
 	}
-}
-
-// MARK: - Activity View Controller
-struct ActivityViewController: UIViewControllerRepresentable {
-	let activityItems: [Any]
-	
-	func makeUIViewController(context: Context) -> UIActivityViewController {
-		UIActivityViewController(
-			activityItems: activityItems,
-			applicationActivities: nil
-		)
-	}
-	
-	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {

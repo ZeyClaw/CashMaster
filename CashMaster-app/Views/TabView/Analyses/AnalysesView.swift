@@ -258,7 +258,7 @@ struct AnalysesView: View {
 			Image(systemName: analysisType == .expenses ? "cart" : "banknote")
 				.font(.system(size: 48))
 				.foregroundStyle(.tertiary)
-			Text("Aucune \(analysisType == .expenses ? "dépense" : "revenu") ce mois")
+			Text(analysisType == .expenses ? "Aucune dépense ce mois" : "Aucun revenu ce mois")
 				.font(.headline)
 				.foregroundStyle(.secondary)
 		}
