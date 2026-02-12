@@ -14,38 +14,15 @@ struct CalendrierMainView: View {
 	
 	var body: some View {
 		NavigationStack {
-			if accountsManager.selectedAccountId != nil {
-				CalendrierTabView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
-						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
-			} else {
-				NoAccountView(accountsManager: accountsManager)
-					.navigationTitle("Calendrier")
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
-						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
+			Group {
+				if accountsManager.selectedAccountId != nil {
+					CalendrierTabView(accountsManager: accountsManager)
+				} else {
+					NoAccountView(accountsManager: accountsManager)
+						.navigationTitle("Calendrier")
+				}
 			}
+			.accountPickerToolbar(isPresented: $showingAccountPicker, accountsManager: accountsManager)
 		}
 	}
 }

@@ -66,7 +66,7 @@ struct CategoryTransactionsView: View {
 									}
 							}
 						} header: {
-							Text(formatDayHeader(group.date))
+							Text(group.date.dayHeaderFormatted())
 								.font(.subheadline)
 								.fontWeight(.semibold)
 								.foregroundStyle(.secondary)
@@ -81,22 +81,6 @@ struct CategoryTransactionsView: View {
 		}
 	}
 	
-	// MARK: - Helpers
-	
-	private func formatDayHeader(_ date: Date) -> String {
-		let calendar = Calendar.current
-		let formatter = DateFormatter()
-		formatter.locale = Locale(identifier: "fr_FR")
-		
-		if calendar.isDateInToday(date) {
-			return "Aujourd'hui"
-		} else if calendar.isDateInYesterday(date) {
-			return "Hier"
-		} else {
-			formatter.dateFormat = "EEEE d MMMM yyyy"
-			return formatter.string(from: date).capitalized
-		}
-	}
 }
 
 #Preview {

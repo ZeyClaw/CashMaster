@@ -2,65 +2,83 @@
 
 > Application iOS de gestion de finances personnelles — Simple, Native, Efficace
 
+![Swift](https://img.shields.io/badge/Swift-5.9+-F05138?logo=swift&logoColor=white)
+![iOS](https://img.shields.io/badge/iOS-16+-000000?logo=apple&logoColor=white)
+![SwiftUI](https://img.shields.io/badge/UI-SwiftUI-007AFF?logo=swift&logoColor=white)
+![Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen)
+![License](https://img.shields.io/badge/License-Private-lightgrey)
+
 ---
 
-## 🎯 Vision Générale
+## 🎯 Vision
 
 **Finoria** est une application de gestion budgétaire conçue pour être :
 
-- **📱 100% Native** — SwiftUI pur, aucune dépendance externe
-- **⚡ Rapide** — Interface réactive avec état centralisé
-- **🔒 Privée** — Données stockées localement (UserDefaults)
-- **🧩 Maintenable** — Architecture claire avec séparation des responsabilités
+- **📱 100% Native** — SwiftUI pur, zéro dépendance externe
+- **⚡ Réactive** — État centralisé, rafraîchissement instantané
+- **🔒 Privée** — Données stockées uniquement en local (UserDefaults)
+- **🧩 Maintenable** — Architecture composée, testable, DRY
 
-### Fonctionnalités Clés
+### Fonctionnalités
 
 | Fonctionnalité | Description |
 |----------------|-------------|
 | Multi-comptes | Gérez plusieurs comptes avec styles personnalisés |
-| Transactions potentielles | Planifiez vos dépenses futures |
-| Calendrier financier | Visualisez votre historique par année/mois |
-| Export CSV | Exportez vos données pour analyse externe |
-| Import CSV | Restaurez vos données depuis un fichier |
-| Raccourcis rapides | Ajoutez des transactions récurrentes en un tap |
-| Transactions récurrentes | Automatisez vos dépenses/revenus périodiques (loyer, salaire, abonnements...) |
+| Transactions récurrentes | Automatisez loyer, salaire, abonnements… |
+| Transactions potentielles | Planifiez vos dépenses/revenus futurs |
+| Calendrier financier | Historique par année / mois avec navigation |
+| Analyses | Répartition par catégorie (camembert Swift Charts) |
+| Raccourcis rapides | Ajoutez une transaction récurrente en un tap |
+| Export / Import CSV | Sauvegardez et restaurez vos données |
 
 ---
 
 ## 🏗️ Architecture
 
-### Pattern: Observable + Single Source of Truth
+### Composition de Services (v3.0)
 
 ```
-┌──────────────┐     observe      ┌─────────────────┐
-│    Views     │ ◀─────────────── │ AccountsManager │
-│  (SwiftUI)   │                  │ (ObservableObj) │
-└──────────────┘ ───────────────▶ └─────────────────┘
-                   appelle méthodes        │
-                                           │ délègue
-                                           ▼
-                                  ┌─────────────────┐
-                                  │    Services     │
-                                  │ (Calcul, CSV)   │
-                                  └─────────────────┘
+┌──────────────┐     observe      ┌──────────────────┐
+│    Views     │ ◀─────────────── │  AccountsManager │
+│  (SwiftUI)   │                  │  (Orchestrateur) │
+└──────────────┘ ───────────────▶ └──────────────────┘
+                   appelle méthodes       │
+                        ┌─────────────────┼─────────────────┐
+                        ▼                 ▼                 ▼
+               ┌────────────────┐ ┌────────────────┐ ┌────────────────┐
+               │ StorageService │ │RecurrenceEngine│ │CalculationSvc  │
+               │  (Persistance) │ │  (Récurrences) │ │  (Calculs)     │
+               └────────────────┘ └────────────────┘ └────────────────┘
+                                                      ┌────────────────┐
+                                                      │   CSVService   │
+                                                      │ (Import/Export)│
+                                                      └────────────────┘
 ```
 
-**Principe fondamental** : Toute modification passe par `AccountsManager`, qui :
-1. Délègue le travail aux services spécialisés
-2. Notifie SwiftUI via `@Published`
-3. Persiste les données via `UserDefaults`
+**Principe** : `AccountsManager` est un orchestrateur léger (~240 lignes) qui :
+1. **Délègue** la persistance à `StorageService`
+2. **Délègue** la génération récurrente à `RecurrenceEngine`
+3. **Délègue** les calculs à `CalculationService` / `CSVService`
+4. **Notifie** SwiftUI via `objectWillChange`
+5. **Persiste** automatiquement via son helper `persist()`
 
 ### Structure des Dossiers
 
 ```
 CashMaster-app/
-├── Models/      → Données (Account, Transaction, RecurringTransaction, AccountsManager)
-├── Services/    → Logique métier (CalculationService, CSVService)
-├── Extensions/  → Utilitaires (DateFormatting, StylableEnum)
-└── Views/       → Interface utilisateur (SwiftUI)
+├── Models/         → Données & orchestration (Account, Transaction, AccountsManager…)
+├── Services/       → Logique métier (StorageService, RecurrenceEngine, CalculationService, CSVService)
+├── Extensions/     → Utilitaires partagés (DateFormatting, StylableEnum, ViewModifiers)
+└── Views/          → Interface utilisateur (SwiftUI)
+    ├── Account/        Gestion comptes
+    ├── Components/     Composants réutilisables
+    ├── Recurring/      Transactions récurrentes
+    ├── TabView/        Onglets principaux (Home, Calendrier, Analyses, Future)
+    ├── Transactions/   Ajout / ligne de transaction
+    └── Widget/         Raccourcis & Toast
 ```
 
-📚 Pour une documentation technique détaillée, voir [STRUCTURE_APP.md](STRUCTURE_APP.md).
+📚 Documentation technique complète → [STRUCTURE_APP.md](STRUCTURE_APP.md)
 
 ---
 
@@ -71,41 +89,52 @@ CashMaster-app/
 ```swift
 // ✅ Correct
 func addTransaction(_ transaction: Transaction)
-func totalForMonth(_ month: Int, year: Int) -> Double
 var selectedAccountId: UUID?
 
 // ❌ À éviter
-func ajouterTransaction(_ transaction: Transaction)
-func total_for_month(_ month: Int, year: Int) -> Double
+func ajouterTransaction(_ t: Transaction)
 var selected_account_id: UUID?
 ```
 
 ### 2. Responsabilité Unique (SRP)
 
-| Classe | Responsabilité UNIQUE |
+| Couche | Responsabilité UNIQUE |
 |--------|----------------------|
-| `AccountsManager` | Orchestration et état global |
-| `TransactionManager` | Opérations CRUD par compte |
+| `AccountsManager` | Orchestration, état global, notifications SwiftUI |
+| `StorageService` | Encodage / décodage UserDefaults |
+| `RecurrenceEngine` | Génération & auto-validation des récurrences |
+| `TransactionManager` | CRUD par compte (collection de transactions) |
 | `CalculationService` | Calculs financiers purs |
-| `CSVService` | Import/Export fichiers |
+| `CSVService` | Import / Export fichiers |
+| `ViewModifiers` | Modifiers & formatters partagés |
 | Vues | Affichage uniquement |
 
 ### 3. Immutabilité des Transactions
-
-Les transactions sont des **structs immuables**. Pour modifier :
 
 ```swift
 // ❌ INTERDIT (Transaction est un struct)
 transaction.amount = 50.0
 
-// ✅ CORRECT (crée une nouvelle instance)
+// ✅ CORRECT
 let updated = transaction.modified(amount: 50.0)
 accountsManager.updateTransaction(updated)
 ```
 
-### 4. Protocoles Génériques
+### 4. DRY via Extensions Partagées
 
-Pour éviter la duplication, les enums de style conforment à `StylableEnum` :
+```swift
+// Modifier partagé — plus de duplication de toolbar account-picker
+.accountPickerToolbar(isPresented: $showSheet, accountsManager: mgr)
+
+// Background adaptatif — remplace le code répété dans 3+ vues
+.adaptiveGroupedBackground()
+
+// Formatting centralisé
+date.dayHeaderFormatted()   // "Lundi 14 Juillet 2025"
+amount.formattedCurrency    // "1 234,56"
+```
+
+### 5. Protocoles Génériques
 
 ```swift
 protocol StylableEnum: CaseIterable, Identifiable, Hashable {
@@ -113,100 +142,35 @@ protocol StylableEnum: CaseIterable, Identifiable, Hashable {
     var color: Color { get }
     var label: String { get }
 }
-
-// Utilisable avec le composant générique
-StylePickerGrid<AccountStyle>(selectedStyle: $style)
-StylePickerGrid<ShortcutStyle>(selectedStyle: $style)
+// → StylePickerGrid<AccountStyle>, StylePickerGrid<ShortcutStyle>
 ```
 
 ---
 
 ## 🔧 Guide de Maintenance
 
-### Ajouter un Nouveau Type de Transaction
+### Ajouter un Nouveau Service
 
-1. **Modifier l'enum** dans [Transaction.swift](CashMaster-app/Models/Transaction.swift) :
+1. Créer `Services/NewService.swift` avec **fonctions statiques pures**
+2. Appeler depuis `AccountsManager`, jamais depuis les vues
+3. Documenter dans `STRUCTURE_APP.md`
+
 ```swift
-enum TransactionType: String, Codable, CaseIterable {
-    case income, expense
-    case newType  // ← Ajouter ici
+struct NewService {
+    static func compute(_ data: [Transaction]) -> Double { /* … */ }
 }
 ```
-
-2. **Mettre à jour l'icône/couleur** si nécessaire dans les vues.
-
-### Ajouter un Nouveau Style de Compte
-
-1. **Modifier l'enum** dans [Account.swift](CashMaster-app/Models/Account.swift) :
-```swift
-enum AccountStyle: String, Codable, CaseIterable, StylableEnum {
-    // ... cases existants
-    case newStyle  // ← Ajouter ici
-    
-    var icon: String {
-        switch self {
-        // ... cases existants
-        case .newStyle: return "star.fill"
-        }
-    }
-    
-    var color: Color {
-        switch self {
-        // ... cases existants
-        case .newStyle: return .orange
-        }
-    }
-    
-    var label: String {
-        switch self {
-        // ... cases existants
-        case .newStyle: return "Nouveau"
-        }
-    }
-}
-```
-
-2. **C'est tout !** Le `StylePickerGrid` affichera automatiquement le nouveau style.
 
 ### Ajouter une Nouvelle Vue
 
-1. Créer le fichier dans le dossier approprié (`Views/` ou sous-dossier)
-2. Injecter `AccountsManager` via `@EnvironmentObject`
-3. Pour modifier des données, toujours appeler les méthodes d'`AccountsManager`
+1. Créer dans le sous-dossier `Views/` approprié
+2. Injecter via `@EnvironmentObject var accountsManager: AccountsManager`
+3. Utiliser les modifiers partagés (`.adaptiveGroupedBackground()`, `.accountPickerToolbar(…)`)
+4. Aucune logique métier dans la vue — déléguer au manager
 
-```swift
-struct NouvelleVue: View {
-    @EnvironmentObject var accountsManager: AccountsManager
-    
-    var body: some View {
-        Button("Ajouter") {
-            // ✅ Passe par le manager
-            accountsManager.addTransaction(transaction)
-        }
-    }
-}
-```
+### Ajouter un Style (Compte / Raccourci)
 
-### Ajouter un Nouveau Service
-
-1. Créer un fichier dans `Services/`
-2. Utiliser des **fonctions statiques** pures (sans état)
-3. Appeler depuis `AccountsManager`, jamais directement depuis les vues
-
-```swift
-// Services/NewService.swift
-struct NewService {
-    static func calculate(_ data: [Transaction]) -> Double {
-        // Logique pure, sans effets de bord
-    }
-}
-
-// Dans AccountsManager
-func useNewService() {
-    let result = NewService.calculate(transactions)
-    // ...
-}
-```
+Ajouter un `case` dans l'enum `StylableEnum` concerné + ses propriétés `icon`, `color`, `label`. Le `StylePickerGrid` l'affichera automatiquement.
 
 ---
 
@@ -217,11 +181,12 @@ func useNewService() {
 | **Plateforme** | iOS 16+ |
 | **Langage** | Swift 5.9+ |
 | **UI** | SwiftUI (100%) |
-| **État** | `@Published`, `@ObservedObject`, `@State` |
-| **Navigation** | `NavigationStack`, `navigationDestination` |
-| **Persistance** | `UserDefaults` + `Codable` (JSON) |
+| **Graphiques** | Swift Charts |
+| **État** | `@Published`, `@EnvironmentObject`, `@State` |
+| **Navigation** | `NavigationStack` + `navigationDestination` |
+| **Persistance** | `UserDefaults` + `Codable` (JSON) via `StorageService` |
 | **Notifications** | `UNUserNotificationCenter` |
-| **Dépendances** | **Aucune** (100% natif Apple) |
+| **Dépendances** | **0** — 100% natif Apple |
 
 ---
 
@@ -229,21 +194,18 @@ func useNewService() {
 
 ### Prérequis
 
-- macOS 13+ (Ventura ou ultérieur)
+- macOS 13+ (Ventura)
 - Xcode 15+
 - iOS Simulator ou appareil physique iOS 16+
 
-### Lancer le Projet
+### Lancer
 
 ```bash
-# Ouvrir dans Xcode
-open Finoria.xcodeproj
-
-# Compiler et lancer
-Cmd + R
+open Finoria.xcodeproj   # Ouvrir dans Xcode
+# ⌘R pour compiler et lancer
 ```
 
-### Structure des Schémas Xcode
+### Schémas Xcode
 
 | Schéma | Cible |
 |--------|-------|
@@ -253,27 +215,29 @@ Cmd + R
 
 ---
 
-## 📋 Checklist de Qualité
+## 📋 Checklist Qualité
 
-Avant chaque commit, vérifier :
+Avant chaque commit :
 
-- [ ] ✅ Toutes les fonctions sont nommées en **anglais camelCase**
-- [ ] ✅ Aucune modification directe de transaction (utiliser `modified()`)
-- [ ] ✅ Toutes les modifications de données passent par `AccountsManager`
-- [ ] ✅ Les nouveaux enums de style conforment à `StylableEnum`
-- [ ] ✅ Pas de code dupliqué (extraire en service ou extension)
-- [ ] ✅ Les vues n'ont **aucune logique métier** (déléguer aux services)
+- [ ] Nommage **anglais camelCase** partout
+- [ ] Aucune modification directe de struct — utiliser `modified()`
+- [ ] Toute mutation passe par `AccountsManager`
+- [ ] Pas de code dupliqué — extraire en service, modifier ou extension
+- [ ] Les vues n'ont **aucune logique métier**
+- [ ] Nouveaux enums de style conforment à `StylableEnum`
 
 ---
 
-## 📊 Métriques Post-Refactoring
+## 📊 Métriques v3.0
 
-| Métrique | Avant | Après | Amélioration |
-|----------|-------|-------|--------------|
-| Lignes AccountsManager | ~500 | ~260 | **-48%** |
-| Fichiers de code mort | 3 | 0 | ✅ Supprimés |
-| Fonctions dupliquées | ~15 | 0 | ✅ Centralisées |
+| Métrique | v1 | v3.0 | Delta |
+|----------|-----|------|-------|
+| Lignes AccountsManager | ~500 | ~240 | **−52%** |
+| Services extraits | 2 | 4 | **+2** (StorageService, RecurrenceEngine) |
+| View Modifiers partagés | 0 | 5 | ✅ DRY |
+| Fonctions dupliquées | ~15 | 0 | ✅ Éliminées |
 | Nommage anglais | ~40% | 100% | ✅ Harmonisé |
+| Fichiers de code mort | 3 | 0 | ✅ Supprimés |
 
 ---
 
@@ -281,8 +245,8 @@ Avant chaque commit, vérifier :
 
 | Document | Description |
 |----------|-------------|
-| [STRUCTURE_APP.md](STRUCTURE_APP.md) | Architecture technique détaillée (AI-Ready) |
-| Ce fichier | Manuel de référence et guide de maintenance |
+| [STRUCTURE_APP.md](STRUCTURE_APP.md) | Architecture technique détaillée v3.0 (AI-Ready) |
+| Ce README | Vision, principes, guide de maintenance |
 
 ---
 
@@ -292,4 +256,4 @@ Projet personnel — Tous droits réservés.
 
 ---
 
-*Finoria v2.1 — Développé avec ❤️ en Swift*
+*Finoria v3.0 — Développé avec ❤️ en Swift*

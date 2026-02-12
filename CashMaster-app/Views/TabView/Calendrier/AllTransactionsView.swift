@@ -52,7 +52,7 @@ struct AllTransactionsView: View {
 							}
 					}
 				} header: {
-					Text(formatDayHeader(group.date))
+					Text(group.date.dayHeaderFormatted())
 						.font(.subheadline)
 						.fontWeight(.semibold)
 						.foregroundStyle(.secondary)
@@ -82,32 +82,5 @@ struct AllTransactionsView: View {
 		}
 	}
 	
-	/// Formate la date pour l'en-tête de section
-	private func formatDayHeader(_ date: Date) -> String {
-		let calendar = Calendar.current
-		let formatter = DateFormatter()
-		formatter.locale = Locale(identifier: "fr_FR")
-		
-		if calendar.isDateInToday(date) {
-			return "Aujourd'hui"
-		} else if calendar.isDateInYesterday(date) {
-			return "Hier"
-		} else {
-			formatter.dateFormat = "EEEE d MMMM yyyy"
-			return formatter.string(from: date).capitalized
-		}
-	}
-}
-
-// MARK: - Extension conditionnelle
-extension View {
-	@ViewBuilder
-	func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-		if condition {
-			transform(self)
-		} else {
-			self
-		}
-	}
 }
 

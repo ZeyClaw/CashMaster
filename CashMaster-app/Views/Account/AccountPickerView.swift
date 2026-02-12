@@ -86,12 +86,7 @@ struct AccountPickerView: View {
 			}
 			.listStyle(.plain)
 			.scrollContentBackground(.hidden)
-			.background(
-				Color(UIColor { traitCollection in
-					traitCollection.userInterfaceStyle == .dark ? .black : .systemGroupedBackground
-				})
-				.ignoresSafeArea()
-			)
+			.adaptiveGroupedBackground()
 			.navigationTitle("Mes comptes")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

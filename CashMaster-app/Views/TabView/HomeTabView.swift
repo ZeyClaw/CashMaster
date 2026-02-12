@@ -20,87 +20,54 @@ struct HomeTabView: View {
 	
 	var body: some View {
 		NavigationStack {
-			if accountsManager.selectedAccountId != nil {
-				HomeView(accountsManager: accountsManager)
-					.navigationBarTitleDisplayMode(.inline)
-					.toolbar {
-						// Boutons Import/Export CSV en haut à gauche
-						ToolbarItem(placement: .navigationBarLeading) {
-							HStack(spacing: 3) {
-								// Bouton Export CSV
-								Button {
-									shareCSV()
-								} label: {
-									Image(systemName: "square.and.arrow.up")
-										.imageScale(.large)
-										.padding(8)
-								}
-								
-								// Bouton Import CSV
-								Button {
-									showingDocumentPicker = true
-								} label: {
-									Image(systemName: "square.and.arrow.down")
-										.imageScale(.large)
-										.padding(8)
+			Group {
+				if accountsManager.selectedAccountId != nil {
+					HomeView(accountsManager: accountsManager)
+						.navigationBarTitleDisplayMode(.inline)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								HStack(spacing: 3) {
+									Button { shareCSV() } label: {
+										Image(systemName: "square.and.arrow.up")
+											.imageScale(.large)
+											.padding(8)
+									}
+									Button { showingDocumentPicker = true } label: {
+										Image(systemName: "square.and.arrow.down")
+											.imageScale(.large)
+											.padding(8)
+									}
 								}
 							}
 						}
-						
-						// Bouton Account en haut à droite
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
+						.sheet(isPresented: $showingDocumentPicker) {
+							DocumentPicker { url in importCSV(from: url) }
 						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
-					.sheet(isPresented: $showingDocumentPicker) {
-						DocumentPicker { url in
-							importCSV(from: url)
+						.alert("Export réussi", isPresented: $showExportSuccessAlert) {
+							Button("OK", role: .cancel) {}
+						} message: {
+							Text("Fichier CSV exporté avec succès.")
 						}
-					}
-					.alert("Export réussi", isPresented: $showExportSuccessAlert) {
-						Button("OK", role: .cancel) {}
-					} message: {
-						Text("Fichier CSV exporté avec succès.")
-					}
-					.alert("Erreur d'export", isPresented: $showExportErrorAlert) {
-						Button("OK", role: .cancel) {}
-					} message: {
-						Text("Impossible de générer le fichier CSV.")
-					}
-					.alert("Import réussi", isPresented: $showImportSuccessAlert) {
-						Button("OK", role: .cancel) {}
-					} message: {
-						Text("\(importedCount) transaction(s) importée(s) avec succès.")
-					}
-					.alert("Erreur d'import", isPresented: $showImportErrorAlert) {
-						Button("OK", role: .cancel) {}
-					} message: {
-						Text("Aucune transaction n'a pu être importée. Vérifiez le format du fichier CSV.")
-					}
-			} else {
-				NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
+						.alert("Erreur d'export", isPresented: $showExportErrorAlert) {
+							Button("OK", role: .cancel) {}
+						} message: {
+							Text("Impossible de générer le fichier CSV.")
 						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
+						.alert("Import réussi", isPresented: $showImportSuccessAlert) {
+							Button("OK", role: .cancel) {}
+						} message: {
+							Text("\(importedCount) transaction(s) importée(s) avec succès.")
+						}
+						.alert("Erreur d'import", isPresented: $showImportErrorAlert) {
+							Button("OK", role: .cancel) {}
+						} message: {
+							Text("Aucune transaction n'a pu être importée. Vérifiez le format du fichier CSV.")
+						}
+				} else {
+					NoAccountView(accountsManager: accountsManager)
+				}
 			}
+			.accountPickerToolbar(isPresented: $showingAccountPicker, accountsManager: accountsManager)
 		}
 	}
 	

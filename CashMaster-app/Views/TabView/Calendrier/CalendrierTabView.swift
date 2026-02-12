@@ -47,12 +47,7 @@ struct CalendrierTabView: View {
 				}
 			}
 		}
-		.background(
-			Color(UIColor { traitCollection in
-				traitCollection.userInterfaceStyle == .dark ? .black : .systemGroupedBackground
-			})
-			.ignoresSafeArea()
-		)
+		.adaptiveGroupedBackground()
 		.navigationTitle("Calendrier")
 		.navigationDestination(for: CalendrierRoute.self) { route in
 			switch route {

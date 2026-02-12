@@ -98,12 +98,7 @@ struct AddAccountSheet: View {
 				}
 			}
 			.scrollContentBackground(.hidden)
-			.background(
-				Color(UIColor { traitCollection in
-					traitCollection.userInterfaceStyle == .dark ? .black : .systemGroupedBackground
-				})
-				.ignoresSafeArea()
-			)
+			.adaptiveGroupedBackground()
 			.navigationTitle(isEditMode ? "Modifier le compte" : "Nouveau compte")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

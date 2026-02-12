@@ -1,168 +1,138 @@
 //
 //  AccountsManager.swift
-//  CashMaster
+//  Finoria
 //
 //  Created by Godefroy REYNAUD on 05/08/2025.
 //
 
 import Foundation
 
-//  Central class for managing accounts and transactions.
-//
-//  IMPORTANT: All account/transaction modifications MUST go through
-//  this class.
-//  Why?
-//  - It calls `objectWillChange.send()` after each update
-//    so SwiftUI automatically refreshes the interface.
-//  - If you modify a `Transaction` or `TransactionManager` directly without going through here,
-//    the UI will not be notified and the display won't update.
+/// Orchestrateur central de l'application.
+///
+/// **Règle d'or** : Toute modification de données DOIT passer par cette classe.
+///
+/// Responsabilités :
+/// - Maintenir l'état `@Published` pour SwiftUI
+/// - Orchestrer les appels aux services spécialisés
+/// - Garantir la persistance après chaque mutation
+///
+/// Délègue à :
+/// - `StorageService` pour la persistance UserDefaults
+/// - `RecurrenceEngine` pour le traitement des récurrences
+/// - `CalculationService` pour les calculs financiers
+/// - `CSVService` pour l'import/export CSV
 class AccountsManager: ObservableObject {
 	
-	// MARK: - Données publiées
+	// MARK: - État publié (Single Source of Truth)
 	
-	/// Liste des comptes
 	@Published private(set) var accounts: [Account] = []
-	
-	/// Dictionnaire des gestionnaires de transactions, où les clés sont des IDs de comptes
-	/// et les valeurs sont des instances de TransactionManager (liste des transactions pour un compte)
 	@Published private(set) var transactionManagers: [UUID: TransactionManager] = [:]
 	@Published var selectedAccountId: UUID? {
-		didSet {
-			if let id = selectedAccountId {
-				UserDefaults.standard.set(id.uuidString, forKey: "lastSelectedAccountId")
-			}
-		}
+		didSet { storage.saveSelectedAccountId(selectedAccountId) }
 	}
 	
+	/// Compte actuellement sélectionné (dérivé de selectedAccountId)
 	var selectedAccount: Account? {
 		accounts.first { $0.id == selectedAccountId }
 	}
-
-	private let saveKey = "accounts_data_v2"
+	
+	// MARK: - Services
+	
+	private let storage = StorageService()
 	
 	// MARK: - Init
 	
 	init() {
-		load()
-		if let idString = UserDefaults.standard.string(forKey: "lastSelectedAccountId"),
-		   let id = UUID(uuidString: idString) {
-			selectedAccountId = id
-		}
+		let loaded = storage.load()
+		accounts = loaded.accounts
+		transactionManagers = loaded.managers
+		selectedAccountId = storage.loadSelectedAccountId()
 	}
 	
-	// MARK: - Structure de sauvegarde
+	// MARK: - Helpers internes
 	
-	private struct AccountData: Codable {
-		var account: Account
-		var transactions: [Transaction]
-		var widgetShortcuts: [WidgetShortcut]
-		var recurringTransactions: [RecurringTransaction]
-		
-		// Rétrocompatibilité : si la clé n'existe pas dans les anciennes données
-		init(from decoder: Decoder) throws {
-			let container = try decoder.container(keyedBy: CodingKeys.self)
-			account = try container.decode(Account.self, forKey: .account)
-			transactions = try container.decode([Transaction].self, forKey: .transactions)
-			widgetShortcuts = try container.decode([WidgetShortcut].self, forKey: .widgetShortcuts)
-			recurringTransactions = try container.decodeIfPresent([RecurringTransaction].self, forKey: .recurringTransactions) ?? []
-		}
-		
-		init(account: Account, transactions: [Transaction], widgetShortcuts: [WidgetShortcut], recurringTransactions: [RecurringTransaction]) {
-			self.account = account
-			self.transactions = transactions
-			self.widgetShortcuts = widgetShortcuts
-			self.recurringTransactions = recurringTransactions
-		}
+	/// Persiste l'état courant et notifie SwiftUI du changement
+	private func persist() {
+		storage.save(accounts: accounts, managers: transactionManagers)
+		objectWillChange.send()
 	}
-
-	// MARK: - Account Management
+	
+	/// TransactionManager du compte actuellement sélectionné
+	private var currentManager: TransactionManager? {
+		guard let id = selectedAccountId else { return nil }
+		return transactionManagers[id]
+	}
+	
+	// MARK: - Gestion des comptes
 	
 	func addAccount(_ account: Account) {
 		guard !accounts.contains(where: { $0.id == account.id }) else { return }
 		accounts.append(account)
 		transactionManagers[account.id] = TransactionManager(accountName: account.name)
-		save()
-		objectWillChange.send()
+		persist()
 	}
 	
 	func deleteAccount(_ account: Account) {
 		accounts.removeAll { $0.id == account.id }
 		transactionManagers.removeValue(forKey: account.id)
-		save()
 		if accounts.isEmpty {
 			selectedAccountId = nil
 		} else if selectedAccountId == account.id {
 			selectedAccountId = accounts.first?.id
 		}
-		objectWillChange.send()
+		persist()
 	}
 	
 	func updateAccount(_ account: Account) {
 		guard let index = accounts.firstIndex(where: { $0.id == account.id }) else { return }
 		accounts[index] = account
-		save()
-		objectWillChange.send()
+		persist()
 	}
 	
 	func resetAccount(_ account: Account) {
 		transactionManagers[account.id]?.transactions.removeAll()
-		save()
-		objectWillChange.send()
+		persist()
 	}
 	
 	func getAllAccounts() -> [Account] {
 		accounts.sorted { $0.name < $1.name }
 	}
 	
-	// MARK: - Transaction Management
+	// MARK: - Gestion des transactions
 	
 	func addTransaction(_ transaction: Transaction) {
-		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.add(transaction)
-		save()
-		objectWillChange.send()
+		currentManager?.add(transaction)
+		persist()
 	}
 	
 	func deleteTransaction(_ transaction: Transaction) {
-		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.remove(transaction)
-		save()
-		objectWillChange.send()
+		currentManager?.remove(transaction)
+		persist()
 	}
 	
 	func validateTransaction(_ transaction: Transaction) {
-		guard let accountId = selectedAccountId else { return }
-		let validatedTransaction = transaction.validated(at: Date())
-		transactionManagers[accountId]?.update(validatedTransaction)
-		save()
-		objectWillChange.send()
+		currentManager?.update(transaction.validated(at: Date()))
+		persist()
 	}
 	
 	func updateTransaction(_ transaction: Transaction) {
-		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.update(transaction)
-		save()
-		objectWillChange.send()
+		currentManager?.update(transaction)
+		persist()
 	}
 	
 	func transactions() -> [Transaction] {
-		guard let accountId = selectedAccountId else { return [] }
-		return transactionManagers[accountId]?.transactions ?? []
+		currentManager?.transactions ?? []
 	}
 	
-	// MARK: - Totals (delegated to CalculationService)
+	// MARK: - Calculs (délégués à CalculationService)
 	
 	func totalNonPotential(for account: Account) -> Double {
-		let txs = transactionManagers[account.id]?.transactions ?? []
-		return CalculationService.totalNonPotential(transactions: txs)
+		CalculationService.totalNonPotential(transactions: transactionManagers[account.id]?.transactions ?? [])
 	}
 	
 	func totalPotential(for account: Account) -> Double {
-		let txs = transactionManagers[account.id]?.transactions ?? []
-		return CalculationService.totalPotential(transactions: txs)
+		CalculationService.totalPotential(transactions: transactionManagers[account.id]?.transactions ?? [])
 	}
-	
-	// MARK: - Groupings (delegated to CalculationService)
 	
 	func availableYears() -> [Int] {
 		CalculationService.availableYears(transactions: transactions())
@@ -180,7 +150,7 @@ class AccountsManager: ObservableObject {
 		CalculationService.monthlyChangePercentage(transactions: transactions())
 	}
 	
-	// MARK: - Filters (delegated to CalculationService)
+	// MARK: - Filtres (délégués à CalculationService)
 	
 	func potentialTransactions() -> [Transaction] {
 		CalculationService.potentialTransactions(from: transactions())
@@ -190,239 +160,105 @@ class AccountsManager: ObservableObject {
 		CalculationService.validatedTransactions(from: transactions(), year: year, month: month)
 	}
 	
-	// MARK: - Persistence
-	
-	/// Public save (for transaction modifications)
-	func saveData() {
-		save()
-		objectWillChange.send()
-	}
-	
-	private func save() {
-		let dataArray = accounts.map { account in
-			AccountData(
-				account: account,
-				transactions: transactionManagers[account.id]?.transactions ?? [],
-				widgetShortcuts: transactionManagers[account.id]?.widgetShortcuts ?? [],
-				recurringTransactions: transactionManagers[account.id]?.recurringTransactions ?? []
-			)
-		}
-		if let data = try? JSONEncoder().encode(dataArray) {
-			UserDefaults.standard.set(data, forKey: saveKey)
-		}
-	}
-	
-	private func load() {
-		guard let data = UserDefaults.standard.data(forKey: saveKey),
-			  let decoded = try? JSONDecoder().decode([AccountData].self, from: data) else {
-			return
-		}
-		
-		var loadedAccounts: [Account] = []
-		var loadedManagers: [UUID: TransactionManager] = [:]
-		
-		for entry in decoded {
-			loadedAccounts.append(entry.account)
-			let manager = TransactionManager(accountName: entry.account.name)
-			manager.transactions = entry.transactions
-			manager.widgetShortcuts = entry.widgetShortcuts
-			manager.recurringTransactions = entry.recurringTransactions
-			loadedManagers[entry.account.id] = manager
-		}
-		
-		accounts = loadedAccounts
-		transactionManagers = loadedManagers
-	}
-	
-	// MARK: - Widgets
+	// MARK: - Raccourcis (Widget Shortcuts)
 	
 	func getWidgetShortcuts() -> [WidgetShortcut] {
-		guard let accountId = selectedAccountId else { return [] }
-		return transactionManagers[accountId]?.widgetShortcuts ?? []
+		currentManager?.widgetShortcuts ?? []
 	}
 	
 	func addWidgetShortcut(_ shortcut: WidgetShortcut) {
-		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.widgetShortcuts.append(shortcut)
-		save()
-		objectWillChange.send()
+		currentManager?.widgetShortcuts.append(shortcut)
+		persist()
 	}
 	
 	func deleteWidgetShortcut(_ shortcut: WidgetShortcut) {
-		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.widgetShortcuts.removeAll { $0.id == shortcut.id }
-		save()
-		objectWillChange.send()
+		currentManager?.widgetShortcuts.removeAll { $0.id == shortcut.id }
+		persist()
 	}
 	
 	func updateWidgetShortcut(_ shortcut: WidgetShortcut) {
-		guard let accountId = selectedAccountId,
-			  let index = transactionManagers[accountId]?.widgetShortcuts.firstIndex(where: { $0.id == shortcut.id }) else { return }
-		transactionManagers[accountId]?.widgetShortcuts[index] = shortcut
-		save()
-		objectWillChange.send()
+		guard let index = currentManager?.widgetShortcuts.firstIndex(where: { $0.id == shortcut.id }) else { return }
+		currentManager?.widgetShortcuts[index] = shortcut
+		persist()
 	}
 	
-	// MARK: - CSV Export/Import (delegated to CSVService)
+	// MARK: - CSV (délégué à CSVService)
 	
-	/// Generates a CSV file containing all transactions from the selected account
-	/// - Returns: Temporary URL of the generated CSV file, or nil if error
 	func generateCSV() -> URL? {
-		guard let account = selectedAccount else {
-			print("❌ No account selected for export")
-			return nil
-		}
+		guard let account = selectedAccount else { return nil }
 		return CSVService.generateCSV(transactions: transactions(), accountName: account.name)
 	}
 	
-	/// Imports transactions from a CSV file
-	/// - Parameter url: URL of the CSV file to import
-	/// - Returns: Number of imported transactions
 	func importCSV(from url: URL) -> Int {
-		guard selectedAccountId != nil else {
-			print("❌ No account selected")
-			return 0
+		guard selectedAccountId != nil else { return 0 }
+		let imported = CSVService.importCSV(from: url)
+		for tx in imported {
+			currentManager?.add(tx)
 		}
-		
-		let importedTransactions = CSVService.importCSV(from: url)
-		
-		for transaction in importedTransactions {
-			addTransaction(transaction)
-		}
-		
-		return importedTransactions.count
+		if !imported.isEmpty { persist() }
+		return imported.count
 	}
 	
-	// MARK: - Recurring Transactions
+	// MARK: - Récurrences (délégué à RecurrenceEngine)
 	
 	func getRecurringTransactions() -> [RecurringTransaction] {
-		guard let accountId = selectedAccountId else { return [] }
-		return transactionManagers[accountId]?.recurringTransactions ?? []
+		currentManager?.recurringTransactions ?? []
 	}
 	
 	func addRecurringTransaction(_ recurring: RecurringTransaction) {
-		guard let accountId = selectedAccountId else { return }
-		transactionManagers[accountId]?.recurringTransactions.append(recurring)
-		save()
-		objectWillChange.send()
-		// Générer immédiatement les transactions à venir
+		currentManager?.recurringTransactions.append(recurring)
+		persist()
 		processRecurringTransactions()
 	}
 	
 	func deleteRecurringTransaction(_ recurring: RecurringTransaction) {
-		guard let accountId = selectedAccountId else { return }
-		// Supprimer les transactions potentielles liées à cette récurrence
-		transactionManagers[accountId]?.transactions.removeAll {
-			$0.recurringTransactionId == recurring.id && $0.potentiel
-		}
-		// Supprimer la récurrence elle-même
-		transactionManagers[accountId]?.recurringTransactions.removeAll { $0.id == recurring.id }
-		save()
-		objectWillChange.send()
+		guard let manager = currentManager else { return }
+		RecurrenceEngine.removePotentialTransactions(for: recurring.id, from: &manager.transactions)
+		manager.recurringTransactions.removeAll { $0.id == recurring.id }
+		persist()
 	}
 	
 	func updateRecurringTransaction(_ recurring: RecurringTransaction) {
-		guard let accountId = selectedAccountId,
-			  let index = transactionManagers[accountId]?.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
-		// Supprimer les transactions potentielles liées à cette récurrence
-		transactionManagers[accountId]?.transactions.removeAll {
-			$0.recurringTransactionId == recurring.id && $0.potentiel
-		}
-		// Mettre à jour avec lastGeneratedDate remise à nil pour regénérer
-		var updatedRecurring = recurring
-		updatedRecurring.lastGeneratedDate = nil
-		transactionManagers[accountId]?.recurringTransactions[index] = updatedRecurring
-		save()
-		objectWillChange.send()
-		// Regénérer les transactions à venir
+		guard let manager = currentManager,
+			  let index = manager.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
+		RecurrenceEngine.removePotentialTransactions(for: recurring.id, from: &manager.transactions)
+		var updated = recurring
+		updated.lastGeneratedDate = nil
+		manager.recurringTransactions[index] = updated
+		persist()
 		processRecurringTransactions()
 	}
 	
-	/// Met en pause une transaction récurrente : supprime ses transactions potentielles
-	/// et empêche la génération de nouvelles transactions tant que la pause est active.
 	func pauseRecurringTransaction(_ recurring: RecurringTransaction) {
-		guard let accountId = selectedAccountId,
-			  let index = transactionManagers[accountId]?.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
-		// Supprimer les transactions potentielles liées
-		transactionManagers[accountId]?.transactions.removeAll {
-			$0.recurringTransactionId == recurring.id && $0.potentiel
-		}
-		// Activer la pause
-		transactionManagers[accountId]?.recurringTransactions[index].isPaused = true
-		save()
-		objectWillChange.send()
+		guard let manager = currentManager,
+			  let index = manager.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
+		RecurrenceEngine.removePotentialTransactions(for: recurring.id, from: &manager.transactions)
+		manager.recurringTransactions[index].isPaused = true
+		persist()
 	}
 	
-	/// Réactive une transaction récurrente en pause.
-	/// Met à jour lastGeneratedDate à aujourd'hui pour éviter de générer
-	/// rétroactivement les occurrences manquées pendant la pause.
 	func resumeRecurringTransaction(_ recurring: RecurringTransaction) {
-		guard let accountId = selectedAccountId,
-			  let index = transactionManagers[accountId]?.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
-		// Reprendre à partir d'aujourd'hui (pas de rattrapage rétroactif)
+		guard let manager = currentManager,
+			  let index = manager.recurringTransactions.firstIndex(where: { $0.id == recurring.id }) else { return }
 		let calendar = Calendar.current
 		let yesterday = calendar.date(byAdding: .day, value: -1, to: calendar.startOfDay(for: Date()))!
-		transactionManagers[accountId]?.recurringTransactions[index].isPaused = false
-		transactionManagers[accountId]?.recurringTransactions[index].lastGeneratedDate = yesterday
-		save()
-		objectWillChange.send()
-		// Regénérer les transactions à venir (à partir d'aujourd'hui)
+		manager.recurringTransactions[index].isPaused = false
+		manager.recurringTransactions[index].lastGeneratedDate = yesterday
+		persist()
 		processRecurringTransactions()
 	}
 	
-	/// Génère automatiquement les transactions potentielles pour les récurrences à venir (< 1 mois)
-	/// et valide celles dont la date est aujourd'hui ou passée.
-	/// Appelé au lancement de l'app, après chaque ajout/modification de récurrence,
-	/// et quand l'app revient au premier plan.
+	/// Traite toutes les récurrences : génère les transactions à venir et valide celles du passé.
+	/// Appelé au lancement, au retour au premier plan, et après ajout/modification de récurrence.
 	func processRecurringTransactions() {
-		let calendar = Calendar.current
-		let now = Date()
-		let startOfToday = calendar.startOfDay(for: now)
-		
-		for account in accounts {
-			guard let manager = transactionManagers[account.id] else { continue }
-			
-			var updated = false
-			
-			for i in manager.recurringTransactions.indices {
-				let recurring = manager.recurringTransactions[i]
-				// Ne pas générer de transactions pour les récurrences en pause
-				guard !recurring.isPaused else { continue }
-				let pending = recurring.pendingTransactions()
-				
-				for entry in pending {
-					// Vérifier qu'une transaction n'existe pas déjà pour cette date et récurrence
-					let alreadyExists = manager.transactions.contains { tx in
-						tx.recurringTransactionId == recurring.id &&
-						tx.date != nil &&
-						calendar.isDate(tx.date!, inSameDayAs: entry.date)
-					}
-					if !alreadyExists {
-						manager.add(entry.transaction)
-						updated = true
-					}
-				}
-				
-				// Mettre à jour la dernière date générée
-				if let lastDate = pending.map({ $0.date }).max() {
-					manager.recurringTransactions[i].lastGeneratedDate = lastDate
-				}
-			}
-			
-			// Valider les transactions potentielles dont la date prévue est passée
-			for i in manager.transactions.indices {
-				let tx = manager.transactions[i]
-				if tx.potentiel, let date = tx.date, calendar.startOfDay(for: date) <= startOfToday {
-					manager.transactions[i] = tx.validated(at: date)
-					updated = true
-				}
-			}
-			
-			if updated {
-				save()
-				objectWillChange.send()
-			}
+		if RecurrenceEngine.processAll(accounts: accounts, managers: transactionManagers) {
+			persist()
 		}
+	}
+	
+	/// Sauvegarde publique pour besoins externes
+	func saveData() {
+		persist()
 	}
 }
 

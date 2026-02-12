@@ -14,48 +14,24 @@ struct AnalysesTabView: View {
 	
 	var body: some View {
 		NavigationStack {
-			if accountsManager.selectedAccountId != nil {
-				AnalysesView(accountsManager: accountsManager)
-					.navigationTitle("Analyses")
-					.navigationBarTitleDisplayMode(.large)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
+			Group {
+				if accountsManager.selectedAccountId != nil {
+					AnalysesView(accountsManager: accountsManager)
+						.navigationBarTitleDisplayMode(.large)
+						.navigationDestination(for: CategoryDetailRoute.self) { route in
+							CategoryTransactionsView(
+								accountsManager: accountsManager,
+								category: route.category,
+								month: route.month,
+								year: route.year
+							)
 						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
-					.navigationDestination(for: CategoryDetailRoute.self) { route in
-						CategoryTransactionsView(
-							accountsManager: accountsManager,
-							category: route.category,
-							month: route.month,
-							year: route.year
-						)
-					}
-			} else {
-				NoAccountView(accountsManager: accountsManager)
-					.navigationTitle("Analyses")
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
-						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
+				} else {
+					NoAccountView(accountsManager: accountsManager)
+				}
 			}
+			.navigationTitle("Analyses")
+			.accountPickerToolbar(isPresented: $showingAccountPicker, accountsManager: accountsManager)
 		}
 	}
 }

@@ -14,38 +14,15 @@ struct FutureTabView: View {
 	
 	var body: some View {
 		NavigationStack {
-			if accountsManager.selectedAccountId != nil {
-				PotentialTransactionsView(accountsManager: accountsManager)
-					.navigationTitle("Futur")
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
-						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
-			} else {
-				NoAccountView(accountsManager: accountsManager)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button {
-								showingAccountPicker = true
-							} label: {
-								Image(systemName: "person.crop.circle")
-									.imageScale(.large)
-							}
-						}
-					}
-					.sheet(isPresented: $showingAccountPicker) {
-						AccountPickerView(accountsManager: accountsManager)
-					}
+			Group {
+				if accountsManager.selectedAccountId != nil {
+					PotentialTransactionsView(accountsManager: accountsManager)
+				} else {
+					NoAccountView(accountsManager: accountsManager)
+				}
 			}
+			.navigationTitle("Futur")
+			.accountPickerToolbar(isPresented: $showingAccountPicker, accountsManager: accountsManager)
 		}
 	}
 }
