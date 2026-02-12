@@ -52,27 +52,6 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
 	/// Indique si la récurrence est en pause (aucune transaction générée tant que c'est true)
 	var isPaused: Bool
 	
-	// MARK: - CodingKeys (rétrocompatibilité: décode "style" comme "category")
-	
-	enum CodingKeys: String, CodingKey {
-		case id, amount, comment, type, frequency, startDate, lastGeneratedDate, isPaused
-		case category = "style"
-	}
-	
-	// Décodage avec rétrocompatibilité (isPaused absent dans les anciennes données)
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		id = try container.decode(UUID.self, forKey: .id)
-		amount = try container.decode(Double.self, forKey: .amount)
-		comment = try container.decode(String.self, forKey: .comment)
-		type = try container.decode(TransactionType.self, forKey: .type)
-		category = try container.decode(TransactionCategory.self, forKey: .category)
-		frequency = try container.decode(RecurrenceFrequency.self, forKey: .frequency)
-		startDate = try container.decode(Date.self, forKey: .startDate)
-		lastGeneratedDate = try container.decodeIfPresent(Date.self, forKey: .lastGeneratedDate)
-		isPaused = try container.decodeIfPresent(Bool.self, forKey: .isPaused) ?? false
-	}
-	
 	init(
 		id: UUID = UUID(),
 		amount: Double,

@@ -20,7 +20,7 @@ struct CategoryTransactionsView: View {
 	/// Transactions validées de cette catégorie pour le mois sélectionné, triées par date décroissante
 	private var categoryTransactions: [Transaction] {
 		accountsManager.validatedTransactions(year: year, month: month)
-			.filter { ($0.category ?? .other) == category }
+			.filter { $0.category == category }
 			.sorted { ($0.date ?? Date.distantPast) > ($1.date ?? Date.distantPast) }
 	}
 	

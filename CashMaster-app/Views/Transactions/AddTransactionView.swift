@@ -123,7 +123,7 @@ struct AddTransactionView: View {
 					transactionType = t.amount >= 0 ? .income : .expense
 					isPotentiel = t.potentiel
 					transactionDate = t.date ?? Date()
-					selectedCategory = t.category ?? (t.amount >= 0 ? .income : .expense)
+					selectedCategory = t.category
 				}
 			}
 		}

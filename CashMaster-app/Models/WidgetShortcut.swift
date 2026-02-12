@@ -17,13 +17,6 @@ struct WidgetShortcut: Identifiable, Codable, Equatable {
 	let type: TransactionType
 	let category: TransactionCategory
 	
-	// MARK: - CodingKeys (rétrocompatibilité: décode "style" comme "category")
-	
-	enum CodingKeys: String, CodingKey {
-		case id, amount, comment, type
-		case category = "style"
-	}
-	
 	init(id: UUID = UUID(), amount: Double, comment: String, type: TransactionType, category: TransactionCategory? = nil) {
 		self.id = id
 		self.amount = amount

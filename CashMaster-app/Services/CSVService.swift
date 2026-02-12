@@ -48,7 +48,7 @@ struct CSVService {
 			let amount = String(format: "%.2f", abs(transaction.amount))
 			let comment = transaction.comment.replacingOccurrences(of: ",", with: ";")
 			let status = transaction.potentiel ? "Potentielle" : "Validée"
-			let category = transaction.category?.label ?? ""
+			let category = transaction.category.label
 			
 			csvText += "\(dateString),\(type),\(amount),\(comment),\(status),\(category)\n"
 		}
@@ -135,11 +135,13 @@ struct CSVService {
 				let statutString = columns[4].trimmingCharacters(in: .whitespacesAndNewlines)
 				let isPotentielle = (statutString == "Potentielle")
 				
-				// Parse Catégorie (optionnel, colonne 6 si présente)
-				var category: TransactionCategory? = nil
+				// Parse Catégorie (colonne 6 si présente, sinon .other)
+				var category: TransactionCategory = .other
 				if columns.count >= 6 {
 					let categoryLabel = columns[5].trimmingCharacters(in: .whitespacesAndNewlines)
-					category = TransactionCategory.allCases.first { $0.label == categoryLabel }
+					if let matched = TransactionCategory.allCases.first(where: { $0.label == categoryLabel }) {
+						category = matched
+					}
 				}
 				
 				let transaction = Transaction(

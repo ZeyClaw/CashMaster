@@ -184,7 +184,7 @@ Ajouter un `case` dans l'enum `StylableEnum` concerné + ses propriétés `icon`
 | **Graphiques** | Swift Charts |
 | **État** | `@Published`, `@EnvironmentObject`, `@State` |
 | **Navigation** | `NavigationStack` + `navigationDestination` |
-| **Persistance** | `UserDefaults` + `Codable` (JSON) via `StorageService` |
+| **Persistance** | `UserDefaults` + `Codable` (JSON) via `StorageService` (schema v1) |
 | **Notifications** | `UNUserNotificationCenter` |
 | **Dépendances** | **0** — 100% natif Apple |
 
@@ -224,17 +224,18 @@ Avant chaque commit :
 - [ ] Toute mutation passe par `AccountsManager`
 - [ ] Pas de code dupliqué — extraire en service, modifier ou extension
 - [ ] Les vues n'ont **aucune logique métier**
-- [ ] Nouveaux enums de style conforment à `StylableEnum`
+- [ ] Schema versioning cohérent (StorageService.schemaVersion)
 
 ---
 
-## 📊 Métriques v3.0
+## 📊 Métriques v3.1
 
-| Métrique | v1 | v3.0 | Delta |
+| Métrique | v1 | v3.1 | Delta |
 |----------|-----|------|-------|
 | Lignes AccountsManager | ~500 | ~240 | **−52%** |
 | Services extraits | 2 | 4 | **+2** (StorageService, RecurrenceEngine) |
 | View Modifiers partagés | 0 | 5 | ✅ DRY |
+| Fichiers Analyses | 1 (361 lig.) | 4 | ✅ SRP |
 | Fonctions dupliquées | ~15 | 0 | ✅ Éliminées |
 | Nommage anglais | ~40% | 100% | ✅ Harmonisé |
 | Fichiers de code mort | 3 | 0 | ✅ Supprimés |
@@ -245,7 +246,7 @@ Avant chaque commit :
 
 | Document | Description |
 |----------|-------------|
-| [STRUCTURE_APP.md](STRUCTURE_APP.md) | Architecture technique détaillée v3.0 (AI-Ready) |
+| [STRUCTURE_APP.md](STRUCTURE_APP.md) | Architecture technique détaillée v3.1 (AI-Ready) |
 | Ce README | Vision, principes, guide de maintenance |
 
 ---
@@ -256,4 +257,4 @@ Projet personnel — Tous droits réservés.
 
 ---
 
-*Finoria v3.0 — Développé avec ❤️ en Swift*
+*Finoria v3.1 — Développé avec ❤️ en Swift*

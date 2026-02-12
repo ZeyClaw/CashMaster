@@ -14,8 +14,15 @@ import Foundation
 /// Ce service ne connaît ni SwiftUI ni l'état de l'application.
 struct StorageService {
 	
-	private let saveKey = "accounts_data_v2"
+	// MARK: - Schema Versioning
+	
+	/// Version du schéma de données. Incrémentez à chaque changement de format
+	/// pour piloter les futures migrations dans `load()`.
+	static let schemaVersion = 1
+	
+	private let dataKey = "accounts_data_v2"
 	private let selectedAccountKey = "lastSelectedAccountId"
+	private let schemaVersionKey = "appSchemaVersion"
 	
 	// MARK: - Structure de sauvegarde
 	
@@ -25,22 +32,6 @@ struct StorageService {
 		var transactions: [Transaction]
 		var widgetShortcuts: [WidgetShortcut]
 		var recurringTransactions: [RecurringTransaction]
-		
-		// Rétrocompatibilité : recurringTransactions absent dans les anciennes données
-		init(from decoder: Decoder) throws {
-			let container = try decoder.container(keyedBy: CodingKeys.self)
-			account = try container.decode(Account.self, forKey: .account)
-			transactions = try container.decode([Transaction].self, forKey: .transactions)
-			widgetShortcuts = try container.decode([WidgetShortcut].self, forKey: .widgetShortcuts)
-			recurringTransactions = try container.decodeIfPresent([RecurringTransaction].self, forKey: .recurringTransactions) ?? []
-		}
-		
-		init(account: Account, transactions: [Transaction], widgetShortcuts: [WidgetShortcut], recurringTransactions: [RecurringTransaction]) {
-			self.account = account
-			self.transactions = transactions
-			self.widgetShortcuts = widgetShortcuts
-			self.recurringTransactions = recurringTransactions
-		}
 	}
 	
 	// MARK: - Sauvegarde / Chargement des comptes
@@ -56,16 +47,26 @@ struct StorageService {
 			)
 		}
 		if let data = try? JSONEncoder().encode(dataArray) {
-			UserDefaults.standard.set(data, forKey: saveKey)
+			UserDefaults.standard.set(data, forKey: dataKey)
+			UserDefaults.standard.set(Self.schemaVersion, forKey: schemaVersionKey)
 		}
 	}
 	
-	/// Charge tous les comptes et reconstruit les TransactionManagers
+	/// Charge tous les comptes et reconstruit les TransactionManagers.
+	///
+	/// Si le schéma change dans le futur, ajoutez la logique de migration ici
+	/// en comparant `savedVersion` avec `Self.schemaVersion`.
 	func load() -> (accounts: [Account], managers: [UUID: TransactionManager]) {
-		guard let data = UserDefaults.standard.data(forKey: saveKey),
+		let savedVersion = UserDefaults.standard.integer(forKey: schemaVersionKey)
+		_ = savedVersion // Réservé pour futures migrations
+		
+		guard let data = UserDefaults.standard.data(forKey: dataKey),
 			  let decoded = try? JSONDecoder().decode([AccountData].self, from: data) else {
 			return ([], [:])
 		}
+		
+		// Future migrations:
+		// if savedVersion < 2 { migrateV1toV2(&decoded) }
 		
 		var accounts: [Account] = []
 		var managers: [UUID: TransactionManager] = [:]

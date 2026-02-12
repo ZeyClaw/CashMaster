@@ -1,6 +1,6 @@
 # 📁 STRUCTURE_APP.md — Architecture Technique de Finoria
 
-> **Version**: 3.0  
+> **Version**: 3.1  
 > **Dernière mise à jour**: Février 2026  
 > **Statut**: Production-Ready, AI-Ready  
 
@@ -120,7 +120,9 @@ CashMaster-app/
         │
         ├── Analyses/               # Onglet Analyses
         │   ├── AnalysesTabView.swift       # Wrapper avec NavigationStack
-        │   ├── AnalysesView.swift          # Camembert + liste par catégorie
+        │   ├── AnalysesView.swift          # Vue principale (navigation mois + liste)
+        │   ├── AnalysesModels.swift        # Modèles (CategoryData, AnalysisType, Route)
+        │   ├── AnalysesPieChart.swift      # Camembert interactif (Charts)
         │   ├── CategoryBreakdownRow.swift  # Ligne détaillée par catégorie
         │   └── CategoryTransactionsView.swift # Transactions d'une catégorie
         │
@@ -213,7 +215,7 @@ struct Transaction: Identifiable, Codable, Equatable {
     var comment: String
     var potentiel: Bool                   // true = future, false = validée
     var date: Date?                       // nil si potentielle sans date prévue
-    var category: TransactionCategory?    // Catégorie (optionnel pour rétrocompat)
+    var category: TransactionCategory     // Catégorie (obligatoire, défaut: .other)
     var recurringTransactionId: UUID?     // Lien vers la récurrence source
     
     func validated(at date: Date) -> Transaction  // Copie validée
@@ -272,10 +274,11 @@ protocol StylableEnum: RawRepresentable, CaseIterable, Identifiable, Codable {
 
 | Méthode | Description |
 |---------|-------------|
-| `save(accounts:managers:)` | Encode tout en JSON → UserDefaults |
-| `load()` | Décode JSON → (accounts, managers) |
+| `save(accounts:managers:)` | Encode tout en JSON → UserDefaults + sauve `schemaVersion` |
+| `load()` | Décode JSON → (accounts, managers), préparé pour futures migrations |
 | `saveSelectedAccountId(_:)` | Persiste l'ID du compte sélectionné |
 | `loadSelectedAccountId()` | Charge le dernier compte sélectionné |
+| `schemaVersion` (static) | Version du schéma de données (actuellement `1`) |
 
 ### RecurrenceEngine (Traitement des récurrences)
 
@@ -464,7 +467,7 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 12. Navigation complète entre les 4 onglets
 13. Le graphique camembert affiche la bonne répartition
 14. Swipe actions (supprimer/valider) avec confirmation pour récurrences
-15. Rétrocompatibilité : anciennes données (sans catégorie) se chargent correctement
+15. Schéma versioning : `schemaVersion` est sauvegardé et prêt pour les migrations futures
 
 ---
 
@@ -481,4 +484,4 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 
 ---
 
-*Document généré le 12 février 2026 — Finoria v3.0*
+*Document généré le 12 février 2026 — Finoria v3.1*
