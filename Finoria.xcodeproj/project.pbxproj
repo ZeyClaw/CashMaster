@@ -45,6 +45,9 @@
 		F8388EA72F3DE67B0081F2F9 /* AnalysesTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EA42F3DE67B0081F2F9 /* AnalysesTabView.swift */; };
 		F8388EA82F3DE67B0081F2F9 /* AnalysesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EA52F3DE67B0081F2F9 /* AnalysesView.swift */; };
 		F8388EAA2F3DF5470081F2F9 /* CategoryTransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EA92F3DF5470081F2F9 /* CategoryTransactionsView.swift */; };
+		F8388EAC2F3E3FC00081F2F9 /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EAB2F3E3FC00081F2F9 /* ViewModifiers.swift */; };
+		F8388EAF2F3E3FDE0081F2F9 /* RecurrenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EAD2F3E3FDD0081F2F9 /* RecurrenceEngine.swift */; };
+		F8388EB02F3E3FDE0081F2F9 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EAE2F3E3FDD0081F2F9 /* StorageService.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
 		F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */; };
@@ -116,6 +119,9 @@
 		F8388EA42F3DE67B0081F2F9 /* AnalysesTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysesTabView.swift; sourceTree = "<group>"; };
 		F8388EA52F3DE67B0081F2F9 /* AnalysesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysesView.swift; sourceTree = "<group>"; };
 		F8388EA92F3DF5470081F2F9 /* CategoryTransactionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryTransactionsView.swift; sourceTree = "<group>"; };
+		F8388EAB2F3E3FC00081F2F9 /* ViewModifiers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
+		F8388EAD2F3E3FDD0081F2F9 /* RecurrenceEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecurrenceEngine.swift; sourceTree = "<group>"; };
+		F8388EAE2F3E3FDD0081F2F9 /* StorageService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -248,6 +254,8 @@
 		F8388E7C2F35532D0081F2F9 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F8388EAD2F3E3FDD0081F2F9 /* RecurrenceEngine.swift */,
+				F8388EAE2F3E3FDD0081F2F9 /* StorageService.swift */,
 				F8388E7D2F35532D0081F2F9 /* CSVService.swift */,
 				F8388E7E2F35532D0081F2F9 /* CalculationService.swift */,
 			);
@@ -266,6 +274,7 @@
 		F8388E882F3563CB0081F2F9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				F8388EAB2F3E3FC00081F2F9 /* ViewModifiers.swift */,
 				F8388E892F3563CB0081F2F9 /* DateFormatting.swift */,
 				F8388E8A2F3563CB0081F2F9 /* StylableEnum.swift */,
 			);
@@ -511,6 +520,7 @@
 				F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */,
 				F8388E9C2F3BC5F90081F2F9 /* RecurringTransactionsGridView.swift in Sources */,
 				F8B818F92F06A7A7002D02F2 /* DocumentPicker.swift in Sources */,
+				F8388EAF2F3E3FDE0081F2F9 /* RecurrenceEngine.swift in Sources */,
 				F8388E732F349A380081F2F9 /* Account.swift in Sources */,
 				F810E30E2E45331900C2DFA9 /* HomeView.swift in Sources */,
 				F800A3F32E4F6D3400918507 /* ToastView.swift in Sources */,
@@ -534,6 +544,7 @@
 				F800A3EA2E4DF80C00918507 /* CalendrierRoute.swift in Sources */,
 				F8388E912F3564140081F2F9 /* HomeComponents.swift in Sources */,
 				F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */,
+				F8388EAC2F3E3FC00081F2F9 /* ViewModifiers.swift in Sources */,
 				F8388E7F2F35532D0081F2F9 /* CSVService.swift in Sources */,
 				F810E2EF2E422F1E00C2DFA9 /* AccountsManager.swift in Sources */,
 				F800A3EC2E4DF82400918507 /* CalendrierTabView.swift in Sources */,
@@ -543,6 +554,7 @@
 				F8388E802F35532D0081F2F9 /* CalculationService.swift in Sources */,
 				F8388E9F2F3BC61C0081F2F9 /* RecurringTransaction.swift in Sources */,
 				F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */,
+				F8388EB02F3E3FDE0081F2F9 /* StorageService.swift in Sources */,
 				F810E30C2E44D4F100C2DFA9 /* AccountPickerView.swift in Sources */,
 				F8388EA62F3DE67B0081F2F9 /* CategoryBreakdownRow.swift in Sources */,
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
