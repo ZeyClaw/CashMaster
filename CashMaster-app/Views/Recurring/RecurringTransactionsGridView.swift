@@ -118,19 +118,18 @@ private struct RecurringCard: View {
 			}
 			.padding(12)
 			.background(Color(UIColor.secondarySystemGroupedBackground))
-			.overlay {
+			.overlay(alignment: .topTrailing) {
 				if recurring.isPaused {
-					RoundedRectangle(cornerRadius: 16, style: .continuous)
-						.fill(.ultraThinMaterial)
 					Image(systemName: "pause.circle.fill")
-						.font(.system(size: 36, weight: .medium))
-						.foregroundStyle(.gray)
-						.shadow(color: .black.opacity(0.15), radius: 4, y: 2)
+						.font(.system(size: 22, weight: .medium))
+						.foregroundStyle(.white, .gray)
+						.shadow(color: .black.opacity(0.15), radius: 3, y: 1)
+						.padding(8)
 				}
 			}
 			.clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 			.shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 4)
-			.grayscale(recurring.isPaused ? 1 : 0)
+			.saturation(recurring.isPaused ? 0 : 1)
 		}
 		.buttonStyle(PlainButtonStyle())
 		.contextMenu {

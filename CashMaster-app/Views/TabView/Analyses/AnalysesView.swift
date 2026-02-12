@@ -41,24 +41,48 @@ struct AnalysesView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	
 	@State private var analysisType: AnalysisType = .expenses
-	@State private var selectedMonth: Int
-	@State private var selectedYear: Int
 	@State private var selectedSlice: TransactionCategory?
-	@State private var slideDirection: Edge = .trailing
+	
+	/// Index de page dans le TabView carousel (0 = mois courant, négatif = mois passés)
+	/// On utilise un range large pour permettre le scroll infini vers le passé.
+	/// L'index 0 correspond au mois courant.
+	@State private var currentPageIndex: Int = 0
+	
+	/// Mois/année courants (pour calculer les limites)
+	private let referenceMonth: Int
+	private let referenceYear: Int
+	
+	/// Nombre de mois dans le passé accessibles
+	private let maxPastMonths = 120 // 10 ans en arrière
 	
 	init(accountsManager: AccountsManager) {
 		self.accountsManager = accountsManager
 		let now = Date()
 		let calendar = Calendar.current
-		_selectedMonth = State(initialValue: calendar.component(.month, from: now))
-		_selectedYear = State(initialValue: calendar.component(.year, from: now))
+		self.referenceMonth = calendar.component(.month, from: now)
+		self.referenceYear = calendar.component(.year, from: now)
 	}
+	
+	// MARK: - Calcul mois/année depuis l'index de page
+	
+	/// Retourne (month, year) pour un index de page donné (0 = mois courant, -1 = mois dernier, etc.)
+	private func monthYear(for pageIndex: Int) -> (month: Int, year: Int) {
+		// Total de mois depuis un point de référence
+		let totalMonths = (referenceYear * 12 + referenceMonth - 1) + pageIndex
+		let year = totalMonths / 12
+		let month = (totalMonths % 12) + 1
+		return (month, year)
+	}
+	
+	/// Mois et année actuellement sélectionnés
+	private var selectedMonth: Int { monthYear(for: currentPageIndex).month }
+	private var selectedYear: Int { monthYear(for: currentPageIndex).year }
 	
 	// MARK: - Données calculées
 	
 	/// Transactions validées filtrées par mois/année et type (dépense ou revenu)
-	private var filteredTransactions: [Transaction] {
-		let validated = accountsManager.validatedTransactions(year: selectedYear, month: selectedMonth)
+	private func filteredTransactions(month: Int, year: Int) -> [Transaction] {
+		let validated = accountsManager.validatedTransactions(year: year, month: month)
 		switch analysisType {
 		case .expenses:
 			return validated.filter { $0.amount < 0 }
@@ -68,10 +92,10 @@ struct AnalysesView: View {
 	}
 	
 	/// Données agrégées par catégorie, triées par montant décroissant
-	private var categoryData: [CategoryData] {
+	private func categoryData(month: Int, year: Int) -> [CategoryData] {
 		var grouped: [TransactionCategory: (total: Double, count: Int)] = [:]
 		
-		for transaction in filteredTransactions {
+		for transaction in filteredTransactions(month: month, year: year) {
 			let category = transaction.category ?? .other
 			let absAmount = abs(transaction.amount)
 			let existing = grouped[category] ?? (total: 0, count: 0)
@@ -83,32 +107,34 @@ struct AnalysesView: View {
 	}
 	
 	/// Montant total pour la période
-	private var totalAmount: Double {
-		categoryData.reduce(0) { $0 + $1.total }
+	private func totalAmount(month: Int, year: Int) -> Double {
+		categoryData(month: month, year: year).reduce(0) { $0 + $1.total }
 	}
 	
-	/// Données avec taille minimale pour l'affichage du graphique (3% minimum)
-	private var chartDisplayData: [CategoryData] {
-		guard totalAmount > 0 else { return categoryData }
-		let minValue = totalAmount * 0.008
-		return categoryData.map {
+	/// Données avec taille minimale pour l'affichage du graphique (1% minimum)
+	private func chartDisplayData(month: Int, year: Int) -> [CategoryData] {
+		let total = totalAmount(month: month, year: year)
+		let data = categoryData(month: month, year: year)
+		guard total > 0 else { return data }
+		let minValue = total * 0.01
+		return data.map {
 			CategoryData(category: $0.category, total: max($0.total, minValue), count: $0.count)
 		}
 	}
 	
 	/// Total des données d'affichage (pour le calcul des angles)
-	private var displayTotal: Double {
-		chartDisplayData.reduce(0) { $0 + $1.total }
+	private func displayTotal(month: Int, year: Int) -> Double {
+		chartDisplayData(month: month, year: year).reduce(0) { $0 + $1.total }
 	}
 	
 	/// Nom du mois formaté
-	private var monthName: String {
+	private func monthName(month: Int, year: Int) -> String {
 		let formatter = DateFormatter()
 		formatter.locale = Locale(identifier: "fr_FR")
 		formatter.dateFormat = "LLLL"
 		var components = DateComponents()
-		components.month = selectedMonth
-		components.year = selectedYear
+		components.month = month
+		components.year = year
 		let date = Calendar.current.date(from: components) ?? Date()
 		return formatter.string(from: date).capitalized
 	}
@@ -116,28 +142,53 @@ struct AnalysesView: View {
 	// MARK: - Body
 	
 	var body: some View {
-		List {
+		TabView(selection: $currentPageIndex) {
+			ForEach((-maxPastMonths)...0, id: \.self) { pageIndex in
+				monthPage(for: pageIndex)
+					.tag(pageIndex)
+			}
+		}
+		.tabViewStyle(.page(indexDisplayMode: .never))
+		.onChange(of: currentPageIndex) { _ in
+			selectedSlice = nil
+		}
+		.onChange(of: analysisType) { _ in
+			selectedSlice = nil
+		}
+	}
+	
+	// MARK: - Page d'un mois
+	
+	/// Contenu complet pour un mois donné (identifié par son pageIndex)
+	private func monthPage(for pageIndex: Int) -> some View {
+		let (month, year) = monthYear(for: pageIndex)
+		let catData = categoryData(month: month, year: year)
+		let total = totalAmount(month: month, year: year)
+		let chartData = chartDisplayData(month: month, year: year)
+		let dispTotal = displayTotal(month: month, year: year)
+		
+		return List {
 			// Section contrôles
 			Section {
 				segmentedControl
-				monthNavigator
+				monthLabel(month: month, year: year)
 			}
 			
-			if categoryData.isEmpty {
+			if catData.isEmpty {
 				Section {
 					emptyStateView
 				}
 			} else {
 				// Section graphique
 				Section {
-					pieChart
+					pieChart(chartData: chartData, catData: catData, total: total, dispTotal: dispTotal)
 				}
 				
 				// Section détail par catégorie
 				Section {
-					ForEach(categoryData) { item in
-						NavigationLink(value: CategoryDetailRoute(category: item.category, month: selectedMonth, year: selectedYear)) {
-							CategoryBreakdownRow(item: item, totalAmount: totalAmount, isSelected: selectedSlice == item.category)
+					ForEach(catData) { item in
+						NavigationLink(value: CategoryDetailRoute(category: item.category, month: month, year: year)) {
+							CategoryBreakdownRow(item: item, totalAmount: total, isSelected: selectedSlice == item.category)
 						}
 						.listRowBackground(
 							selectedSlice == item.category
@@ -149,9 +200,6 @@ struct AnalysesView: View {
 			}
 		}
 		.listStyle(.insetGrouped)
-		.onChange(of: analysisType) { _ in
-			selectedSlice = nil
-		}
 	}
 	
 	// MARK: - Composants
@@ -166,56 +214,11 @@ struct AnalysesView: View {
 		.pickerStyle(.segmented)
 	}
 	
-	/// Navigateur de mois avec flèches
-	private var monthNavigator: some View {
-		HStack {
-			Button {
-				slideDirection = .leading
-				withAnimation(.easeInOut(duration: 0.3)) { goToPreviousMonth() }
-			} label: {
-				Image(systemName: "chevron.left")
-					.font(.title3.weight(.semibold))
-					.foregroundStyle(.primary)
-					.frame(width: 44, height: 44)
-					.contentShape(Rectangle())
-			}
-			.buttonStyle(.plain)
-			
-			Spacer()
-			
-			Text("\(monthName) \(String(selectedYear))")
-				.font(.title3.weight(.semibold))
-				.id("\(selectedMonth)-\(selectedYear)")
-				.transition(.push(from: slideDirection))
-			
-			Spacer()
-			
-			Button {
-				slideDirection = .trailing
-				withAnimation(.easeInOut(duration: 0.3)) { goToNextMonth() }
-			} label: {
-				Image(systemName: "chevron.right")
-					.font(.title3.weight(.semibold))
-					.foregroundStyle(isCurrentMonth ? .tertiary : .primary)
-					.frame(width: 44, height: 44)
-					.contentShape(Rectangle())
-			}
-			.buttonStyle(.plain)
-			.disabled(isCurrentMonth)
-		}
-		.simultaneousGesture(
-			DragGesture(minimumDistance: 30)
-				.onEnded { value in
-					guard abs(value.translation.width) > abs(value.translation.height) else { return }
-					if value.translation.width > 0 {
-						slideDirection = .leading
-						withAnimation(.easeInOut(duration: 0.3)) { goToPreviousMonth() }
-					} else if !isCurrentMonth {
-						slideDirection = .trailing
-						withAnimation(.easeInOut(duration: 0.3)) { goToNextMonth() }
-					}
-				}
-		)
+	/// Label du mois courant dans la page
+	private func monthLabel(month: Int, year: Int) -> some View {
+		Text("\(monthName(month: month, year: year)) \(String(year))")
+			.font(.title3.weight(.semibold))
+			.frame(maxWidth: .infinity, alignment: .center)
 	}
 	
 	/// État vide quand aucune transaction
@@ -233,8 +236,8 @@ struct AnalysesView: View {
 	}
 	
 	/// Graphique camembert avec Swift Charts et interaction tap
-	private var pieChart: some View {
-		Chart(chartDisplayData) { item in
+	private func pieChart(chartData: [CategoryData], catData: [CategoryData], total: Double, dispTotal: Double) -> some View {
+		Chart(chartData) { item in
 			SectorMark(
 				angle: .value("Montant", item.total),
 				innerRadius: .ratio(0.6),
@@ -246,7 +249,7 @@ struct AnalysesView: View {
 		.chartBackground { _ in
 			VStack(spacing: 2) {
 				if let selected = selectedSlice,
-				   let data = categoryData.first(where: { $0.category == selected }) {
+				   let data = catData.first(where: { $0.category == selected }) {
 					StyleIconView(style: selected, size: 28)
 					Text(data.total, format: .currency(code: "EUR"))
 						.font(.title3.weight(.bold))
@@ -255,7 +258,7 @@ struct AnalysesView: View {
 						.font(.caption)
 						.foregroundStyle(.secondary)
 				} else {
-					Text(totalAmount, format: .currency(code: "EUR"))
+					Text(total, format: .currency(code: "EUR"))
 						.font(.title2.weight(.bold))
 						.minimumScaleFactor(0.6)
 					Text(analysisType == .expenses ? "dépensés" : "gagnés")
@@ -269,7 +272,7 @@ struct AnalysesView: View {
 			GeometryReader { geometry in
 				Rectangle().fill(.clear).contentShape(Rectangle())
 					.onTapGesture { location in
-						handleChartTap(at: location, in: geometry.size)
+						handleChartTap(at: location, in: geometry.size, chartData: chartData, dispTotal: dispTotal)
 					}
 			}
 		}
@@ -279,7 +282,7 @@ struct AnalysesView: View {
 	
 	/// Gère le tap sur le graphique : sélectionne une tranche si le tap est sur l'anneau,
 	/// désélectionne sinon
-	private func handleChartTap(at location: CGPoint, in size: CGSize) {
+	private func handleChartTap(at location: CGPoint, in size: CGSize, chartData: [CategoryData], dispTotal: Double) {
 		let center = CGPoint(x: size.width / 2, y: size.height / 2)
 		let dx = location.x - center.x
 		let dy = location.y - center.y
@@ -298,54 +301,24 @@ struct AnalysesView: View {
 		var angle = atan2(dx, -dy)
 		if angle < 0 { angle += 2 * .pi }
 		let fraction = angle / (2 * .pi)
-		let angleValue = fraction * displayTotal
+		let angleValue = fraction * dispTotal
 		
-		let found = findCategory(for: angleValue)
+		let found = findCategory(for: angleValue, in: chartData)
 		withAnimation(.easeInOut(duration: 0.2)) {
 			selectedSlice = (selectedSlice == found) ? nil : found
 		}
 	}
 	
 	/// Trouve la catégorie correspondant à une valeur cumulée dans le graphique
-	private func findCategory(for value: Double) -> TransactionCategory? {
+	private func findCategory(for value: Double, in chartData: [CategoryData]) -> TransactionCategory? {
 		var cumulative: Double = 0
-		for item in chartDisplayData {
+		for item in chartData {
 			cumulative += item.total
 			if value <= cumulative {
 				return item.category
 			}
 		}
 		return nil
-	}
-	
-	// MARK: - Navigation temporelle
-	
-	private var isCurrentMonth: Bool {
-		let calendar = Calendar.current
-		let now = Date()
-		return selectedMonth == calendar.component(.month, from: now)
-			&& selectedYear == calendar.component(.year, from: now)
-	}
-	
-	private func goToPreviousMonth() {
-		selectedSlice = nil
-		if selectedMonth == 1 {
-			selectedMonth = 12
-			selectedYear -= 1
-		} else {
-			selectedMonth -= 1
-		}
-	}
-	
-	private func goToNextMonth() {
-		guard !isCurrentMonth else { return }
-		selectedSlice = nil
-		if selectedMonth == 12 {
-			selectedMonth = 1
-			selectedYear += 1
-		} else {
-			selectedMonth += 1
-		}
 	}
 }
 
