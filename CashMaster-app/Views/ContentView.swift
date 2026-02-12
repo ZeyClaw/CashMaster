@@ -15,7 +15,7 @@ struct ContentView: View {
 	@Environment(\.scenePhase) private var scenePhase
 	
 	enum TabItem: Hashable {
-		case home, calendrier, potentielles, add
+		case home, analyses, calendrier, potentielles, add
 	}
 	
 	var body: some View {
@@ -25,6 +25,13 @@ struct ContentView: View {
 				HomeTabView(accountsManager: accountsManager)
 			} label: {
 				Label("Home", systemImage: "house")
+			}
+			
+			// Onglet Analyses
+			Tab(value: TabItem.analyses) {
+				AnalysesTabView(accountsManager: accountsManager)
+			} label: {
+				Label("Analyses", systemImage: "chart.pie")
 			}
 			
 			// Onglet Calendrier

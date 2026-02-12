@@ -1,6 +1,6 @@
 # 📁 STRUCTURE_APP.md — Architecture Technique de Finoria
 
-> **Version**: 2.2  
+> **Version**: 2.3  
 > **Dernière mise à jour**: Février 2026  
 > **Statut**: Production-Ready, AI-Ready  
 
@@ -45,7 +45,7 @@ CashMaster-app/
 │   └── StylableEnum.swift          # Protocole + composants génériques + compactAmount()
 │
 └── 🖼️ Views/                       # INTERFACE - Composants SwiftUI
-    ├── ContentView.swift           # TabView principal (3 onglets)
+    ├── ContentView.swift           # TabView principal (4 onglets)
     ├── NoAccountView.swift         # État vide (aucun compte)
     ├── DocumentPicker.swift        # Sélecteur de fichiers iOS
     │
@@ -72,7 +72,7 @@ CashMaster-app/
     │   ├── AddRecurringTransactionView.swift  # Formulaire création/édition récurrence
     │   └── RecurringTransactionsGridView.swift # Grille d'affichage des récurrences
     │
-    └── TabView/                    # Les 3 onglets principaux
+    └── TabView/                    # Les 4 onglets principaux
         ├── HomeTabView.swift       # Wrapper onglet Accueil
         ├── HomeView.swift          # Contenu Accueil
         ├── FutureTabView.swift     # Wrapper onglet À venir
@@ -81,6 +81,11 @@ CashMaster-app/
         ├── Home/                   # Composants de l'accueil
         │   ├── HomeComponents.swift
         │   └── ShortcutsGridView.swift
+        │
+        ├── Analyses/               # Onglet Analyses (camembert par catégorie)
+        │   ├── AnalysesTabView.swift       # Wrapper onglet Analyses
+        │   ├── AnalysesView.swift          # Vue principale (graphique + détails)
+        │   └── CategoryBreakdownRow.swift  # Ligne détaillée par catégorie
         │
         └── Calendrier/             # Navigation temporelle
             ├── CalendrierMainView.swift
@@ -194,6 +199,7 @@ transactionManager.add(transaction)  // L'UI ne se met pas à jour !
 │  AddTransactionView ───────┼──▶ AccountsManager                 │
 │  CalendrierTabView ────────┤         │                          │
 │  PotentialTransactionsView ┘         │                          │
+│  AnalysesView ─────────────────▶    │                          │
 │  AddRecurringTransactionView ─▶     │                          │
 │  RecurringTransactionsGridView ─▶   │                          │
 │                                      ▼                          │
@@ -218,7 +224,7 @@ transactionManager.add(transaction)  // L'UI ne se met pas à jour !
 
 | Service | Dépend de | Utilisé par |
 |---------|-----------|-------------|
-| `CalculationService` | `Transaction` (struct) | `AccountsManager` |
+| `CalculationService` | `Transaction` (struct) | `AccountsManager`, `AnalysesView` |
 | `CSVService` | `Transaction` (struct) | `AccountsManager` |
 | `TransactionManager` | `Transaction` (struct) | `AccountsManager` |
 
@@ -248,7 +254,15 @@ ContentView (TabView)
 │       │   └── → PotentialTransactionsView (tap "À venir")
 │       └── [Toolbar: Export/Import CSV, Account Picker]
 │
-├── Tab 2: CalendrierMainView
+├── Tab 2: AnalysesTabView
+│   └── NavigationStack
+│       └── AnalysesView (racine)
+│           ├── Segmented Control: Dépenses / Revenus
+│           ├── Navigation mensuelle (< Mois Année >)
+│           ├── Graphique camembert (Swift Charts SectorMark)
+│           └── Liste détaillée par catégorie (CategoryBreakdownRow)
+│
+├── Tab 3: CalendrierMainView
 │   └── NavigationStack + Segmented Control
 │       ├── Mode "Années" → CalendrierYearsContentView
 │       │   └── → MonthsView (tap année)
@@ -256,7 +270,7 @@ ContentView (TabView)
 │       └── Mode "Mois" → CalendrierMonthsContentView
 │           └── → TransactionsListView (tap mois)
 │
-└── Tab 3: FutureTabView
+└── Tab 4: FutureTabView
     └── NavigationStack
         └── PotentialTransactionsView
             └── [Swipe: Valider / Supprimer]
@@ -387,6 +401,7 @@ Chaque fichier Swift suit cette structure :
 | Composant | Technologie Apple |
 |-----------|-------------------|
 | UI Framework | SwiftUI |
+| Graphiques | Swift Charts (`SectorMark`) |
 | State Management | `@Published`, `@ObservedObject`, `@State` |
 | Navigation | `NavigationStack`, `NavigationLink` |
 | Persistance | `UserDefaults` + `Codable` |
@@ -409,7 +424,9 @@ Chaque fichier Swift suit cette structure :
 9. **Modification récurrence** : Les transactions potentielles sont-elles regénérées ?
 10. **Catégories** : `TransactionCategory` est-elle correctement partagée entre transactions, raccourcis et récurrences ?
 11. **Rétrocompatibilité** : Les anciennes données (sans catégorie) se chargent-elles correctement ?
+12. **Analyses** : Le graphique camembert affiche-t-il la bonne répartition par catégorie ?
+13. **Navigation temporelle Analyses** : La navigation mois par mois fonctionne-t-elle correctement ?
 
 ---
 
-*Document généré le 10 février 2026 — Finoria v2.2*
+*Document généré le 12 février 2026 — Finoria v2.3*
