@@ -52,12 +52,12 @@
 		F8388EB42F3E580C0081F2F9 /* AnalysesPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8388EB22F3E580C0081F2F9 /* AnalysesPieChart.swift */; };
 		F842F8C62CBD3AD3007D1A54 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C52CBD3AD3007D1A54 /* Transaction.swift */; };
 		F842F8CA2CBD3B47007D1A54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F842F8C92CBD3B47007D1A54 /* ContentView.swift */; };
-		F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */; };
+		F8B79A6F2CAEC5E4002D88AE /* FinoriaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */; };
 		F8B79A732CAEC5EE002D88AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A722CAEC5EE002D88AE /* Assets.xcassets */; };
 		F8B79A762CAEC5EE002D88AE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A752CAEC5EE002D88AE /* Preview Assets.xcassets */; };
-		F8B79A802CAEC5EE002D88AE /* CashMaster_appTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A7F2CAEC5EE002D88AE /* CashMaster_appTests.swift */; };
-		F8B79A8A2CAEC5EF002D88AE /* CashMaster_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */; };
-		F8B79A8C2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */; };
+		F8B79A802CAEC5EE002D88AE /* Finoria_appTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A7F2CAEC5EE002D88AE /* Finoria_appTests.swift */; };
+		F8B79A8A2CAEC5EF002D88AE /* Finoria_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A892CAEC5EF002D88AE /* Finoria_appUITests.swift */; };
+		F8B79A8C2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift */; };
 		F8B818F92F06A7A7002D02F2 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */; };
 		F8B818FD2F06D137002D02F2 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FB2F06D137002D02F2 /* HomeTabView.swift */; };
 		F8B818FF2F06D14E002D02F2 /* CalendrierMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */; };
@@ -129,14 +129,14 @@
 		F842F8C52CBD3AD3007D1A54 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMasterApp.swift; sourceTree = "<group>"; };
+		F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinoriaApp.swift; sourceTree = "<group>"; };
 		F8B79A722CAEC5EE002D88AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F8B79A752CAEC5EE002D88AE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F8B79A7B2CAEC5EE002D88AE /* FinoriaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinoriaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F8B79A7F2CAEC5EE002D88AE /* CashMaster_appTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appTests.swift; sourceTree = "<group>"; };
+		F8B79A7F2CAEC5EE002D88AE /* Finoria_appTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Finoria_appTests.swift; sourceTree = "<group>"; };
 		F8B79A852CAEC5EE002D88AE /* FinoriaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinoriaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appUITests.swift; sourceTree = "<group>"; };
-		F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CashMaster_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F8B79A892CAEC5EF002D88AE /* Finoria_appUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Finoria_appUITests.swift; sourceTree = "<group>"; };
+		F8B79A8B2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Finoria_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		F8B818F52F059289002D02F2 /* Finoria.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Finoria.entitlements; sourceTree = "<group>"; };
 		F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		F8B818FB2F06D137002D02F2 /* HomeTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
@@ -329,9 +329,9 @@
 			children = (
 				F8B818F52F059289002D02F2 /* Finoria.entitlements */,
 				F812E1FB2CC828DF00619857 /* Finoria-Info.plist */,
-				F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */,
-				F8B79A7E2CAEC5EE002D88AE /* CashMaster-appTests */,
-				F8B79A882CAEC5EF002D88AE /* CashMaster-appUITests */,
+				F8B79A6D2CAEC5E4002D88AE /* Finoria-app */,
+				F8B79A7E2CAEC5EE002D88AE /* Finoria-appTests */,
+				F8B79A882CAEC5EF002D88AE /* Finoria-appUITests */,
 				F8B79A6C2CAEC5E4002D88AE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -346,11 +346,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F8B79A6D2CAEC5E4002D88AE /* CashMaster-app */ = {
+		F8B79A6D2CAEC5E4002D88AE /* Finoria-app */ = {
 			isa = PBXGroup;
 			children = (
 				F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */,
-				F8B79A6E2CAEC5E4002D88AE /* CashMasterApp.swift */,
+				F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */,
 				F807613D2CC6E31B00C34EDD /* Notifications.swift */,
 				F8388E882F3563CB0081F2F9 /* Extensions */,
 				F8388E7C2F35532D0081F2F9 /* Services */,
@@ -359,7 +359,7 @@
 				F8B79A722CAEC5EE002D88AE /* Assets.xcassets */,
 				F8B79A742CAEC5EE002D88AE /* Preview Content */,
 			);
-			path = "CashMaster-app";
+			path = "Finoria-app";
 			sourceTree = "<group>";
 		};
 		F8B79A742CAEC5EE002D88AE /* Preview Content */ = {
@@ -370,21 +370,21 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		F8B79A7E2CAEC5EE002D88AE /* CashMaster-appTests */ = {
+		F8B79A7E2CAEC5EE002D88AE /* Finoria-appTests */ = {
 			isa = PBXGroup;
 			children = (
-				F8B79A7F2CAEC5EE002D88AE /* CashMaster_appTests.swift */,
+				F8B79A7F2CAEC5EE002D88AE /* Finoria_appTests.swift */,
 			);
-			path = "CashMaster-appTests";
+			path = "Finoria-appTests";
 			sourceTree = "<group>";
 		};
-		F8B79A882CAEC5EF002D88AE /* CashMaster-appUITests */ = {
+		F8B79A882CAEC5EF002D88AE /* Finoria-appUITests */ = {
 			isa = PBXGroup;
 			children = (
-				F8B79A892CAEC5EF002D88AE /* CashMaster_appUITests.swift */,
-				F8B79A8B2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift */,
+				F8B79A892CAEC5EF002D88AE /* Finoria_appUITests.swift */,
+				F8B79A8B2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift */,
 			);
-			path = "CashMaster-appUITests";
+			path = "Finoria-appUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -550,7 +550,7 @@
 				F8388EA12F3BD3B30081F2F9 /* TransactionCategory.swift in Sources */,
 				F800A3EA2E4DF80C00918507 /* CalendrierRoute.swift in Sources */,
 				F8388E912F3564140081F2F9 /* HomeComponents.swift in Sources */,
-				F8B79A6F2CAEC5E4002D88AE /* CashMasterApp.swift in Sources */,
+				F8B79A6F2CAEC5E4002D88AE /* FinoriaApp.swift in Sources */,
 				F8388EAC2F3E3FC00081F2F9 /* ViewModifiers.swift in Sources */,
 				F8388E7F2F35532D0081F2F9 /* CSVService.swift in Sources */,
 				F810E2EF2E422F1E00C2DFA9 /* AccountsManager.swift in Sources */,
@@ -575,7 +575,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F8B79A802CAEC5EE002D88AE /* CashMaster_appTests.swift in Sources */,
+				F8B79A802CAEC5EE002D88AE /* Finoria_appTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -583,8 +583,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F8B79A8C2CAEC5EF002D88AE /* CashMaster_appUITestsLaunchTests.swift in Sources */,
-				F8B79A8A2CAEC5EF002D88AE /* CashMaster_appUITests.swift in Sources */,
+				F8B79A8C2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift in Sources */,
+				F8B79A8A2CAEC5EF002D88AE /* Finoria_appUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -731,7 +731,7 @@
 				CODE_SIGN_ENTITLEMENTS = Finoria.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2010;
-				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Finoria-app/Preview Content\"";
 				DEVELOPMENT_TEAM = K9559SXCGV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -765,7 +765,7 @@
 				CODE_SIGN_ENTITLEMENTS = Finoria.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2010;
-				DEVELOPMENT_ASSET_PATHS = "\"CashMaster-app/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Finoria-app/Preview Content\"";
 				DEVELOPMENT_TEAM = K9559SXCGV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;

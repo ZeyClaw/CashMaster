@@ -65,7 +65,7 @@
 ### Structure des Dossiers
 
 ```
-CashMaster-app/
+Finoria-app/
 ├── Models/         → Données & orchestration (Account, Transaction, AccountsManager…)
 ├── Services/       → Logique métier (StorageService, RecurrenceEngine, CalculationService, CSVService)
 ├── Extensions/     → Utilitaires partagés (DateFormatting, StylableEnum, ViewModifiers)
@@ -210,8 +210,8 @@ open Finoria.xcodeproj   # Ouvrir dans Xcode
 | Schéma | Cible |
 |--------|-------|
 | `Finoria` | Application principale |
-| `CashMaster-appTests` | Tests unitaires |
-| `CashMaster-appUITests` | Tests d'interface |
+| `Finoria-appTests` | Tests unitaires |
+| `Finoria-appUITests` | Tests d'interface |
 
 ---
 

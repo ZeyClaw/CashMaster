@@ -55,9 +55,9 @@ Vue → appelle méthode → AccountsManager → délègue au Service → persis
 ## 📂 Arborescence des Dossiers
 
 ```
-CashMaster-app/
+Finoria-app/
 │
-├── 📱 CashMasterApp.swift          # Point d'entrée (@main)
+├── 📱 FinoriaApp.swift          # Point d'entrée (@main)
 ├── 🔔 Notifications.swift          # Notifications locales hebdomadaires
 │
 ├── 🧩 Models/                      # DONNÉES — Structures immuables
