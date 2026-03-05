@@ -14,11 +14,15 @@ import SwiftData
 /// - Créer et configurer le `ModelContainer` avec le schéma courant
 /// - Fournir un conteneur en mémoire pour les Previews et tests
 ///
-/// ## Activer la synchronisation CloudKit
-/// 1. Ajouter la capability **CloudKit** dans Xcode ➜ Signing & Capabilities
-/// 2. Créer un container CloudKit (ex: `iCloud.com.votreapp.finoria`)
-/// 3. Dans `makeContainer()`, décommenter `cloudKitDatabase: .automatic`
-/// 4. Tester sur un **appareil physique** (CloudKit ne fonctionne pas en simulateur)
+/// ## Synchronisation CloudKit (ACTIVE)
+/// La synchronisation iCloud est activée via `cloudKitDatabase: .automatic`.
+/// Container CloudKit : `iCloud.com.godefroyinformatique.GDF-app`
+///
+/// Prérequis vérifiés :
+/// - ✅ Capability CloudKit dans Signing & Capabilities
+/// - ✅ Container CloudKit déclaré dans les entitlements (Debug + Release)
+/// - ✅ `cloudKitDatabase: .automatic` configuré dans `makeContainer()`
+/// - ⚠️ Tester sur un **appareil physique** (CloudKit ne fonctionne pas en simulateur)
 ///
 /// ## Gérer les futures versions du schéma (Schema Migration)
 ///
@@ -59,7 +63,7 @@ enum SwiftDataService {
 	/// Crée le `ModelContainer` configuré pour l'application en production.
 	///
 	/// Les données sont persistées sur disque dans le répertoire par défaut de l'app.
-	/// Pour activer CloudKit, décommenter la ligne `cloudKitDatabase:` ci-dessous.
+	/// CloudKit est activé pour la synchronisation iCloud entre appareils.
 	static func makeContainer() throws -> ModelContainer {
 		let schema = Schema([
 			Account.self,
