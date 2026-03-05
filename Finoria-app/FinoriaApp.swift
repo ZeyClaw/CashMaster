@@ -14,12 +14,16 @@ struct FinoriaApp: App {
 	@StateObject private var accountsManager: AccountsManager
 	
 	init() {
-		// 1. Créer le conteneur SwiftData
+		// 1. Créer le conteneur SwiftData (avec fallback en mémoire si échec)
 		let container: ModelContainer
 		do {
 			container = try SwiftDataService.makeContainer()
 		} catch {
-			fatalError("❌ Impossible de créer le ModelContainer : \(error)")
+			print("⚠️ Erreur création ModelContainer principal : \(error)")
+			print("⚠️ Fallback sur un conteneur en mémoire (données non persistées)")
+			// Fallback : conteneur en mémoire pour que l'app reste utilisable
+			container = (try? SwiftDataService.makePreviewContainer())
+				?? (try! ModelContainer(for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self))
 		}
 		self.modelContainer = container
 		
