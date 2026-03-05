@@ -1,6 +1,6 @@
 # 📁 STRUCTURE_APP.md — Architecture Technique de Finoria
 
-> **Version**: 4.0  
+> **Version**: 5.0  
 > **Dernière mise à jour**: Mars 2026  
 > **Statut**: Production-Ready, AI-Ready  
 
@@ -49,6 +49,24 @@ Vue → appelle méthode → AccountsManager → mute @Model objet → persist()
 - `CalculationService` : tous les calculs financiers (fonctions pures)
 - `CSVService` : import/export CSV
 
+### 4. Fichiers de Projet Xcode (⚠️ Règle Critique)
+
+> **NE JAMAIS MODIFIER MANUELLEMENT** les fichiers gérés par Xcode :
+> - `Finoria.xcodeproj/project.pbxproj`
+> - `*.xcworkspace/contents.xcworkspacedata`
+> - `*.xcuserdata/` (préférences locales)
+> - `*.xcschemes/` (schémas de build)
+> - `*.plist` générés par Xcode (Info.plist, entitlements)
+>
+> **À la place**, indiquer à l'utilisateur les actions à effectuer dans l'interface Xcode :
+> - Ajouter/supprimer des fichiers → Glisser-déposer dans le Project Navigator Xcode
+> - Modifier les Signing & Capabilities → Onglet Signing & Capabilities de la target
+> - Changer le deployment target → Onglet General de la target
+> - Ajouter un framework/package → File > Add Package Dependencies
+> - Modifier les Build Settings → Onglet Build Settings de la target
+>
+> Ces fichiers sont binaires ou semi-binaires et toute modification manuelle peut corrompre le projet.
+
 ---
 
 ## 📂 Arborescence des Dossiers
@@ -56,7 +74,8 @@ Vue → appelle méthode → AccountsManager → mute @Model objet → persist()
 ```
 Finoria-app/
 │
-├── 📱 FinoriaApp.swift              # Point d'entrée (@main) + ModelContainer + Migration
+├── 📱 FinoriaApp.swift              # Point d'entrée (@main) + ModelContainer + Fallback erreur
+├── 🚨 LaunchScreen.storyboard       # Écran de lancement (géré par Xcode)
 ├── 🔔 Notifications.swift           # Notifications locales hebdomadaires
 │
 ├── 🧩 Models/                       # DONNÉES — Classes @Model SwiftData
@@ -65,16 +84,13 @@ Finoria-app/
 │   ├── RecurringTransaction.swift   # @Model RecurringTransaction + RecurrenceFrequency
 │   ├── Transaction.swift            # @Model Transaction + TransactionType enum
 │   ├── TransactionCategory.swift    # Catégorie unifiée (transactions, raccourcis, récurrences)
-│   ├── WidgetShortcut.swift         # @Model Raccourci rapide
-│   ├── TransactionManager.swift     # ⚠️ OBSOLÈTE — À supprimer après migration complète
+│   └── WidgetShortcut.swift         # @Model Raccourci rapide
 │
 ├── ⚙️ Services/                     # LOGIQUE MÉTIER
 │   ├── CalculationService.swift     # Calculs financiers (totaux, filtres, pourcentages)
 │   ├── CSVService.swift             # Import/Export CSV
 │   ├── RecurrenceEngine.swift       # Moteur de génération des récurrences (utilise ModelContext)
-│   ├── SwiftDataService.swift       # 🆕 Configuration ModelContainer + guide CloudKit/Migration
-│   ├── LegacyMigrationService.swift # 🆕 Migration one-shot UserDefaults → SwiftData
-│   ├── StorageService.swift         # ⚠️ OBSOLÈTE — À supprimer après migration complète
+│   └── SwiftDataService.swift       # Configuration ModelContainer + guide CloudKit/Migration
 │
 ├── 🔧 Extensions/                   # UTILITAIRES — Code partagé et réutilisable
 │   ├── DateFormatting.swift         # Extension Date (noms de mois)
@@ -83,6 +99,7 @@ Finoria-app/
 │
 └── 🖼️ Views/                        # INTERFACE — Composants SwiftUI
     ├── ContentView.swift            # TabView principal (4 onglets + bouton ajout)
+    ├── DatabaseErrorView.swift      # Vue d'erreur si SwiftData ne peut pas démarrer
     ├── NoAccountView.swift          # État vide (aucun compte)
     ├── DocumentPicker.swift         # Sélecteur de fichiers iOS (UIKit bridge)
     │
@@ -360,14 +377,6 @@ La synchronisation iCloud est activée et configurée :
 | `makeContainer()` | Crée le ModelContainer de production (SQLite sur disque) |
 | `makePreviewContainer()` | Crée un ModelContainer en mémoire pour previews/tests |
 
-### LegacyMigrationService (Migration one-shot)
-
-| Méthode | Description |
-|---------|-------------|
-| `migrateIfNeeded(context:)` | Lit UserDefaults JSON → injecte dans SwiftData → marque comme fait |
-
-> ⚠️ **À supprimer** quand tous les utilisateurs sont sur la version SwiftData.
-
 ### RecurrenceEngine (Traitement des récurrences)
 
 | Méthode | Description |
@@ -480,7 +489,6 @@ Views ──────▶ AccountsManager ──────▶ ModelContext (
                     └──────▶ CSVService
 
 FinoriaApp ─▶ SwiftDataService (crée ModelContainer)
-           ─▶ LegacyMigrationService (migration one-shot)
 
 Views ──────▶ StylableEnum (StylePickerGrid, StyleIconView)
 Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPickerToolbar)
@@ -545,7 +553,6 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 3. `CalculationService.totalForMonth` : retourne les bonnes valeurs
 4. `CalculationService.monthlyChangePercentage` : calcul correct (y compris edge cases)
 5. `CSVService` : export/import round-trip sans perte
-6. `LegacyMigrationService.migrateIfNeeded` : migration correcte UserDefaults → SwiftData
 
 ### AccountsManager (tests d'intégration)
 
@@ -561,7 +568,7 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 13. Navigation complète entre les 4 onglets
 14. Le graphique camembert affiche la bonne répartition
 15. Swipe actions (supprimer/valider) avec confirmation pour récurrences
-16. Migration legacy → SwiftData préserve toutes les données
+16. États vides cliquables ("Aucune transaction" / "Aucune transaction potentielle") ouvrent la sheet d'ajout
 
 ---
 
@@ -579,17 +586,4 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 
 ---
 
-## 🗑️ Fichiers à Supprimer après Migration Complète
-
-> Quand **tous** les utilisateurs ont mis à jour vers la version SwiftData :
-
-| Fichier | Raison |
-|---------|--------|
-| `LegacyMigrationService.swift` | Migration one-shot terminée |
-| `StorageService.swift` | Ancien service UserDefaults |
-| `TransactionManager.swift` | Remplacé par relations SwiftData |
-| Appel `LegacyMigrationService.migrateIfNeeded()` dans `FinoriaApp.swift` | Plus nécessaire |
-
----
-
-*Document généré le 5 mars 2026 — Finoria v4.0 (SwiftData)*
+*Document généré le 6 mars 2026 — Finoria v5.0 (SwiftData)*
