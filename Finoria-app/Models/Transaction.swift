@@ -35,7 +35,7 @@ final class Transaction {
 	
 	// MARK: - Propriétés persistées
 	
-	@Attribute(.unique) var id: UUID
+	var id: UUID
 	var amount: Double
 	var comment: String
 	var potentiel: Bool

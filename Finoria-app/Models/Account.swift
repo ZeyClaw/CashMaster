@@ -101,7 +101,7 @@ final class Account {
 	
 	// MARK: - Propriétés persistées
 	
-	@Attribute(.unique) var id: UUID
+	var id: UUID
 	var name: String
 	var detail: String
 	var style: AccountStyle

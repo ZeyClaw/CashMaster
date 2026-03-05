@@ -22,7 +22,11 @@ import SwiftData
 /// - ✅ Capability CloudKit dans Signing & Capabilities
 /// - ✅ Container CloudKit déclaré dans les entitlements (Debug + Release)
 /// - ✅ `cloudKitDatabase: .automatic` configuré dans `makeContainer()`
+/// - ✅ Aucun `@Attribute(.unique)` sur les modèles (incompatible avec CloudKit)
 /// - ⚠️ Tester sur un **appareil physique** (CloudKit ne fonctionne pas en simulateur)
+///
+/// **Important** : CloudKit ne supporte PAS `@Attribute(.unique)`.
+/// L'unicité des UUID est garantie par génération côté client (`UUID()` dans les `init`).
 ///
 /// ## Gérer les futures versions du schéma (Schema Migration)
 ///

@@ -49,7 +49,7 @@ final class RecurringTransaction {
 	
 	// MARK: - Propriétés persistées
 	
-	@Attribute(.unique) var id: UUID
+	var id: UUID
 	var amount: Double
 	var comment: String
 	var type: TransactionType
