@@ -12,11 +12,18 @@ import SwiftData
 ///
 /// Responsabilités :
 /// - Créer et configurer le `ModelContainer` avec le schéma courant
+/// - Synchroniser les données via CloudKit (iCloud)
 /// - Fournir un conteneur en mémoire pour les Previews et tests
 ///
-/// ## Synchronisation CloudKit (DÉSACTIVÉE)
-/// CloudKit est désactivé pour le moment (cloudKitDatabase: .none).
-/// Pour réactiver plus tard : changer `.none` en `.automatic`
+/// ## Synchronisation CloudKit (ACTIVÉE)
+/// CloudKit est activé avec `cloudKitDatabase: .automatic`.
+/// Les données sont synchronisées automatiquement entre les appareils du même compte iCloud.
+///
+/// Prérequis Xcode :
+/// - Capability "iCloud" avec CloudKit coché + container `iCloud.com.godefroyinformatique.GDF-app`
+/// - Capability "Push Notifications" activée
+/// - Capability "Background Modes" → "Remote notifications" coché
+/// - Aucun `@Attribute(.unique)` sur les modèles (incompatible CloudKit)
 enum SwiftDataService {
 	
 	// MARK: - Schema
@@ -38,7 +45,7 @@ enum SwiftDataService {
 		let configuration = ModelConfiguration(
 			isStoredInMemoryOnly: false,
 			allowsSave: true,
-			cloudKitDatabase: .none
+			cloudKitDatabase: .automatic
 		)
 		
 		return try ModelContainer(
