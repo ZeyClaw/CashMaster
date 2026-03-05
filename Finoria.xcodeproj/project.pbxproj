@@ -61,7 +61,6 @@
 		F8B79A8A2CAEC5EF002D88AE /* Finoria_appUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A892CAEC5EF002D88AE /* Finoria_appUITests.swift */; };
 		F8B79A8C2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A8B2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift */; };
 		F8B818F92F06A7A7002D02F2 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */; };
-		F8DBEF022F687A0100A1B2C3 /* DatabaseErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DBEF012F687A0100A1B2C3 /* DatabaseErrorView.swift */; };
 		F8B818FD2F06D137002D02F2 /* HomeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FB2F06D137002D02F2 /* HomeTabView.swift */; };
 		F8B818FF2F06D14E002D02F2 /* CalendrierMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */; };
 		F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */; };
@@ -145,7 +144,6 @@
 		F8B79A8B2CAEC5EF002D88AE /* Finoria_appUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Finoria_appUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		F8B818F52F059289002D02F2 /* Finoria.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Finoria.entitlements; sourceTree = "<group>"; };
 		F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
-		F8DBEF012F687A0100A1B2C3 /* DatabaseErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseErrorView.swift; sourceTree = "<group>"; };
 		F8B818FB2F06D137002D02F2 /* HomeTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
 		F8B818FE2F06D14E002D02F2 /* CalendrierMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendrierMainView.swift; sourceTree = "<group>"; };
 		F8EA0EA12CC2E49D0071875C /* TransactionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManager.swift; sourceTree = "<group>"; };
@@ -223,7 +221,6 @@
 				F8B818F82F06A7A7002D02F2 /* DocumentPicker.swift */,
 				F842F8C92CBD3B47007D1A54 /* ContentView.swift */,
 				F800A3ED2E4E01F700918507 /* NoAccountView.swift */,
-				F8DBEF012F687A0100A1B2C3 /* DatabaseErrorView.swift */,
 				F810E3152E46086500C2DFA9 /* Account */,
 				F810E3162E46088500C2DFA9 /* Widget */,
 				F810E3072E43EAC800C2DFA9 /* TabView */,
@@ -533,7 +530,6 @@
 				F8388E772F350F150081F2F9 /* AllTransactionsView.swift in Sources */,
 				F8388E9D2F3BC5F90081F2F9 /* AddRecurringTransactionView.swift in Sources */,
 				F800A3EE2E4E01F700918507 /* NoAccountView.swift in Sources */,
-				F8DBEF022F687A0100A1B2C3 /* DatabaseErrorView.swift in Sources */,
 				F8388E8C2F3563CC0081F2F9 /* StylableEnum.swift in Sources */,
 				F8EA0EA22CC2E49D0071875C /* TransactionManager.swift in Sources */,
 				F8388E9C2F3BC5F90081F2F9 /* RecurringTransactionsGridView.swift in Sources */,
