@@ -28,5 +28,5 @@ struct CalendrierMainView: View {
 }
 
 #Preview {
-	CalendrierMainView(accountsManager: AccountsManager())
+	CalendrierMainView(accountsManager: .preview)
 }

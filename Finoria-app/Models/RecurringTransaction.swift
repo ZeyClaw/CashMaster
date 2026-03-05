@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 
 // MARK: - Fréquence de récurrence
@@ -37,20 +38,39 @@ enum RecurrenceFrequency: String, Codable, CaseIterable, Identifiable {
 	}
 }
 
-// MARK: - Modèle RecurringTransaction
+// MARK: - Modèle RecurringTransaction (SwiftData)
 
-struct RecurringTransaction: Identifiable, Codable, Equatable {
-	let id: UUID
-	let amount: Double
-	let comment: String
-	let type: TransactionType
-	let category: TransactionCategory
-	let frequency: RecurrenceFrequency
-	let startDate: Date
+/// Modèle persistant représentant une transaction récurrente.
+///
+/// Génère automatiquement des `Transaction` potentielles pour le mois à venir.
+/// Les transactions passées sont auto-validées par le `RecurrenceEngine`.
+@Model
+final class RecurringTransaction {
+	
+	// MARK: - Propriétés persistées
+	
+	@Attribute(.unique) var id: UUID
+	var amount: Double
+	var comment: String
+	var type: TransactionType
+	var category: TransactionCategory
+	var frequency: RecurrenceFrequency
+	var startDate: Date
 	/// Date de la dernière transaction générée (pour éviter les doublons)
 	var lastGeneratedDate: Date?
 	/// Indique si la récurrence est en pause (aucune transaction générée tant que c'est true)
 	var isPaused: Bool
+	
+	// MARK: - Relations
+	
+	/// Compte propriétaire de cette récurrence
+	var account: Account?
+	
+	/// Transactions générées par cette récurrence (nullify à la suppression)
+	@Relationship(deleteRule: .nullify, inverse: \Transaction.sourceRecurringTransaction)
+	var generatedTransactions: [Transaction] = []
+	
+	// MARK: - Init
 	
 	init(
 		id: UUID = UUID(),
@@ -143,7 +163,7 @@ struct RecurringTransaction: Identifiable, Codable, Equatable {
 					potentiel: !isToday,
 					date: date,
 					category: category,
-					recurringTransactionId: self.id
+					sourceRecurringTransaction: self
 				)
 				return (date: date, transaction: transaction)
 			}

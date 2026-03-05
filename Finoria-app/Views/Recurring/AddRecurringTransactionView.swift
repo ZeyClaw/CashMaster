@@ -142,17 +142,16 @@ struct AddRecurringTransactionView: View {
 		}
 		
 		if let existing = recurringToEdit {
-			let updated = RecurringTransaction(
-				id: existing.id,
+			// Mode édition: mutation en place de l'objet SwiftData
+			accountsManager.updateRecurringTransaction(
+				existing,
 				amount: amount,
 				comment: comment,
 				type: type,
 				category: selectedCategory,
 				frequency: frequency,
-				startDate: startDate,
-				lastGeneratedDate: existing.lastGeneratedDate
+				startDate: startDate
 			)
-			accountsManager.updateRecurringTransaction(updated)
 		} else {
 			let recurring = RecurringTransaction(
 				amount: amount,
@@ -171,5 +170,5 @@ struct AddRecurringTransactionView: View {
 // MARK: - Preview
 
 #Preview {
-	AddRecurringTransactionView(accountsManager: AccountsManager())
+	AddRecurringTransactionView(accountsManager: .preview)
 }

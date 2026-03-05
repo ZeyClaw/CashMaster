@@ -6,16 +6,29 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 
-// MARK: - Modèle WidgetShortcut
+// MARK: - Modèle WidgetShortcut (SwiftData)
 
-struct WidgetShortcut: Identifiable, Codable, Equatable {
-	let id: UUID
-	let amount: Double
-	let comment: String
-	let type: TransactionType
-	let category: TransactionCategory
+/// Modèle persistant représentant un raccourci rapide pour ajouter une transaction en un tap.
+@Model
+final class WidgetShortcut {
+	
+	// MARK: - Propriétés persistées
+	
+	@Attribute(.unique) var id: UUID
+	var amount: Double
+	var comment: String
+	var type: TransactionType
+	var category: TransactionCategory
+	
+	// MARK: - Relations
+	
+	/// Compte propriétaire de ce raccourci
+	var account: Account?
+	
+	// MARK: - Init
 	
 	init(id: UUID = UUID(), amount: Double, comment: String, type: TransactionType, category: TransactionCategory? = nil) {
 		self.id = id

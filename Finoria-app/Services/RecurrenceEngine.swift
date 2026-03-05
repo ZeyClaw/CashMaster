@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 /// Moteur de traitement des transactions récurrentes.
 ///
@@ -14,8 +15,8 @@ import Foundation
 /// - Auto-valider les transactions dont la date est passée
 /// - Nettoyer les transactions potentielles lors de suppression/modification de récurrence
 ///
-/// Ce service est **pur** : il opère directement sur les TransactionManagers (référence)
-/// mais ne gère aucune persistance. C'est AccountsManager qui persiste après appel.
+/// Ce service utilise le `ModelContext` pour insérer/supprimer des objets SwiftData.
+/// C'est `AccountsManager` qui persiste (save) après chaque appel.
 struct RecurrenceEngine {
 	
 	// MARK: - Traitement global
@@ -25,12 +26,12 @@ struct RecurrenceEngine {
 	///
 	/// - Parameters:
 	///   - accounts: Liste de tous les comptes
-	///   - managers: Dictionnaire des TransactionManagers par compte
+	///   - context: Le ModelContext SwiftData pour insérer les nouvelles transactions
 	/// - Returns: `true` si des modifications ont été effectuées
 	@discardableResult
 	static func processAll(
 		accounts: [Account],
-		managers: [UUID: TransactionManager]
+		context: ModelContext
 	) -> Bool {
 		let calendar = Calendar.current
 		let now = Date()
@@ -38,38 +39,35 @@ struct RecurrenceEngine {
 		var anyChange = false
 		
 		for account in accounts {
-			guard let manager = managers[account.id] else { continue }
 			
 			// 1. Générer les transactions potentielles depuis les récurrences actives
-			for i in manager.recurringTransactions.indices {
-				let recurring = manager.recurringTransactions[i]
-				guard !recurring.isPaused else { continue }
-				
+			for recurring in account.recurringTransactions where !recurring.isPaused {
 				let pending = recurring.pendingTransactions()
 				
 				for entry in pending {
-					let alreadyExists = manager.transactions.contains { tx in
-						tx.recurringTransactionId == recurring.id &&
+					let alreadyExists = account.transactions.contains { tx in
+						tx.sourceRecurringTransaction?.id == recurring.id &&
 						tx.date != nil &&
 						calendar.isDate(tx.date!, inSameDayAs: entry.date)
 					}
 					if !alreadyExists {
-						manager.add(entry.transaction)
+						let transaction = entry.transaction
+						transaction.account = account
+						context.insert(transaction)
 						anyChange = true
 					}
 				}
 				
 				// Mettre à jour la dernière date générée
 				if let lastDate = pending.map({ $0.date }).max() {
-					manager.recurringTransactions[i].lastGeneratedDate = lastDate
+					recurring.lastGeneratedDate = lastDate
 				}
 			}
 			
 			// 2. Auto-valider les transactions potentielles dont la date prévue est passée
-			for i in manager.transactions.indices {
-				let tx = manager.transactions[i]
-				if tx.potentiel, let date = tx.date, calendar.startOfDay(for: date) <= startOfToday {
-					manager.transactions[i] = tx.validated(at: date)
+			for transaction in account.transactions where transaction.potentiel {
+				if let date = transaction.date, calendar.startOfDay(for: date) <= startOfToday {
+					transaction.validate(at: date)
 					anyChange = true
 				}
 			}
@@ -82,7 +80,14 @@ struct RecurrenceEngine {
 	
 	/// Supprime toutes les transactions potentielles liées à une récurrence donnée.
 	/// Utilisé lors de la suppression, modification ou mise en pause d'une récurrence.
-	static func removePotentialTransactions(for recurringId: UUID, from transactions: inout [Transaction]) {
-		transactions.removeAll { $0.recurringTransactionId == recurringId && $0.potentiel }
+	///
+	/// - Parameters:
+	///   - recurring: La récurrence dont les transactions potentielles doivent être supprimées
+	///   - context: Le ModelContext pour supprimer les objets
+	static func removePotentialTransactions(for recurring: RecurringTransaction, context: ModelContext) {
+		let potentials = recurring.generatedTransactions.filter { $0.potentiel }
+		for transaction in potentials {
+			context.delete(transaction)
+		}
 	}
 }

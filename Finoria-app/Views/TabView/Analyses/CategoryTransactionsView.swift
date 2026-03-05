@@ -86,7 +86,7 @@ struct CategoryTransactionsView: View {
 #Preview {
 	NavigationStack {
 		CategoryTransactionsView(
-			accountsManager: AccountsManager(),
+			accountsManager: .preview,
 			category: .food,
 			month: 2,
 			year: 2026

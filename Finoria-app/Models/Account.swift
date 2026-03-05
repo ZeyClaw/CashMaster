@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 
 // MARK: - Style des comptes (icône + couleur liés)
@@ -85,13 +86,38 @@ enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 	}
 }
 
-// MARK: - Modèle Account
+// MARK: - Modèle Account (SwiftData)
 
-struct Account: Identifiable, Codable, Equatable {
-	let id: UUID
+/// Modèle persistant représentant un compte financier.
+///
+/// Possède des relations one-to-many vers :
+/// - `transactions` : toutes les transactions du compte
+/// - `widgetShortcuts` : les raccourcis rapides
+/// - `recurringTransactions` : les transactions récurrentes
+///
+/// La suppression d'un compte entraîne la suppression en cascade de toutes ses données liées.
+@Model
+final class Account {
+	
+	// MARK: - Propriétés persistées
+	
+	@Attribute(.unique) var id: UUID
 	var name: String
 	var detail: String
 	var style: AccountStyle
+	
+	// MARK: - Relations (one-to-many, cascade delete)
+	
+	@Relationship(deleteRule: .cascade, inverse: \Transaction.account)
+	var transactions: [Transaction] = []
+	
+	@Relationship(deleteRule: .cascade, inverse: \WidgetShortcut.account)
+	var widgetShortcuts: [WidgetShortcut] = []
+	
+	@Relationship(deleteRule: .cascade, inverse: \RecurringTransaction.account)
+	var recurringTransactions: [RecurringTransaction] = []
+	
+	// MARK: - Init
 	
 	init(id: UUID = UUID(), name: String, detail: String = "", style: AccountStyle? = nil) {
 		self.id = id

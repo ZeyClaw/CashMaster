@@ -37,5 +37,5 @@ struct AnalysesTabView: View {
 }
 
 #Preview {
-	AnalysesTabView(accountsManager: AccountsManager())
+	AnalysesTabView(accountsManager: .preview)
 }

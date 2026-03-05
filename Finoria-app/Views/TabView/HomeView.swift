@@ -202,6 +202,6 @@ struct HomeView: View {
 
 #Preview {
 	NavigationStack {
-		HomeView(accountsManager: AccountsManager())
+		HomeView(accountsManager: .preview)
 	}
 }

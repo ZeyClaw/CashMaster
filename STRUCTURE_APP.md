@@ -1,7 +1,7 @@
 # 📁 STRUCTURE_APP.md — Architecture Technique de Finoria
 
-> **Version**: 3.1  
-> **Dernière mise à jour**: Février 2026  
+> **Version**: 4.0  
+> **Dernière mise à jour**: Mars 2026  
 > **Statut**: Production-Ready, AI-Ready  
 
 Ce document est la **carte géographique** de l'application. Il est optimisé pour qu'un développeur ou une IA puisse comprendre le projet en une seule lecture.
@@ -11,12 +11,12 @@ Ce document est la **carte géographique** de l'application. Il est optimisé po
 ## 🎯 Vue d'Ensemble en 30 Secondes
 
 **Finoria** est une application iOS de gestion de finances personnelles construite avec :
-- **SwiftUI** (100% déclaratif, iOS 16+)
+- **SwiftUI** (100% déclaratif, iOS 17+)
+- **SwiftData** (persistance native avec `@Model`, relations, migration de schéma)
 - **Architecture Observable** (Single Source of Truth via `AccountsManager`)
-- **Persistance UserDefaults** (JSON encodé via `Codable`)
-- **Composition de services** (StorageService, RecurrenceEngine, CalculationService, CSVService)
+- **Composition de services** (RecurrenceEngine, CalculationService, CSVService)
 
-**Principe clé** : `AccountsManager` est un **orchestrateur léger**. Il ne contient aucune logique métier complexe. Il délègue aux services spécialisés et garantit la persistance + notification SwiftUI après chaque mutation.
+**Principe clé** : `AccountsManager` est un **orchestrateur léger**. Il ne contient aucune logique métier complexe. Il délègue aux services spécialisés et garantit la persistance SwiftData + notification SwiftUI après chaque mutation.
 
 ---
 
@@ -28,8 +28,8 @@ Pas d'abstractions inutiles. Pas de protocol-oriented-everything. Chaque couche 
 
 | Couche | Rôle | Exemple |
 |--------|------|---------|
-| **Models** | Structures de données `Codable` | `Transaction`, `Account` |
-| **Services** | Logique métier pure, sans état | `CalculationService`, `RecurrenceEngine` |
+| **Models** | Classes `@Model` SwiftData avec relations | `Account`, `Transaction` |
+| **Services** | Logique métier pure ou avec contexte | `CalculationService`, `RecurrenceEngine` |
 | **Store** | État observable + orchestration | `AccountsManager` |
 | **Views** | Interface SwiftUI déclarative | `HomeView`, `AnalysesView` |
 | **Extensions** | Utilitaires partagés | `ViewModifiers`, `DateFormatting` |
@@ -37,15 +37,14 @@ Pas d'abstractions inutiles. Pas de protocol-oriented-everything. Chaque couche 
 ### 2. Single Source of Truth
 
 ```
-Vue → appelle méthode → AccountsManager → délègue au Service → persist() → objectWillChange.send()
+Vue → appelle méthode → AccountsManager → mute @Model objet → persist() (context.save())
 ```
 
 > ⚠️ **TOUTE modification de données DOIT passer par `AccountsManager`.**
 
 ### 3. Composition over Inheritance
 
-`AccountsManager` orchestre 4 services indépendants :
-- `StorageService` : persistance UserDefaults
+`AccountsManager` orchestre avec un `ModelContext` SwiftData et 3 services indépendants :
 - `RecurrenceEngine` : génération/validation des transactions récurrentes
 - `CalculationService` : tous les calculs financiers (fonctions pures)
 - `CSVService` : import/export CSV
@@ -57,80 +56,82 @@ Vue → appelle méthode → AccountsManager → délègue au Service → persis
 ```
 Finoria-app/
 │
-├── 📱 FinoriaApp.swift          # Point d'entrée (@main)
-├── 🔔 Notifications.swift          # Notifications locales hebdomadaires
+├── 📱 FinoriaApp.swift              # Point d'entrée (@main) + ModelContainer + Migration
+├── 🔔 Notifications.swift           # Notifications locales hebdomadaires
 │
-├── 🧩 Models/                      # DONNÉES — Structures immuables
-│   ├── Account.swift               # Modèle compte + AccountStyle enum
-│   ├── AccountsManager.swift       # 🔑 ORCHESTRATEUR (Single Source of Truth)
-│   ├── RecurringTransaction.swift  # Transaction récurrente + RecurrenceFrequency
-│   ├── Transaction.swift           # Struct immuable + TransactionType enum
-│   ├── TransactionCategory.swift   # Catégorie unifiée (transactions, raccourcis, récurrences)
-│   ├── TransactionManager.swift    # Conteneur de données par compte (non observable)
-│   └── WidgetShortcut.swift        # Raccourci rapide
+├── 🧩 Models/                       # DONNÉES — Classes @Model SwiftData
+│   ├── Account.swift                # @Model Account + AccountStyle enum + Relations
+│   ├── AccountsManager.swift        # 🔑 ORCHESTRATEUR (Single Source of Truth + ModelContext)
+│   ├── RecurringTransaction.swift   # @Model RecurringTransaction + RecurrenceFrequency
+│   ├── Transaction.swift            # @Model Transaction + TransactionType enum
+│   ├── TransactionCategory.swift    # Catégorie unifiée (transactions, raccourcis, récurrences)
+│   ├── WidgetShortcut.swift         # @Model Raccourci rapide
+│   ├── TransactionManager.swift     # ⚠️ OBSOLÈTE — À supprimer après migration complète
 │
-├── ⚙️ Services/                    # LOGIQUE MÉTIER — Fonctions pures, sans état
-│   ├── CalculationService.swift    # Calculs financiers (totaux, filtres, pourcentages)
-│   ├── CSVService.swift            # Import/Export CSV
-│   ├── RecurrenceEngine.swift      # 🆕 Moteur de génération des récurrences
-│   └── StorageService.swift        # 🆕 Persistance UserDefaults
+├── ⚙️ Services/                     # LOGIQUE MÉTIER
+│   ├── CalculationService.swift     # Calculs financiers (totaux, filtres, pourcentages)
+│   ├── CSVService.swift             # Import/Export CSV
+│   ├── RecurrenceEngine.swift       # Moteur de génération des récurrences (utilise ModelContext)
+│   ├── SwiftDataService.swift       # 🆕 Configuration ModelContainer + guide CloudKit/Migration
+│   ├── LegacyMigrationService.swift # 🆕 Migration one-shot UserDefaults → SwiftData
+│   ├── StorageService.swift         # ⚠️ OBSOLÈTE — À supprimer après migration complète
 │
-├── 🔧 Extensions/                  # UTILITAIRES — Code partagé et réutilisable
-│   ├── DateFormatting.swift        # Extension Date (noms de mois)
-│   ├── StylableEnum.swift          # Protocole StylableEnum + composants génériques + compactAmount()
-│   └── ViewModifiers.swift         # 🆕 Modifiers partagés (fond adaptatif, toolbar, formatage)
+├── 🔧 Extensions/                   # UTILITAIRES — Code partagé et réutilisable
+│   ├── DateFormatting.swift         # Extension Date (noms de mois)
+│   ├── StylableEnum.swift           # Protocole StylableEnum + composants génériques + compactAmount()
+│   └── ViewModifiers.swift          # Modifiers partagés (fond adaptatif, toolbar, formatage)
 │
-└── 🖼️ Views/                       # INTERFACE — Composants SwiftUI
-    ├── ContentView.swift           # TabView principal (4 onglets + bouton ajout)
-    ├── NoAccountView.swift         # État vide (aucun compte)
-    ├── DocumentPicker.swift        # Sélecteur de fichiers iOS (UIKit bridge)
+└── 🖼️ Views/                        # INTERFACE — Composants SwiftUI
+    ├── ContentView.swift            # TabView principal (4 onglets + bouton ajout)
+    ├── NoAccountView.swift          # État vide (aucun compte)
+    ├── DocumentPicker.swift         # Sélecteur de fichiers iOS (UIKit bridge)
     │
-    ├── Account/                    # Gestion des comptes
-    │   ├── AccountCardView.swift   # Carte visuelle d'un compte
-    │   ├── AccountPickerView.swift # Sélecteur de compte (sheet)
-    │   └── AddAccountSheet.swift   # Formulaire création/édition compte
+    ├── Account/                     # Gestion des comptes
+    │   ├── AccountCardView.swift    # Carte visuelle d'un compte
+    │   ├── AccountPickerView.swift  # Sélecteur de compte (sheet)
+    │   └── AddAccountSheet.swift    # Formulaire création/édition compte
     │
-    ├── Transactions/               # Gestion des transactions
+    ├── Transactions/                # Gestion des transactions
     │   ├── AddTransactionView.swift # Formulaire ajout/édition
-    │   └── TransactionRow.swift    # Ligne d'affichage transaction
+    │   └── TransactionRow.swift     # Ligne d'affichage transaction
     │
-    ├── Components/                 # Composants UI réutilisables
-    │   └── CurrencyTextField.swift # Champ montant avec €
+    ├── Components/                  # Composants UI réutilisables
+    │   └── CurrencyTextField.swift  # Champ montant avec €
     │
-    ├── Widget/                     # Raccourcis rapides
+    ├── Widget/                      # Raccourcis rapides
     │   ├── AddWidgetShortcutView.swift # Formulaire création/édition raccourci
-    │   └── Toast/                  # Notifications visuelles éphémères
+    │   └── Toast/                   # Notifications visuelles éphémères
     │       ├── ToastCard.swift
     │       ├── ToastData.swift
     │       └── ToastView.swift
     │
-    ├── Recurring/                  # Transactions récurrentes
+    ├── Recurring/                   # Transactions récurrentes
     │   ├── AddRecurringTransactionView.swift  # Formulaire création/édition
     │   └── RecurringTransactionsGridView.swift # Grille d'affichage
     │
-    └── TabView/                    # Les 4 onglets principaux
-        ├── HomeTabView.swift       # Wrapper onglet Accueil (+ CSV import/export)
-        ├── HomeView.swift          # Contenu Accueil (solde, raccourcis, récurrences)
-        ├── FutureTabView.swift     # Wrapper onglet Futur
+    └── TabView/                     # Les 4 onglets principaux
+        ├── HomeTabView.swift        # Wrapper onglet Accueil (+ CSV import/export)
+        ├── HomeView.swift           # Contenu Accueil (solde, raccourcis, récurrences)
+        ├── FutureTabView.swift      # Wrapper onglet Futur
         ├── PotentialTransactionsView.swift # Transactions à venir
         │
-        ├── Home/                   # Composants de l'accueil
-        │   ├── HomeComponents.swift    # BalanceHeader, QuickCard, ToastStack
-        │   └── ShortcutsGridView.swift # Grille de raccourcis
+        ├── Home/                    # Composants de l'accueil
+        │   ├── HomeComponents.swift     # BalanceHeader, QuickCard, ToastStack
+        │   └── ShortcutsGridView.swift  # Grille de raccourcis
         │
-        ├── Analyses/               # Onglet Analyses
-        │   ├── AnalysesTabView.swift       # Wrapper avec NavigationStack
-        │   ├── AnalysesView.swift          # Vue principale (navigation mois + liste)
-        │   ├── AnalysesModels.swift        # Modèles (CategoryData, AnalysisType, Route)
-        │   ├── AnalysesPieChart.swift      # Camembert interactif (Charts)
-        │   ├── CategoryBreakdownRow.swift  # Ligne détaillée par catégorie
+        ├── Analyses/                # Onglet Analyses
+        │   ├── AnalysesTabView.swift        # Wrapper avec NavigationStack
+        │   ├── AnalysesView.swift           # Vue principale (navigation mois + liste)
+        │   ├── AnalysesModels.swift         # Modèles (CategoryData, AnalysisType, Route)
+        │   ├── AnalysesPieChart.swift       # Camembert interactif (Charts)
+        │   ├── CategoryBreakdownRow.swift   # Ligne détaillée par catégorie
         │   └── CategoryTransactionsView.swift # Transactions d'une catégorie
         │
-        └── Calendrier/             # Onglet Navigation temporelle
-            ├── CalendrierMainView.swift  # Wrapper avec toolbar
-            ├── CalendrierTabView.swift   # Contenu (Jour/Mois/Année)
-            ├── CalendrierRoute.swift     # Enum de navigation
-            ├── MonthsView.swift          # Liste des mois d'une année
+        └── Calendrier/              # Onglet Navigation temporelle
+            ├── CalendrierMainView.swift   # Wrapper avec toolbar
+            ├── CalendrierTabView.swift    # Contenu (Jour/Mois/Année)
+            ├── CalendrierRoute.swift      # Enum de navigation
+            ├── MonthsView.swift           # Liste des mois d'une année
             ├── TransactionsListView.swift # Transactions d'un mois
             └── AllTransactionsView.swift  # Toutes les transactions groupées par jour
 ```
@@ -139,7 +140,7 @@ Finoria-app/
 
 ## 🔄 Flux de Données
 
-### Architecture en Couches
+### Architecture en Couches (SwiftData)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -153,38 +154,34 @@ Finoria-app/
 │                  AccountsManager (Orchestrateur)                │
 │                     ObservableObject                            │
 │                                                                 │
-│  @Published accounts: [Account]                                 │
-│  @Published transactionManagers: [UUID: TransactionManager]     │
-│  @Published selectedAccountId: UUID?                            │
+│  let modelContext: ModelContext                                  │
+│  @Published accounts: [Account]     (snapshot fetch)            │
+│  @Published selectedAccountId: UUID? (UserDefaults préférence)  │
 │                                                                 │
-│  ┌─────────────┐  Chaque méthode publique suit le même schéma : │
-│  │  persist()   │  1. Muter l'état                              │
-│  │  ┌────────┐  │  2. storage.save(...)                         │
-│  │  │ save() │  │  3. objectWillChange.send()                   │
-│  │  │notify()│  │                                               │
-│  │  └────────┘  │                                               │
-│  └─────────────┘                                                │
-└───────┬──────────┬──────────────┬───────────────┬───────────────┘
-        │          │              │               │
-        ▼          ▼              ▼               ▼
- ┌────────────┐┌──────────────┐┌──────────────┐┌───────────┐
- │  Storage   ││  Recurrence  ││ Calculation  ││    CSV    │
- │  Service   ││   Engine     ││   Service    ││  Service  │
- │            ││              ││              ││           │
- │ save()     ││ processAll() ││ totalFor...()││ generate()│
- │ load()     ││ removePot.() ││ available..()││ import()  │
- │            ││              ││ validated..()││           │
- └─────┬──────┘└──────────────┘└──────────────┘└───────────┘
-       │
-       ▼
- ┌────────────┐
- │ UserDefaults│
- │ (JSON)     │
- │            │
- │ Key:       │
- │ accounts_  │
- │ data_v2    │
- └────────────┘
+│  Chaque méthode publique suit le même schéma :                  │
+│  1. Muter l'objet @Model (SwiftData tracke automatiquement)    │
+│  2. modelContext.save()                                         │
+│  3. fetchAccounts() pour rafraîchir le snapshot                 │
+└───────┬──────────────┬───────────────┬──────────────────────────┘
+        │              │               │
+        ▼              ▼               ▼
+ ┌──────────────┐┌──────────────┐┌───────────┐
+ │  Recurrence  ││ Calculation  ││    CSV    │
+ │   Engine     ││   Service    ││  Service  │
+ │              ││              ││           │
+ │ processAll() ││ totalFor...()││ generate()│
+ │ removePot.() ││ available..()││ import()  │
+ │              ││ validated..()││           │
+ └──────────────┘└──────────────┘└───────────┘
+        │
+        ▼
+ ┌──────────────┐
+ │  SwiftData   │
+ │  (SQLite)    │
+ │              │
+ │ ModelContext  │
+ │ ModelContainer│
+ └──────────────┘
 ```
 
 ### Cycle de Vie d'une Mutation
@@ -192,63 +189,101 @@ Finoria-app/
 ```swift
 // Exemple : ajouter une transaction
 func addTransaction(_ transaction: Transaction) {
-    currentManager?.add(transaction)  // 1. Muter
-    persist()                         // 2. Sauvegarder + Notifier
+    guard let account = selectedAccount else { return }
+    transaction.account = account       // 1. Lier au compte
+    modelContext.insert(transaction)     // 2. Insérer dans SwiftData
+    persist()                           // 3. Sauvegarder + Rafraîchir
 }
 
 private func persist() {
-    storage.save(accounts: accounts, managers: transactionManagers)
-    objectWillChange.send()
+    try? modelContext.save()
+    fetchAccounts()  // Rafraîchit @Published accounts
 }
 ```
 
 ---
 
-## 📊 Modèles de Données
+## 📊 Modèles de Données (SwiftData @Model)
 
-### Transaction (Struct Immuable)
-
-```swift
-struct Transaction: Identifiable, Codable, Equatable {
-    let id: UUID
-    var amount: Double                    // Positif = revenu, Négatif = dépense
-    var comment: String
-    var potentiel: Bool                   // true = future, false = validée
-    var date: Date?                       // nil si potentielle sans date prévue
-    var category: TransactionCategory     // Catégorie (obligatoire, défaut: .other)
-    var recurringTransactionId: UUID?     // Lien vers la récurrence source
-    
-    func validated(at date: Date) -> Transaction  // Copie validée
-    func modified(...) -> Transaction             // Copie modifiée
-}
-```
-
-### Account (Struct)
+### Account
 
 ```swift
-struct Account: Identifiable, Codable, Equatable {
-    let id: UUID
+@Model
+final class Account {
+    @Attribute(.unique) var id: UUID       // Clé primaire
     var name: String
     var detail: String
-    var style: AccountStyle  // Enum avec icon + color + label
+    var style: AccountStyle                // Enum Codable
+
+    // Relations one-to-many (cascade delete)
+    @Relationship(deleteRule: .cascade, inverse: \Transaction.account)
+    var transactions: [Transaction] = []
+
+    @Relationship(deleteRule: .cascade, inverse: \WidgetShortcut.account)
+    var widgetShortcuts: [WidgetShortcut] = []
+
+    @Relationship(deleteRule: .cascade, inverse: \RecurringTransaction.account)
+    var recurringTransactions: [RecurringTransaction] = []
 }
 ```
 
-### RecurringTransaction (Struct)
+### Transaction
 
 ```swift
-struct RecurringTransaction: Identifiable, Codable, Equatable {
-    let id: UUID
-    let amount: Double
-    let comment: String
-    let type: TransactionType             // .income / .expense
-    let category: TransactionCategory
-    let frequency: RecurrenceFrequency    // .daily, .weekly, .monthly, .yearly
-    let startDate: Date
-    var lastGeneratedDate: Date?          // Anti-doublons
-    var isPaused: Bool                    // Pause = aucune génération
-    
+@Model
+final class Transaction {
+    @Attribute(.unique) var id: UUID
+    var amount: Double                     // Positif = revenu, Négatif = dépense
+    var comment: String
+    var potentiel: Bool                    // true = future, false = validée
+    var date: Date?                        // nil si potentielle sans date
+    var category: TransactionCategory      // Enum Codable
+
+    // Relations
+    var account: Account?                  // Compte propriétaire
+    var sourceRecurringTransaction: RecurringTransaction?  // Récurrence source (nil si manuelle)
+
+    func validate(at date: Date)           // Mutation en place
+    func modify(...)                       // Mutation en place
+}
+```
+
+### RecurringTransaction
+
+```swift
+@Model
+final class RecurringTransaction {
+    @Attribute(.unique) var id: UUID
+    var amount: Double
+    var comment: String
+    var type: TransactionType
+    var category: TransactionCategory
+    var frequency: RecurrenceFrequency     // .daily, .weekly, .monthly, .yearly
+    var startDate: Date
+    var lastGeneratedDate: Date?           // Anti-doublons
+    var isPaused: Bool
+
+    // Relations
+    var account: Account?
+    @Relationship(deleteRule: .nullify, inverse: \Transaction.sourceRecurringTransaction)
+    var generatedTransactions: [Transaction] = []
+
     func pendingTransactions() -> [(date: Date, transaction: Transaction)]
+}
+```
+
+### WidgetShortcut
+
+```swift
+@Model
+final class WidgetShortcut {
+    @Attribute(.unique) var id: UUID
+    var amount: Double
+    var comment: String
+    var type: TransactionType
+    var category: TransactionCategory
+
+    var account: Account?
 }
 ```
 
@@ -264,28 +299,77 @@ protocol StylableEnum: RawRepresentable, CaseIterable, Identifiable, Codable {
 // AccountStyle : bank, savings, investment, card, cash, piggy, wallet, business
 // TransactionCategory : salary, income, rent, utilities, subscription, phone, insurance,
 //   food, shopping, fuel, transport, loan, savings, family, health, gift, party, expense, other
+// TransactionType : income, expense
+// RecurrenceFrequency : daily, weekly, monthly, yearly
 ```
+
+---
+
+## 💾 Persistance SwiftData
+
+### Configuration (SwiftDataService)
+
+```swift
+// Production : données sur disque (SQLite)
+let container = try SwiftDataService.makeContainer()
+
+// Preview/Tests : données en mémoire
+let container = try SwiftDataService.makePreviewContainer()
+```
+
+### Relations et Delete Rules
+
+| Relation | Delete Rule | Effet |
+|----------|-------------|-------|
+| Account → Transaction | `.cascade` | Supprimer un compte supprime ses transactions |
+| Account → WidgetShortcut | `.cascade` | Supprimer un compte supprime ses raccourcis |
+| Account → RecurringTransaction | `.cascade` | Supprimer un compte supprime ses récurrences |
+| RecurringTransaction → Transaction | `.nullify` | Supprimer une récurrence met `sourceRecurringTransaction` à nil |
+
+### Identifiants Uniques (UUID)
+
+Tous les modèles utilisent `@Attribute(.unique) var id: UUID` comme clé primaire.
+SwiftData garantit l'unicité au niveau de la base de données.
+
+### Synchronisation CloudKit
+
+Pour activer la synchronisation iCloud :
+1. Ajouter la capability **CloudKit** dans Xcode (Signing & Capabilities)
+2. Créer un container CloudKit (ex: `iCloud.com.votreapp.finoria`)
+3. Dans `SwiftDataService.makeContainer()`, décommenter `cloudKitDatabase: .automatic`
+4. Tester sur un appareil physique
+
+### Évolution du Schéma (Schema Migration)
+
+- **Migration légère** (automatique) : ajouter une propriété avec valeur par défaut
+- **Migration complexe** : utiliser `VersionedSchema` + `SchemaMigrationPlan`
+- Voir le guide complet en commentaires dans `SwiftDataService.swift`
 
 ---
 
 ## ⚙️ Services — Responsabilités
 
-### StorageService (Persistance)
+### SwiftDataService (Configuration)
 
 | Méthode | Description |
 |---------|-------------|
-| `save(accounts:managers:)` | Encode tout en JSON → UserDefaults + sauve `schemaVersion` |
-| `load()` | Décode JSON → (accounts, managers), préparé pour futures migrations |
-| `saveSelectedAccountId(_:)` | Persiste l'ID du compte sélectionné |
-| `loadSelectedAccountId()` | Charge le dernier compte sélectionné |
-| `schemaVersion` (static) | Version du schéma de données (actuellement `1`) |
+| `makeContainer()` | Crée le ModelContainer de production (SQLite sur disque) |
+| `makePreviewContainer()` | Crée un ModelContainer en mémoire pour previews/tests |
+
+### LegacyMigrationService (Migration one-shot)
+
+| Méthode | Description |
+|---------|-------------|
+| `migrateIfNeeded(context:)` | Lit UserDefaults JSON → injecte dans SwiftData → marque comme fait |
+
+> ⚠️ **À supprimer** quand tous les utilisateurs sont sur la version SwiftData.
 
 ### RecurrenceEngine (Traitement des récurrences)
 
 | Méthode | Description |
 |---------|-------------|
-| `processAll(accounts:managers:)` | Génère les transactions futures (<1 mois) et auto-valide les passées |
-| `removePotentialTransactions(for:from:)` | Nettoie les potentielles d'une récurrence |
+| `processAll(accounts:context:)` | Génère les transactions futures (<1 mois) et auto-valide les passées |
+| `removePotentialTransactions(for:context:)` | Nettoie les potentielles d'une récurrence |
 
 ### CalculationService (Calculs financiers)
 
@@ -383,13 +467,16 @@ ContentView (TabView)
 ### Qui Dépend de Qui ?
 
 ```
-Views ──────▶ AccountsManager ──────▶ StorageService
-                    │                        │
-                    ├──────▶ RecurrenceEngine │
-                    │                        ▼
-                    ├──────▶ CalculationService   UserDefaults
+Views ──────▶ AccountsManager ──────▶ ModelContext (SwiftData)
+                    │
+                    ├──────▶ RecurrenceEngine (+ ModelContext)
+                    │
+                    ├──────▶ CalculationService
                     │
                     └──────▶ CSVService
+
+FinoriaApp ─▶ SwiftDataService (crée ModelContainer)
+           ─▶ LegacyMigrationService (migration one-shot)
 
 Views ──────▶ StylableEnum (StylePickerGrid, StyleIconView)
 Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPickerToolbar)
@@ -399,11 +486,11 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 
 | Couche | Peut importer | Ne peut PAS importer |
 |--------|---------------|---------------------|
-| Models | Foundation | SwiftUI, Services, Views |
-| Services | Foundation, Models | SwiftUI, Views |
+| Models (@Model) | Foundation, SwiftData | SwiftUI, Services, Views |
+| Services | Foundation, SwiftData, Models | SwiftUI, Views |
 | Extensions | SwiftUI, Foundation | Services, Views |
 | Views | Tout | — |
-| AccountsManager | Foundation, Services | SwiftUI (sauf ObservableObject) |
+| AccountsManager | Foundation, SwiftData, Services | SwiftUI (sauf ObservableObject) |
 
 ---
 
@@ -416,12 +503,12 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 >
 > Le `RecurrenceEngine` effectue :
 > 1. Génère les transactions futures (< 1 mois) comme **transactions potentielles**
-> 2. Vérifie les doublons via `recurringTransactionId` + `date` avant d'ajouter
+> 2. Vérifie les doublons via `sourceRecurringTransaction` + `date` avant d'ajouter
 > 3. Valide automatiquement les transactions dont la date est **aujourd'hui ou passée**
 > 4. Met à jour `lastGeneratedDate` pour éviter les regénérations
 >
 > Cas particuliers :
-> - **Suppression** : les transactions potentielles liées sont supprimées
+> - **Suppression** : les transactions potentielles liées sont supprimées via `context.delete()`
 > - **Modification** : les potentielles sont supprimées puis regénérées
 > - **Pause** : les potentielles sont supprimées, `isPaused = true`
 > - **Réactivation** : `isPaused = false`, `lastGeneratedDate` = hier (pas de rattrapage)
@@ -432,14 +519,16 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 
 | Composant | Technologie |
 |-----------|-------------|
-| UI Framework | SwiftUI (iOS 16+) |
+| UI Framework | SwiftUI (iOS 17+) |
+| Persistance | **SwiftData** (`@Model`, `ModelContext`, `ModelContainer`) |
+| Base de données | SQLite (via SwiftData, transparent) |
 | Graphiques | Swift Charts (`SectorMark`) |
-| State Management | `@Published`, `@ObservedObject`, `@State` |
+| State Management | `@Published`, `@ObservedObject`, `@State`, `ObservableObject` |
 | Navigation | `NavigationStack`, `NavigationLink`, `.navigationDestination` |
-| Persistance | `UserDefaults` + `Codable` (via `StorageService`) |
 | Notifications | `UNUserNotificationCenter` |
 | Partage | `UIActivityViewController` |
 | Fichiers | `UIDocumentPickerViewController` |
+| Cloud (optionnel) | CloudKit (prêt via `ModelConfiguration.cloudKitDatabase`) |
 
 ---
 
@@ -447,27 +536,28 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 
 ### Services (tests unitaires)
 
-1. `StorageService` : save/load préserve les données sans perte
-2. `RecurrenceEngine.processAll` : génère les bonnes transactions, évite les doublons
-3. `RecurrenceEngine.removePotentialTransactions` : ne supprime que les potentielles liées
-4. `CalculationService.totalForMonth` : retourne les bonnes valeurs
-5. `CalculationService.monthlyChangePercentage` : calcul correct (y compris edge cases)
-6. `CSVService` : export/import round-trip sans perte
+1. `RecurrenceEngine.processAll` : génère les bonnes transactions, évite les doublons
+2. `RecurrenceEngine.removePotentialTransactions` : ne supprime que les potentielles liées
+3. `CalculationService.totalForMonth` : retourne les bonnes valeurs
+4. `CalculationService.monthlyChangePercentage` : calcul correct (y compris edge cases)
+5. `CSVService` : export/import round-trip sans perte
+6. `LegacyMigrationService.migrateIfNeeded` : migration correcte UserDefaults → SwiftData
 
 ### AccountsManager (tests d'intégration)
 
-7. `addTransaction` → transaction ajoutée + persistance + notification
-8. `deleteAccount` → sélection automatique du suivant
+7. `addTransaction` → transaction ajoutée + persistance SwiftData + notification SwiftUI
+8. `deleteAccount` → suppression en cascade (transactions, raccourcis, récurrences)
 9. `processRecurringTransactions` → génération + auto-validation
 10. `pauseRecurringTransaction` → potentielles supprimées, flag isPaused = true
 11. `resumeRecurringTransaction` → pas de rattrapage rétroactif
+12. Relations SwiftData : Account.transactions reflète correctement les ajouts/suppressions
 
 ### UI (tests fonctionnels)
 
-12. Navigation complète entre les 4 onglets
-13. Le graphique camembert affiche la bonne répartition
-14. Swipe actions (supprimer/valider) avec confirmation pour récurrences
-15. Schéma versioning : `schemaVersion` est sauvegardé et prêt pour les migrations futures
+13. Navigation complète entre les 4 onglets
+14. Le graphique camembert affiche la bonne répartition
+15. Swipe actions (supprimer/valider) avec confirmation pour récurrences
+16. Migration legacy → SwiftData préserve toutes les données
 
 ---
 
@@ -475,13 +565,27 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 
 | Type | Convention | Exemple |
 |------|------------|---------|
-| Structs / Classes | UpperCamelCase | `AccountsManager`, `Transaction` |
+| @Model Classes | UpperCamelCase, `final` | `Account`, `Transaction` |
+| Structs / Enums | UpperCamelCase | `CalculationService`, `AccountStyle` |
 | Protocoles | UpperCamelCase | `StylableEnum` |
 | Fonctions | lowerCamelCase | `addTransaction()`, `totalForMonth()` |
 | Variables | lowerCamelCase | `selectedAccountId`, `currentMonth` |
-| Enums | UpperCamelCase, cases lowerCamelCase | `AccountStyle.bank` |
+| Enum cases | lowerCamelCase | `AccountStyle.bank`, `.cascade` |
 | ViewModifiers | UpperCamelCase (struct), lowerCamelCase (extension) | `AdaptiveGroupedBackground` / `.adaptiveGroupedBackground()` |
 
 ---
 
-*Document généré le 12 février 2026 — Finoria v3.1*
+## 🗑️ Fichiers à Supprimer après Migration Complète
+
+> Quand **tous** les utilisateurs ont mis à jour vers la version SwiftData :
+
+| Fichier | Raison |
+|---------|--------|
+| `LegacyMigrationService.swift` | Migration one-shot terminée |
+| `StorageService.swift` | Ancien service UserDefaults |
+| `TransactionManager.swift` | Remplacé par relations SwiftData |
+| Appel `LegacyMigrationService.migrateIfNeeded()` dans `FinoriaApp.swift` | Plus nécessaire |
+
+---
+
+*Document généré le 5 mars 2026 — Finoria v4.0 (SwiftData)*

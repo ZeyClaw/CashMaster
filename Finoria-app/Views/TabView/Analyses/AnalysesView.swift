@@ -217,6 +217,6 @@ struct AnalysesView: View {
 
 #Preview {
 	NavigationStack {
-		AnalysesView(accountsManager: AccountsManager())
+		AnalysesView(accountsManager: .preview)
 	}
 }

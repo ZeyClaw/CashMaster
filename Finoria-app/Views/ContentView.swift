@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Vue racine de l'application avec TabView principale
 struct ContentView: View {
-	@StateObject private var accountsManager = AccountsManager()
+	@ObservedObject var accountsManager: AccountsManager
 	@State private var showingAddTransactionSheet = false
 	@State private var tabSelection: TabItem = .home
 	@Environment(\.scenePhase) private var scenePhase
@@ -91,5 +91,5 @@ struct ContentView: View {
 }
 
 #Preview {
-	ContentView()
+	ContentView(accountsManager: .preview)
 }

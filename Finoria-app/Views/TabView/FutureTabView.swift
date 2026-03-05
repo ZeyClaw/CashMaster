@@ -28,5 +28,5 @@ struct FutureTabView: View {
 }
 
 #Preview {
-	FutureTabView(accountsManager: AccountsManager())
+	FutureTabView(accountsManager: .preview)
 }

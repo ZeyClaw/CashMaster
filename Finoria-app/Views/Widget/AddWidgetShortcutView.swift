@@ -121,15 +121,14 @@ struct AddWidgetShortcutView: View {
 		}
 		
 		if let existingShortcut = shortcutToEdit {
-			// Mode édition: créer un raccourci modifié avec le même ID
-			let updatedShortcut = WidgetShortcut(
-				id: existingShortcut.id,
+			// Mode édition: mutation en place de l'objet SwiftData
+			accountsManager.updateWidgetShortcut(
+				existingShortcut,
 				amount: amount,
 				comment: comment,
 				type: type,
 				category: selectedCategory
 			)
-			accountsManager.updateWidgetShortcut(updatedShortcut)
 		} else {
 			// Mode création: nouveau raccourci
 			let shortcut = WidgetShortcut(

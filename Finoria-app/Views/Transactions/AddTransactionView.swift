@@ -147,15 +147,15 @@ struct AddTransactionView: View {
 		let finalDate: Date? = isPotentiel ? nil : transactionDate
 		
 		if let existingTransaction = transactionToEdit {
-			// Edit mode: create a modified copy (immutable struct)
-			let updatedTransaction = existingTransaction.modified(
+			// Edit mode: mutation en place de l'objet SwiftData
+			accountsManager.updateTransaction(
+				existingTransaction,
 				amount: finalAmount,
 				comment: finalComment,
 				potentiel: isPotentiel,
 				date: finalDate,
 				category: selectedCategory
 			)
-			accountsManager.updateTransaction(updatedTransaction)
 		} else {
 			// Creation mode: new transaction
 			accountsManager.addTransaction(Transaction(

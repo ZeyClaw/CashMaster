@@ -111,5 +111,5 @@ struct HomeTabView: View {
 }
 
 #Preview {
-	HomeTabView(accountsManager: AccountsManager())
+	HomeTabView(accountsManager: .preview)
 }

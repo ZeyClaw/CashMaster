@@ -20,14 +20,14 @@ struct PotentialTransactionsView: View {
 	/// Transactions récurrentes futures, triées par date décroissante (plus récente en haut)
 	private var recurringTransactions: [Transaction] {
 		accountsManager.potentialTransactions()
-			.filter { $0.recurringTransactionId != nil }
+			.filter { $0.sourceRecurringTransaction != nil }
 			.sorted { ($0.date ?? Date.distantPast) > ($1.date ?? Date.distantPast) }
 	}
 	
 	/// Transactions futures normales, triées par ordre d'ajout inversé (dernière ajoutée en haut)
 	private var normalTransactions: [Transaction] {
 		accountsManager.potentialTransactions()
-			.filter { $0.recurringTransactionId == nil }
+			.filter { $0.sourceRecurringTransaction == nil }
 			.reversed()
 	}
 	
@@ -105,7 +105,7 @@ struct PotentialTransactionsView: View {
 			}
 			.swipeActions(edge: .trailing, allowsFullSwipe: true) {
 				Button(role: .destructive) {
-					if transaction.recurringTransactionId != nil {
+					if transaction.sourceRecurringTransaction != nil {
 						transactionToDelete = transaction
 						showDeleteConfirmation = true
 					} else {
@@ -117,7 +117,7 @@ struct PotentialTransactionsView: View {
 			}
 			.swipeActions(edge: .leading, allowsFullSwipe: true) {
 				Button {
-					if transaction.recurringTransactionId != nil {
+					if transaction.sourceRecurringTransaction != nil {
 						transactionToValidate = transaction
 						showValidateConfirmation = true
 					} else {

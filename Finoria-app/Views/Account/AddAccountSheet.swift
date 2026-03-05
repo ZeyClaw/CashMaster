@@ -128,9 +128,13 @@ struct AddAccountSheet: View {
 		guard !trimmed.isEmpty else { return }
 		
 		if let existingAccount = accountToEdit {
-			// Mode édition: créer un compte modifié avec le même ID
-			let updatedAccount = Account(id: existingAccount.id, name: trimmed, detail: detail, style: style)
-			accountsManager.updateAccount(updatedAccount)
+			// Mode édition: mutation en place de l'objet SwiftData
+			accountsManager.updateAccount(
+				existingAccount,
+				name: trimmed,
+				detail: detail.trimmingCharacters(in: .whitespacesAndNewlines),
+				style: style
+			)
 		} else {
 			// Mode création: nouveau compte
 			let account = Account(name: trimmed, detail: detail, style: style)
