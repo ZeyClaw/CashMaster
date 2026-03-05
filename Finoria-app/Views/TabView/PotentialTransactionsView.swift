@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PotentialTransactionsView: View {
 	@ObservedObject var accountsManager: AccountsManager
+	@State private var showingAddTransactionSheet = false
 	@State private var transactionToEdit: Transaction? = nil
 	@State private var transactionToDelete: Transaction? = nil
 	@State private var transactionToValidate: Transaction? = nil
@@ -36,8 +37,20 @@ struct PotentialTransactionsView: View {
 	var body: some View {
 		List {
 			if recurringTransactions.isEmpty && normalTransactions.isEmpty {
-				Text("Aucune transaction potentielle")
-					.foregroundStyle(.secondary)
+				Button {
+					showingAddTransactionSheet = true
+				} label: {
+					VStack(spacing: 12) {
+						Image(systemName: "plus.circle")
+							.font(.system(size: 40))
+							.foregroundStyle(.blue)
+						Text("Aucune transaction potentielle")
+							.foregroundStyle(.secondary)
+					}
+					.frame(maxWidth: .infinity)
+					.padding(.vertical, 40)
+				}
+				.buttonStyle(.plain)
 			} else {
 				// Section récurrences
 				if !recurringTransactions.isEmpty {
@@ -63,6 +76,9 @@ struct PotentialTransactionsView: View {
 			}
 		}
 		.navigationTitle("Futur")
+		.sheet(isPresented: $showingAddTransactionSheet) {
+			AddTransactionView(accountsManager: accountsManager, initialIsPotentiel: true)
+		}
 		.sheet(item: $transactionToEdit) { transaction in
 			AddTransactionView(accountsManager: accountsManager, transactionToEdit: transaction)
 		}

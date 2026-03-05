@@ -17,6 +17,7 @@ enum CalendrierViewMode: String, CaseIterable {
 struct CalendrierTabView: View {
 	@ObservedObject var accountsManager: AccountsManager
 	@State private var selectedMode: CalendrierViewMode = .jour
+	@State private var showingAddTransactionSheet = false
 	
 	var body: some View {
 		VStack(spacing: 0) {
@@ -33,8 +34,20 @@ struct CalendrierTabView: View {
 			// Contenu selon le mode sélectionné
 			if accountsManager.transactions().isEmpty {
 				List {
-					Text("Aucune transaction")
-						.foregroundStyle(.secondary)
+					Button {
+						showingAddTransactionSheet = true
+					} label: {
+						VStack(spacing: 12) {
+							Image(systemName: "plus.circle")
+								.font(.system(size: 40))
+								.foregroundStyle(.blue)
+							Text("Aucune transaction")
+								.foregroundStyle(.secondary)
+						}
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 40)
+					}
+					.buttonStyle(.plain)
 				}
 			} else {
 				switch selectedMode {
@@ -49,6 +62,9 @@ struct CalendrierTabView: View {
 		}
 		.adaptiveGroupedBackground()
 		.navigationTitle("Calendrier")
+		.sheet(isPresented: $showingAddTransactionSheet) {
+			AddTransactionView(accountsManager: accountsManager)
+		}
 		.navigationDestination(for: CalendrierRoute.self) { route in
 			switch route {
 			case .months(let year):

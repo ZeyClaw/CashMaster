@@ -13,6 +13,9 @@ struct AddTransactionView: View {
 	
 	// Transaction à éditer (nil = nouvelle transaction)
 	var transactionToEdit: Transaction? = nil
+
+	/// Valeur initiale du toggle "potentiel" pour une nouvelle transaction
+	var initialIsPotentiel: Bool = false
 	
 	// MARK: - Limites
 	private let maxCommentLength = 30
@@ -124,6 +127,8 @@ struct AddTransactionView: View {
 					isPotentiel = t.potentiel
 					transactionDate = t.date ?? Date()
 					selectedCategory = t.category
+				} else {
+					isPotentiel = initialIsPotentiel
 				}
 			}
 		}
