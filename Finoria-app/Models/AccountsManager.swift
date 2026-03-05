@@ -53,8 +53,12 @@ class AccountsManager: ObservableObject {
 	/// Crée un AccountsManager avec un conteneur en mémoire pour les Previews
 	@MainActor
 	static var preview: AccountsManager {
-		let container = try! SwiftDataService.makePreviewContainer()
-		return AccountsManager(modelContext: container.mainContext)
+		do {
+			let container = try SwiftDataService.makePreviewContainer()
+			return AccountsManager(modelContext: container.mainContext)
+		} catch {
+			fatalError("Failed to create preview container: \(error)")
+		}
 	}
 	
 	// MARK: - Persistance interne

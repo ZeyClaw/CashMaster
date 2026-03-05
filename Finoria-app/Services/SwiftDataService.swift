@@ -128,25 +128,29 @@ enum SwiftDataService {
 	///
 	/// Utilisé en cas de base de données corrompue ou d'incompatibilité de schéma
 	/// pour permettre une recréation propre du conteneur.
+	///
+	/// Supprime tous les fichiers dont le nom commence par `default.store`
+	/// (inclut `-wal`, `-shm`, et autres métadonnées éventuelles).
 	private static func deleteExistingStore() {
 		let fileManager = FileManager.default
-		guard let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return }
+		guard let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+			print("⚠️ Impossible de localiser le répertoire Application Support")
+			return
+		}
 		
-		// SwiftData utilise default.store comme nom par défaut
-		let storeURL = appSupport.appendingPathComponent("default.store")
-		let extensions = ["", "-wal", "-shm"]
-		
-		for ext in extensions {
-			let url = storeURL.appendingPathExtension(ext.isEmpty ? "" : String(ext.dropFirst()))
-			let finalURL = ext.isEmpty ? storeURL : URL(fileURLWithPath: storeURL.path + ext)
-			if fileManager.fileExists(atPath: finalURL.path) {
-				do {
-					try fileManager.removeItem(at: finalURL)
-					print("🗑️ Supprimé : \(finalURL.lastPathComponent)")
-				} catch {
-					print("❌ Impossible de supprimer \(finalURL.lastPathComponent) : \(error)")
-				}
+		do {
+			let contents = try fileManager.contentsOfDirectory(at: appSupport, includingPropertiesForKeys: nil)
+			var deletedCount = 0
+			for fileURL in contents where fileURL.lastPathComponent.hasPrefix("default.store") {
+				try fileManager.removeItem(at: fileURL)
+				print("🗑️ Supprimé : \(fileURL.lastPathComponent)")
+				deletedCount += 1
 			}
+			if deletedCount == 0 {
+				print("ℹ️ Aucun fichier default.store trouvé dans Application Support")
+			}
+		} catch {
+			print("❌ Erreur lors du nettoyage du store : \(error)")
 		}
 	}
 }
