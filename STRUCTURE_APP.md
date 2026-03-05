@@ -210,7 +210,7 @@ private func persist() {
 ```swift
 @Model
 final class Account {
-    @Attribute(.unique) var id: UUID       // Clé primaire
+    var id: UUID                           // Identifiant unique (généré côté client)
     var name: String
     var detail: String
     var style: AccountStyle                // Enum Codable
@@ -232,7 +232,7 @@ final class Account {
 ```swift
 @Model
 final class Transaction {
-    @Attribute(.unique) var id: UUID
+    var id: UUID
     var amount: Double                     // Positif = revenu, Négatif = dépense
     var comment: String
     var potentiel: Bool                    // true = future, false = validée
@@ -253,7 +253,7 @@ final class Transaction {
 ```swift
 @Model
 final class RecurringTransaction {
-    @Attribute(.unique) var id: UUID
+    var id: UUID
     var amount: Double
     var comment: String
     var type: TransactionType
@@ -277,7 +277,7 @@ final class RecurringTransaction {
 ```swift
 @Model
 final class WidgetShortcut {
-    @Attribute(.unique) var id: UUID
+    var id: UUID
     var amount: Double
     var comment: String
     var type: TransactionType
@@ -328,8 +328,11 @@ let container = try SwiftDataService.makePreviewContainer()
 
 ### Identifiants Uniques (UUID)
 
-Tous les modèles utilisent `@Attribute(.unique) var id: UUID` comme clé primaire.
-SwiftData garantit l'unicité au niveau de la base de données.
+Tous les modèles utilisent `var id: UUID` comme identifiant.
+L'unicité est garantie par génération côté client (`UUID()` dans les `init`).
+
+> **Note** : `@Attribute(.unique)` n'est PAS utilisé car il est incompatible avec CloudKit.
+> CloudKit ne supporte pas les contraintes d'unicité au niveau de la base de données.
 
 ### Synchronisation CloudKit (ACTIVE)
 
@@ -337,6 +340,7 @@ La synchronisation iCloud est activée et configurée :
 - ✅ Capability CloudKit dans Signing & Capabilities
 - ✅ Container : `iCloud.com.godefroyinformatique.GDF-app` (Debug + Release entitlements)
 - ✅ `cloudKitDatabase: .automatic` dans `SwiftDataService.makeContainer()`
+- ✅ Aucun `@Attribute(.unique)` sur les modèles (incompatible CloudKit)
 - ⚠️ Tester sur un **appareil physique** (CloudKit ne fonctionne pas en simulateur)
 
 ### Évolution du Schéma (Schema Migration)
