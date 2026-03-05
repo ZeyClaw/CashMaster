@@ -70,13 +70,8 @@ enum SwiftDataService {
 		
 		let configuration = ModelConfiguration(
 			schema: schema,
-			isStoredInMemoryOnly: false
-			// ──────────────────────────────────────────────────────────
-			// 🔐 CloudKit : décommenter la ligne suivante après avoir
-			//    configuré la capability CloudKit dans Xcode.
-			//
-			// cloudKitDatabase: .automatic
-			// ──────────────────────────────────────────────────────────
+			isStoredInMemoryOnly: false,
+			cloudKitDatabase: .automatic
 		)
 		
 		return try ModelContainer(for: schema, configurations: [configuration])

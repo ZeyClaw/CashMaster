@@ -132,6 +132,7 @@
 		F842F8C92CBD3B47007D1A54 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F8ACBAA02F5A1C550074CE1B /* SwiftDataService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftDataService.swift; sourceTree = "<group>"; };
 		F8ACBAA22F5A1C6E0074CE1B /* LegacyMigrationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyMigrationService.swift; sourceTree = "<group>"; };
+		F8ACBAA42F5A22420074CE1B /* FinoriaRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FinoriaRelease.entitlements; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinoriaApp.swift; sourceTree = "<group>"; };
 		F8B79A722CAEC5EE002D88AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -333,6 +334,7 @@
 		F8B79A622CAEC5E4002D88AE = {
 			isa = PBXGroup;
 			children = (
+				F8ACBAA42F5A22420074CE1B /* FinoriaRelease.entitlements */,
 				F8B818F52F059289002D02F2 /* Finoria.entitlements */,
 				F812E1FB2CC828DF00619857 /* Finoria-Info.plist */,
 				F8B79A6D2CAEC5E4002D88AE /* Finoria-app */,
@@ -770,7 +772,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Finoria.entitlements;
+				CODE_SIGN_ENTITLEMENTS = FinoriaRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2010;
 				DEVELOPMENT_ASSET_PATHS = "\"Finoria-app/Preview Content\"";
