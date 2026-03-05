@@ -11,6 +11,9 @@ import SwiftData
 @main
 struct FinoriaApp: App {
 	
+	/// AppDelegate pour gérer les notifications push (CloudKit + push visibles)
+	@UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+	
 	/// Conteneur SwiftData partagé pour toute l'application
 	let modelContainer: ModelContainer
 	

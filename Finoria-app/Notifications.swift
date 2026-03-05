@@ -7,6 +7,57 @@
 import SwiftUI
 import UserNotifications
 
+// MARK: - AppDelegate (Remote Notifications + CloudKit)
+
+/// AppDelegate nécessaire pour gérer les notifications push distantes.
+///
+/// CloudKit utilise les push silencieux pour déclencher la synchronisation entre appareils.
+/// L'inscription via `registerForRemoteNotifications()` est requise pour que cela fonctionne.
+///
+/// Depuis le CloudKit Dashboard (https://icloud.developer.apple.com), vous pouvez aussi
+/// envoyer des push visibles à tous les utilisateurs via les Subscriptions CloudKit.
+class AppDelegate: NSObject, UIApplicationDelegate {
+	
+	func application(
+		_ application: UIApplication,
+		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+	) -> Bool {
+		// Inscription aux notifications distantes (push silencieux CloudKit + push visibles)
+		application.registerForRemoteNotifications()
+		return true
+	}
+	
+	func application(
+		_ application: UIApplication,
+		didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+	) {
+		// CloudKit gère automatiquement le token pour la synchronisation.
+		// Pas besoin de l'envoyer manuellement à un serveur.
+		let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+		print("✅ Enregistré pour les notifications push (token: \(token.prefix(8))...)")
+	}
+	
+	func application(
+		_ application: UIApplication,
+		didFailToRegisterForRemoteNotificationsWithError error: Error
+	) {
+		print("❌ Échec inscription push: \(error.localizedDescription)")
+	}
+	
+	func application(
+		_ application: UIApplication,
+		didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+		fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+	) {
+		// CloudKit envoie des push silencieux pour notifier d'un changement de données.
+		// SwiftData + CloudKit gèrent automatiquement le merge des données.
+		print("📩 Push reçu — CloudKit synchronise les données...")
+		completionHandler(.newData)
+	}
+}
+
+// MARK: - NotificationManager (Notifications Locales)
+
 struct NotificationManager {
 	static let shared = NotificationManager()
 	private let notificationIdentifier = "WeeklyNotification"  // Identifiant fixe pour éviter les duplications
