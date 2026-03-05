@@ -68,6 +68,11 @@ enum SwiftDataService {
 	///
 	/// Les données sont persistées sur disque dans le répertoire par défaut de l'app.
 	/// CloudKit est activé pour la synchronisation iCloud entre appareils.
+	///
+	/// Stratégie de résilience :
+	/// 1. Tente de créer/ouvrir le store normalement
+	/// 2. Si échec (schéma incompatible, base corrompue…), supprime le store et retente
+	/// 3. En dernier recours, l'appelant peut fallback sur un conteneur en mémoire
 	static func makeContainer() throws -> ModelContainer {
 		let schema = Schema([
 			Account.self,
@@ -82,7 +87,18 @@ enum SwiftDataService {
 			cloudKitDatabase: .automatic
 		)
 		
-		return try ModelContainer(for: schema, configurations: [configuration])
+		do {
+			return try ModelContainer(for: schema, configurations: [configuration])
+		} catch {
+			print("⚠️ Échec création ModelContainer : \(error)")
+			print("⚠️ Suppression du store corrompu et nouvelle tentative…")
+			
+			// Supprimer le store existant (potentiellement corrompu ou incompatible)
+			deleteExistingStore()
+			
+			// Retenter avec un store vierge
+			return try ModelContainer(for: schema, configurations: [configuration])
+		}
 	}
 	
 	// MARK: - Preview / Test Container
@@ -104,5 +120,33 @@ enum SwiftDataService {
 		)
 		
 		return try ModelContainer(for: schema, configurations: [configuration])
+	}
+	
+	// MARK: - Store Cleanup
+	
+	/// Supprime les fichiers du store SwiftData existant sur disque.
+	///
+	/// Utilisé en cas de base de données corrompue ou d'incompatibilité de schéma
+	/// pour permettre une recréation propre du conteneur.
+	private static func deleteExistingStore() {
+		let fileManager = FileManager.default
+		guard let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return }
+		
+		// SwiftData utilise default.store comme nom par défaut
+		let storeURL = appSupport.appendingPathComponent("default.store")
+		let extensions = ["", "-wal", "-shm"]
+		
+		for ext in extensions {
+			let url = storeURL.appendingPathExtension(ext.isEmpty ? "" : String(ext.dropFirst()))
+			let finalURL = ext.isEmpty ? storeURL : URL(fileURLWithPath: storeURL.path + ext)
+			if fileManager.fileExists(atPath: finalURL.path) {
+				do {
+					try fileManager.removeItem(at: finalURL)
+					print("🗑️ Supprimé : \(finalURL.lastPathComponent)")
+				} catch {
+					print("❌ Impossible de supprimer \(finalURL.lastPathComponent) : \(error)")
+				}
+			}
+		}
 	}
 }
