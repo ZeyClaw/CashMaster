@@ -52,9 +52,9 @@ final class RecurringTransaction {
 	var id: UUID = UUID()
 	var amount: Double = 0
 	var comment: String = ""
-	var type: TransactionType = .expense
-	var category: TransactionCategory = .other
-	var frequency: RecurrenceFrequency = .monthly
+	var type: TransactionType = TransactionType.expense
+	var category: TransactionCategory = TransactionCategory.other
+	var frequency: RecurrenceFrequency = RecurrenceFrequency.monthly
 	var startDate: Date = Date()
 	/// Date de la dernière transaction générée (pour éviter les doublons)
 	var lastGeneratedDate: Date?

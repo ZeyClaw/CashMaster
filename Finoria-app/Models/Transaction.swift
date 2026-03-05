@@ -40,7 +40,7 @@ final class Transaction {
 	var comment: String = ""
 	var potentiel: Bool = true
 	var date: Date?
-	var category: TransactionCategory = .other
+	var category: TransactionCategory = TransactionCategory.other
 	
 	// MARK: - Relations
 	

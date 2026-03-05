@@ -20,8 +20,8 @@ final class WidgetShortcut {
 	var id: UUID = UUID()
 	var amount: Double = 0
 	var comment: String = ""
-	var type: TransactionType = .expense
-	var category: TransactionCategory = .other
+	var type: TransactionType = TransactionType.expense
+	var category: TransactionCategory = TransactionCategory.other
 	
 	// MARK: - Relations
 	

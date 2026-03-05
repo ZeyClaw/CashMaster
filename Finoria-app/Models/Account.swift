@@ -104,7 +104,7 @@ final class Account {
 	var id: UUID = UUID()
 	var name: String = ""
 	var detail: String = ""
-	var style: AccountStyle = .bank
+	var style: AccountStyle = AccountStyle.bank
 	
 	// MARK: - Relations (one-to-many, cascade delete)
 	
