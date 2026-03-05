@@ -49,17 +49,17 @@ final class RecurringTransaction {
 	
 	// MARK: - Propriétés persistées
 	
-	var id: UUID
-	var amount: Double
-	var comment: String
-	var type: TransactionType
-	var category: TransactionCategory
-	var frequency: RecurrenceFrequency
-	var startDate: Date
+	var id: UUID = UUID()
+	var amount: Double = 0
+	var comment: String = ""
+	var type: TransactionType = .expense
+	var category: TransactionCategory = .other
+	var frequency: RecurrenceFrequency = .monthly
+	var startDate: Date = Date()
 	/// Date de la dernière transaction générée (pour éviter les doublons)
 	var lastGeneratedDate: Date?
 	/// Indique si la récurrence est en pause (aucune transaction générée tant que c'est true)
-	var isPaused: Bool
+	var isPaused: Bool = false
 	
 	// MARK: - Relations
 	

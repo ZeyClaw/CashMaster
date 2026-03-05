@@ -35,12 +35,12 @@ final class Transaction {
 	
 	// MARK: - Propriétés persistées
 	
-	var id: UUID
-	var amount: Double
-	var comment: String
-	var potentiel: Bool
+	var id: UUID = UUID()
+	var amount: Double = 0
+	var comment: String = ""
+	var potentiel: Bool = true
 	var date: Date?
-	var category: TransactionCategory
+	var category: TransactionCategory = .other
 	
 	// MARK: - Relations
 	

@@ -17,11 +17,11 @@ final class WidgetShortcut {
 	
 	// MARK: - Propriétés persistées
 	
-	var id: UUID
-	var amount: Double
-	var comment: String
-	var type: TransactionType
-	var category: TransactionCategory
+	var id: UUID = UUID()
+	var amount: Double = 0
+	var comment: String = ""
+	var type: TransactionType = .expense
+	var category: TransactionCategory = .other
 	
 	// MARK: - Relations
 	

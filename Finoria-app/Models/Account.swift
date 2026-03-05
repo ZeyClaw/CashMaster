@@ -101,10 +101,10 @@ final class Account {
 	
 	// MARK: - Propriétés persistées
 	
-	var id: UUID
-	var name: String
-	var detail: String
-	var style: AccountStyle
+	var id: UUID = UUID()
+	var name: String = ""
+	var detail: String = ""
+	var style: AccountStyle = .bank
 	
 	// MARK: - Relations (one-to-many, cascade delete)
 	
