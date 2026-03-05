@@ -74,9 +74,9 @@ Vue → appelle méthode → AccountsManager → mute @Model objet → persist()
 ```
 Finoria-app/
 │
-├── 📱 FinoriaApp.swift              # Point d'entrée (@main) + ModelContainer + Fallback erreur
+├── 📱 FinoriaApp.swift              # Point d'entrée (@main) + ModelContainer + AppDelegate + Fallback erreur
 ├── 🚨 LaunchScreen.storyboard       # Écran de lancement (géré par Xcode)
-├── 🔔 Notifications.swift           # Notifications locales hebdomadaires
+├── 🔔 Notifications.swift           # AppDelegate (Push CloudKit) + Notifications locales hebdomadaires
 │
 ├── 🧩 Models/                       # DONNÉES — Classes @Model SwiftData
 │   ├── Account.swift                # @Model Account + AccountStyle enum + Relations
@@ -355,10 +355,22 @@ L'unicité est garantie par génération côté client (`UUID()` dans les `init`
 
 La synchronisation iCloud est activée et configurée :
 - ✅ Capability CloudKit dans Signing & Capabilities
+- ✅ Capability Push Notifications activée
+- ✅ Capability Background Modes → Remote notifications cochée
 - ✅ Container : `iCloud.com.godefroyinformatique.GDF-app` (Debug + Release entitlements)
 - ✅ `cloudKitDatabase: .automatic` dans `SwiftDataService.makeContainer()`
+- ✅ `@UIApplicationDelegateAdaptor(AppDelegate.self)` dans `FinoriaApp`
+- ✅ `registerForRemoteNotifications()` au lancement (AppDelegate)
+- ✅ Gestion des push silencieux CloudKit dans `didReceiveRemoteNotification`
 - ✅ Aucun `@Attribute(.unique)` sur les modèles (incompatible CloudKit)
 - ⚠️ Tester sur un **appareil physique** (CloudKit ne fonctionne pas en simulateur)
+
+### Notifications Push Distantes
+
+L'app s'inscrit aux notifications push via `registerForRemoteNotifications()` :
+- **Push silencieux** : CloudKit les envoie automatiquement pour synchroniser les données entre appareils
+- **Push visibles** : Envoyables à tous les utilisateurs via le CloudKit Dashboard (icloud.developer.apple.com)
+- L'`AppDelegate` dans `Notifications.swift` gère les callbacks de registration et réception
 
 ### Évolution du Schéma (Schema Migration)
 
