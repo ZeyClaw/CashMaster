@@ -331,13 +331,13 @@ let container = try SwiftDataService.makePreviewContainer()
 Tous les modèles utilisent `@Attribute(.unique) var id: UUID` comme clé primaire.
 SwiftData garantit l'unicité au niveau de la base de données.
 
-### Synchronisation CloudKit
+### Synchronisation CloudKit (ACTIVE)
 
-Pour activer la synchronisation iCloud :
-1. Ajouter la capability **CloudKit** dans Xcode (Signing & Capabilities)
-2. Créer un container CloudKit (ex: `iCloud.com.votreapp.finoria`)
-3. Dans `SwiftDataService.makeContainer()`, décommenter `cloudKitDatabase: .automatic`
-4. Tester sur un appareil physique
+La synchronisation iCloud est activée et configurée :
+- ✅ Capability CloudKit dans Signing & Capabilities
+- ✅ Container : `iCloud.com.godefroyinformatique.GDF-app` (Debug + Release entitlements)
+- ✅ `cloudKitDatabase: .automatic` dans `SwiftDataService.makeContainer()`
+- ⚠️ Tester sur un **appareil physique** (CloudKit ne fonctionne pas en simulateur)
 
 ### Évolution du Schéma (Schema Migration)
 
@@ -528,7 +528,7 @@ Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPic
 | Notifications | `UNUserNotificationCenter` |
 | Partage | `UIActivityViewController` |
 | Fichiers | `UIDocumentPickerViewController` |
-| Cloud (optionnel) | CloudKit (prêt via `ModelConfiguration.cloudKitDatabase`) |
+| Cloud | CloudKit (actif via `cloudKitDatabase: .automatic`, container `iCloud.com.godefroyinformatique.GDF-app`) |
 
 ---
 
