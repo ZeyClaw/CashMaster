@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import os.log
 
 /// Orchestrateur central de l'application.
 ///
@@ -24,6 +25,13 @@ import SwiftData
 /// - `CSVService` pour l'import/export CSV
 class AccountsManager: ObservableObject {
 	
+	// MARK: - Logger
+	
+	private static let logger = Logger(
+		subsystem: Bundle.main.bundleIdentifier ?? "com.finoria",
+		category: "AccountsManager"
+	)
+	
 	// MARK: - Dependencies
 	
 	let modelContext: ModelContext
@@ -34,6 +42,9 @@ class AccountsManager: ObservableObject {
 	@Published var selectedAccountId: UUID? {
 		didSet { saveSelectedAccountId() }
 	}
+	
+	/// Dernière erreur de persistance (pour affichage UI si nécessaire)
+	@Published var lastPersistenceError: String?
 	
 	/// Compte actuellement sélectionné (dérivé de selectedAccountId)
 	var selectedAccount: Account? {
@@ -63,16 +74,37 @@ class AccountsManager: ObservableObject {
 	
 	// MARK: - Persistance interne
 	
-	/// Sauvegarde le contexte SwiftData et rafraîchit la liste des comptes
+	/// Sauvegarde le contexte SwiftData et rafraîchit la liste des comptes.
+	///
+	/// CloudKit : `modelContext.save()` déclenche la synchronisation automatique.
+	/// En cas de conflit, SwiftData utilise la politique de merge par défaut (server wins).
+	/// Les erreurs sont loguées via os.log pour le diagnostic.
 	private func persist() {
-		try? modelContext.save()
+		do {
+			try modelContext.save()
+			lastPersistenceError = nil
+		} catch {
+			Self.logger.error("Échec sauvegarde SwiftData: \(error.localizedDescription)")
+			lastPersistenceError = error.localizedDescription
+		}
 		fetchAccounts()
 	}
 	
-	/// Recharge la liste des comptes depuis SwiftData et valide la sélection
+	/// Recharge la liste des comptes depuis SwiftData et valide la sélection.
+	///
+	/// Appelé après chaque mutation et au retour au premier plan
+	/// pour récupérer les changements synchronisés via CloudKit.
 	private func fetchAccounts() {
 		let descriptor = FetchDescriptor<Account>(sortBy: [SortDescriptor(\.name)])
-		accounts = (try? modelContext.fetch(descriptor)) ?? []
+		do {
+			accounts = try modelContext.fetch(descriptor)
+			lastPersistenceError = nil
+		} catch {
+			Self.logger.error("Échec chargement des comptes: \(error.localizedDescription)")
+			lastPersistenceError = error.localizedDescription
+			// Ne pas écraser accounts avec [] en cas d'erreur temporaire
+			// pour éviter de montrer un écran vide alors que les données existent
+		}
 		
 		// Vérifier que le compte sélectionné existe toujours
 		if let id = selectedAccountId, !accounts.contains(where: { $0.id == id }) {
@@ -336,6 +368,7 @@ class AccountsManager: ObservableObject {
 	/// Rafraîchit les données depuis le store SwiftData.
 	/// Appelé quand l'app revient au premier plan pour récupérer les changements CloudKit.
 	func refreshFromStore() {
+		Self.logger.info("Rafraîchissement depuis le store (CloudKit sync)")
 		fetchAccounts()
 	}
 }
