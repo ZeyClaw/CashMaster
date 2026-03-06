@@ -7,9 +7,15 @@
 
 import SwiftUI
 import SwiftData
+import os.log
 
 @main
 struct FinoriaApp: App {
+	
+	private static let logger = Logger(
+		subsystem: Bundle.main.bundleIdentifier ?? "com.finoria",
+		category: "FinoriaApp"
+	)
 	
 	/// AppDelegate pour gérer les notifications push (CloudKit + push visibles)
 	@UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -29,15 +35,13 @@ struct FinoriaApp: App {
 		let container: ModelContainer
 		do {
 			container = try SwiftDataService.makeContainer()
-			print("✅ ModelContainer créé (CloudKit .automatic)")
+			Self.logger.info("ModelContainer créé (CloudKit .automatic)")
 		} catch {
-			// Ce cas est très rare (corruption de base, migration impossible, etc.)
-			print("❌ Erreur création ModelContainer avec CloudKit: \(error)")
-			print("❌ Détail: \(error.localizedDescription)")
+			Self.logger.error("Erreur création ModelContainer avec CloudKit: \(error.localizedDescription)")
 			// Fallback : conteneur SUR DISQUE sans CloudKit (données conservées !)
 			do {
 				container = try SwiftDataService.makeFallbackContainer()
-				print("⚠️ Fallback: conteneur local sans CloudKit (données sur disque)")
+				Self.logger.warning("Fallback: conteneur local sans CloudKit (données sur disque)")
 			} catch {
 				fatalError("Impossible de créer le ModelContainer: \(error)")
 			}
