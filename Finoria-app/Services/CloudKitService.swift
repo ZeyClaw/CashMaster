@@ -7,6 +7,7 @@
 
 import Foundation
 import CloudKit
+import os.log
 
 /// Service de diagnostic CloudKit.
 ///
@@ -17,6 +18,13 @@ import CloudKit
 ///
 /// Utilise l'API officielle Apple `CKContainer.accountStatus()`.
 enum CloudKitService {
+	
+	// MARK: - Logger
+	
+	private static let logger = Logger(
+		subsystem: Bundle.main.bundleIdentifier ?? "com.finoria",
+		category: "CloudKitService"
+	)
 	
 	/// Container CloudKit de l'application
 	private static let container = CKContainer(identifier: "iCloud.com.godefroyinformatique.GDF-app")
@@ -97,27 +105,27 @@ enum CloudKitService {
 				return await verifyContainerAccess()
 				
 			case .noAccount:
-				print("⚠️ CloudKit: pas de compte iCloud")
+				logger.warning("CloudKit: pas de compte iCloud")
 				return .noAccount
 				
 			case .restricted:
-				print("⚠️ CloudKit: compte restreint")
+				logger.warning("CloudKit: compte restreint")
 				return .restricted
 				
 			case .couldNotDetermine:
-				print("⚠️ CloudKit: statut indéterminé")
+				logger.warning("CloudKit: statut indéterminé")
 				return .couldNotDetermine
 				
 			case .temporarilyUnavailable:
-				print("⚠️ CloudKit: temporairement indisponible")
+				logger.warning("CloudKit: temporairement indisponible")
 				return .temporarilyUnavailable
 				
 			@unknown default:
-				print("⚠️ CloudKit: statut inconnu")
+				logger.warning("CloudKit: statut inconnu")
 				return .couldNotDetermine
 			}
 		} catch {
-			print("❌ CloudKit: erreur vérification account status: \(error.localizedDescription)")
+			logger.error("CloudKit: erreur vérification account status: \(error.localizedDescription)")
 			return .error(error.localizedDescription)
 		}
 	}
@@ -128,7 +136,7 @@ enum CloudKitService {
 	private static func verifyContainerAccess() async -> CloudKitStatus {
 		do {
 			let _ = try await container.userRecordID()
-			print("✅ CloudKit: container accessible, utilisateur identifié")
+			logger.info("CloudKit: container accessible, utilisateur identifié")
 			return .available
 		} catch {
 			let ckError = error as? CKError
@@ -136,28 +144,28 @@ enum CloudKitService {
 			if let ckError = ckError {
 				switch ckError.code {
 				case .networkUnavailable, .networkFailure:
-					print("⚠️ CloudKit: pas de réseau")
+					logger.warning("CloudKit: pas de réseau")
 					return .error("Pas de connexion internet. Vérifiez votre Wi-Fi ou données cellulaires.")
 					
 				case .notAuthenticated:
-					print("⚠️ CloudKit: pas authentifié")
+					logger.warning("CloudKit: pas authentifié")
 					return .noAccount
 					
 				case .quotaExceeded:
-					print("⚠️ CloudKit: quota dépassé")
+					logger.warning("CloudKit: quota dépassé")
 					return .error("Votre stockage iCloud est plein. Libérez de l'espace dans Réglages → iCloud → Gérer le stockage.")
 					
 				case .serviceUnavailable, .requestRateLimited:
-					print("⚠️ CloudKit: service indisponible")
+					logger.warning("CloudKit: service indisponible")
 					return .temporarilyUnavailable
 					
 				default:
-					print("⚠️ CloudKit: erreur CK \(ckError.code.rawValue): \(ckError.localizedDescription)")
+					logger.warning("CloudKit: erreur CK \(ckError.code.rawValue): \(ckError.localizedDescription)")
 					return .error(ckError.localizedDescription)
 				}
 			}
 			
-			print("⚠️ CloudKit: erreur non-CK: \(error.localizedDescription)")
+			logger.warning("CloudKit: erreur non-CK: \(error.localizedDescription)")
 			return .error(error.localizedDescription)
 		}
 	}
