@@ -14,6 +14,11 @@ struct ContentView: View {
 	@State private var tabSelection: TabItem = .home
 	@Environment(\.scenePhase) private var scenePhase
 	
+	// MARK: - CloudKit Alert
+	@State private var showCloudKitAlert = false
+	@State private var cloudKitAlertTitle = ""
+	@State private var cloudKitAlertMessage = ""
+	
 	enum TabItem: Hashable {
 		case home, analyses, calendrier, futur, add
 	}
@@ -80,6 +85,8 @@ struct ContentView: View {
 			}
 			// Générer les transactions récurrentes à venir / valider celles du jour
 			accountsManager.processRecurringTransactions()
+			// Vérifier le statut CloudKit au lancement
+			checkCloudKit()
 		}
 		.onChange(of: scenePhase) { _, newPhase in
 			if newPhase == .active {
@@ -87,6 +94,27 @@ struct ContentView: View {
 				accountsManager.refreshFromStore()
 				// Retraiter les récurrences quand l'app revient au premier plan
 				accountsManager.processRecurringTransactions()
+			}
+		}
+		.alert(cloudKitAlertTitle, isPresented: $showCloudKitAlert) {
+			Button("OK", role: .cancel) { }
+		} message: {
+			Text(cloudKitAlertMessage)
+		}
+	}
+	
+	// MARK: - CloudKit Check
+	
+	/// Vérifie que CloudKit est fonctionnel et affiche une alerte si ce n'est pas le cas.
+	private func checkCloudKit() {
+		Task {
+			let status = await CloudKitService.checkAccountStatus()
+			if !status.isAvailable {
+				await MainActor.run {
+					cloudKitAlertTitle = status.alertTitle
+					cloudKitAlertMessage = status.userMessage
+					showCloudKitAlert = true
+				}
 			}
 		}
 	}

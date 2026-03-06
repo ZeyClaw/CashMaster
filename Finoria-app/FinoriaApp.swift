@@ -22,16 +22,22 @@ struct FinoriaApp: App {
 	
 	init() {
 		// 1. Créer le conteneur SwiftData (CloudKit activé)
+		// Note : makeContainer() avec .automatic ne crash quasiment jamais.
+		// Si CloudKit est indisponible (pas de compte iCloud, simulateur, etc.),
+		// SwiftData fonctionne en local et synchronise plus tard quand c'est possible.
+		// Le diagnostic CloudKit est fait dans ContentView via CloudKitService.
 		let container: ModelContainer
 		do {
 			container = try SwiftDataService.makeContainer()
-			print("✅ ModelContainer créé avec CloudKit")
+			print("✅ ModelContainer créé (CloudKit .automatic)")
 		} catch {
-			print("⚠️ CloudKit indisponible: \(error.localizedDescription)")
-			// Fallback vers conteneur SUR DISQUE sans CloudKit (données conservées !)
+			// Ce cas est très rare (corruption de base, migration impossible, etc.)
+			print("❌ Erreur création ModelContainer avec CloudKit: \(error)")
+			print("❌ Détail: \(error.localizedDescription)")
+			// Fallback : conteneur SUR DISQUE sans CloudKit (données conservées !)
 			do {
 				container = try SwiftDataService.makeFallbackContainer()
-				print("⚠️ Utilisation d'un conteneur local (sans synchronisation iCloud)")
+				print("⚠️ Fallback: conteneur local sans CloudKit (données sur disque)")
 			} catch {
 				fatalError("Impossible de créer le ModelContainer: \(error)")
 			}
