@@ -6,6 +6,14 @@
 
 import SwiftUI
 import UserNotifications
+import os.log
+
+// MARK: - Logger
+
+private let notifLogger = Logger(
+	subsystem: Bundle.main.bundleIdentifier ?? "com.finoria",
+	category: "Notifications"
+)
 
 // MARK: - AppDelegate (Remote Notifications + CloudKit)
 
@@ -31,17 +39,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		_ application: UIApplication,
 		didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
 	) {
-		// CloudKit gère automatiquement le token pour la synchronisation.
-		// Pas besoin de l'envoyer manuellement à un serveur.
 		let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-		print("✅ Enregistré pour les notifications push (token: \(token.prefix(8))...)")
+		notifLogger.info("Enregistré pour les notifications push (token: \(token.prefix(8))...)")
 	}
 	
 	func application(
 		_ application: UIApplication,
 		didFailToRegisterForRemoteNotificationsWithError error: Error
 	) {
-		print("❌ Échec inscription push: \(error.localizedDescription)")
+		notifLogger.warning("Échec inscription push: \(error.localizedDescription)")
 	}
 	
 	func application(
@@ -51,7 +57,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 	) {
 		// CloudKit envoie des push silencieux pour notifier d'un changement de données.
 		// SwiftData + CloudKit gèrent automatiquement le merge des données.
-		print("📩 Push reçu — CloudKit synchronise les données...")
+		notifLogger.info("Push reçu — CloudKit synchronise les données")
 		completionHandler(.newData)
 	}
 }
@@ -65,10 +71,10 @@ struct NotificationManager {
 	func requestNotificationPermission() {
 		let center = UNUserNotificationCenter.current()
 		center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-			if granted {
-				print("Permission granted")
+			if let error = error {
+				notifLogger.error("Erreur autorisation notifications: \(error.localizedDescription)")
 			} else {
-				print("Permission denied")
+				notifLogger.info("Permission notifications: \(granted ? "accordée" : "refusée")")
 			}
 		}
 	}
@@ -78,31 +84,10 @@ struct NotificationManager {
 		
 		notificationCenter.getPendingNotificationRequests { requests in
 			if requests.isEmpty {
-				print("Aucune notification programmée.")
+				notifLogger.info("Aucune notification programmée.")
 			} else {
-				print("Notifications programmées actuellement :")
 				for request in requests {
-					print("----------------------------")
-					print("ID : \(request.identifier)")
-					print("Titre : \(request.content.title)")
-					print("Corps : \(request.content.body)")
-					
-					if let trigger = request.trigger as? UNCalendarNotificationTrigger {
-						if let nextTriggerDate = trigger.nextTriggerDate() {
-							let formatter = DateFormatter()
-							formatter.dateStyle = .medium
-							formatter.timeStyle = .short
-							let dateString = formatter.string(from: nextTriggerDate)
-							print("Prochaine date de déclenchement : \(dateString)")
-						} else {
-							print("Prochaine date de déclenchement : Inconnue")
-						}
-					} else if let trigger = request.trigger as? UNTimeIntervalNotificationTrigger {
-						print("Intervalle en secondes : \(trigger.timeInterval)")
-						print("Répète : \(trigger.repeats ? "Oui" : "Non")")
-					} else {
-						print("Type de déclencheur : Inconnu")
-					}
+					notifLogger.info("Notification: \(request.identifier) - \(request.content.title)")
 				}
 			}
 		}
@@ -114,13 +99,12 @@ struct NotificationManager {
 	func scheduleWeeklyNotificationIfNeeded() {
 		UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
 			if let existing = requests.first(where: { $0.identifier == self.notificationIdentifier }) {
-				// Si le titre ne correspond plus (ex: ancien nom "Finoria"), on réinitialise
 				if existing.content.title != "Rappel - Finoria" {
-					print("Notification obsolète détectée, reprogrammation...")
+					notifLogger.info("Notification obsolète détectée, reprogrammation...")
 					self.resetNotifications()
 					self.scheduleWeeklyNotification()
 				} else {
-					print("La notification hebdomadaire est déjà programmée.")
+					notifLogger.info("Notification hebdomadaire déjà programmée.")
 				}
 			} else {
 				self.scheduleWeeklyNotification()
@@ -148,9 +132,9 @@ struct NotificationManager {
 		// Ajouter la requête au centre de notifications
 		UNUserNotificationCenter.current().add(request) { error in
 			if let error = error {
-				print("Erreur lors de l'envoi de la notification : \(error.localizedDescription)")
+				notifLogger.error("Erreur programmation notification: \(error.localizedDescription)")
 			} else {
-				print("Notification hebdomadaire programmée avec succès.")
+				notifLogger.info("Notification hebdomadaire programmée avec succès.")
 			}
 		}
 	}
@@ -158,7 +142,7 @@ struct NotificationManager {
 	// Réinitialiser les notifications
 	func resetNotifications() {
 		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-		print("Toutes les notifications ont été réinitialisées.")
+		notifLogger.info("Toutes les notifications ont été réinitialisées.")
 	}
 	
 }
