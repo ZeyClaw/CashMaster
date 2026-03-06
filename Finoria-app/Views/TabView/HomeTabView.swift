@@ -21,7 +21,7 @@ struct HomeTabView: View {
 	var body: some View {
 		NavigationStack {
 			Group {
-				if accountsManager.selectedAccountId != nil {
+				if accountsManager.selectedAccount != nil {
 					HomeView(accountsManager: accountsManager)
 						.navigationBarTitleDisplayMode(.inline)
 						.toolbar {

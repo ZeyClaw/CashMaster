@@ -36,11 +36,11 @@ enum SwiftDataService {
 		RecurringTransaction.self
 	]
 	
-	// MARK: - Production Container
+	// MARK: - Production Container (CloudKit activé)
 	
-	/// Crée le `ModelContainer` configuré pour l'application en production.
+	/// Crée le `ModelContainer` configuré pour l'application en production avec CloudKit.
 	///
-	/// Les données sont persistées sur disque dans le répertoire par défaut de l'app.
+	/// Les données sont persistées sur disque et synchronisées via iCloud.
 	static func makeContainer() throws -> ModelContainer {
 		let configuration = ModelConfiguration(
 			isStoredInMemoryOnly: false,
@@ -54,7 +54,26 @@ enum SwiftDataService {
 		)
 	}
 	
-	// MARK: - Preview / Test Container
+	// MARK: - Fallback Container (CloudKit désactivé, données SUR DISQUE)
+	
+	/// Crée un `ModelContainer` **sur disque** mais sans CloudKit.
+	///
+	/// Utilisé comme fallback si CloudKit échoue (pas de compte iCloud, simulateur, etc.).
+	/// **Les données sont persistées** — rien n'est perdu au redémarrage.
+	static func makeFallbackContainer() throws -> ModelContainer {
+		let configuration = ModelConfiguration(
+			isStoredInMemoryOnly: false,
+			allowsSave: true,
+			cloudKitDatabase: .none
+		)
+		
+		return try ModelContainer(
+			for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self,
+			configurations: configuration
+		)
+	}
+	
+	// MARK: - Preview / Test Container (en mémoire uniquement)
 	
 	/// Crée un `ModelContainer` en mémoire pour les Previews et les tests unitaires.
 	///

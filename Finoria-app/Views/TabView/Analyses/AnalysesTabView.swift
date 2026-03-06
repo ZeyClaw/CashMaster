@@ -15,7 +15,7 @@ struct AnalysesTabView: View {
 	var body: some View {
 		NavigationStack {
 			Group {
-				if accountsManager.selectedAccountId != nil {
+				if accountsManager.selectedAccount != nil {
 					AnalysesView(accountsManager: accountsManager)
 						.navigationBarTitleDisplayMode(.large)
 						.navigationDestination(for: CategoryDetailRoute.self) { route in

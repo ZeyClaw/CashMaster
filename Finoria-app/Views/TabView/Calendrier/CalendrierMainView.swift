@@ -15,7 +15,7 @@ struct CalendrierMainView: View {
 	var body: some View {
 		NavigationStack {
 			Group {
-				if accountsManager.selectedAccountId != nil {
+				if accountsManager.selectedAccount != nil {
 					CalendrierTabView(accountsManager: accountsManager)
 				} else {
 					NoAccountView(accountsManager: accountsManager)

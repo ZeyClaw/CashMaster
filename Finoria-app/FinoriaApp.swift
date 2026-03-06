@@ -21,16 +21,17 @@ struct FinoriaApp: App {
 	@StateObject private var accountsManager: AccountsManager
 	
 	init() {
-		// 1. Créer le conteneur SwiftData
+		// 1. Créer le conteneur SwiftData (CloudKit activé)
 		let container: ModelContainer
 		do {
 			container = try SwiftDataService.makeContainer()
+			print("✅ ModelContainer créé avec CloudKit")
 		} catch {
-			print("❌ Erreur création ModelContainer: \(error)")
-			// Fallback vers conteneur en mémoire
+			print("⚠️ CloudKit indisponible: \(error.localizedDescription)")
+			// Fallback vers conteneur SUR DISQUE sans CloudKit (données conservées !)
 			do {
-				container = try SwiftDataService.makePreviewContainer()
-				print("⚠️ Utilisation d'un conteneur en mémoire (données non persistées)")
+				container = try SwiftDataService.makeFallbackContainer()
+				print("⚠️ Utilisation d'un conteneur local (sans synchronisation iCloud)")
 			} catch {
 				fatalError("Impossible de créer le ModelContainer: \(error)")
 			}

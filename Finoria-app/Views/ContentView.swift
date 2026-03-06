@@ -59,7 +59,7 @@ struct ContentView: View {
 			// Détection du tap sur l'onglet "Ajouter"
 			if newValue == .add {
 				// Ouvrir la feuille d'ajout de transaction si un compte est sélectionné
-				if accountsManager.selectedAccountId != nil {
+				if accountsManager.selectedAccount != nil {
 					showingAddTransactionSheet = true
 				}
 				// Revenir immédiatement à l'onglet précédent
@@ -69,21 +69,23 @@ struct ContentView: View {
 			}
 		}
 		.sheet(isPresented: $showingAddTransactionSheet) {
-			if accountsManager.selectedAccountId != nil {
+			if accountsManager.selectedAccount != nil {
 				AddTransactionView(accountsManager: accountsManager)
 			}
 		}
 		.onAppear {
-			// Auto-sélection du premier compte si aucun n'est sélectionné
-			if accountsManager.selectedAccountId == nil {
+			// Auto-sélection du premier compte si aucun n'est sélectionné ou si le compte n'existe plus
+			if accountsManager.selectedAccount == nil {
 				accountsManager.selectedAccountId = accountsManager.getAllAccounts().first?.id
 			}
 			// Générer les transactions récurrentes à venir / valider celles du jour
 			accountsManager.processRecurringTransactions()
 		}
 		.onChange(of: scenePhase) { _, newPhase in
-			// Retraiter les récurrences quand l'app revient au premier plan (couvre le cas "chaque jour")
 			if newPhase == .active {
+				// Rafraîchir les données depuis SwiftData (récupère les changements CloudKit)
+				accountsManager.refreshFromStore()
+				// Retraiter les récurrences quand l'app revient au premier plan
 				accountsManager.processRecurringTransactions()
 			}
 		}

@@ -15,7 +15,7 @@ struct FutureTabView: View {
 	var body: some View {
 		NavigationStack {
 			Group {
-				if accountsManager.selectedAccountId != nil {
+				if accountsManager.selectedAccount != nil {
 					PotentialTransactionsView(accountsManager: accountsManager)
 				} else {
 					NoAccountView(accountsManager: accountsManager)

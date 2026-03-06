@@ -69,10 +69,16 @@ class AccountsManager: ObservableObject {
 		fetchAccounts()
 	}
 	
-	/// Recharge la liste des comptes depuis SwiftData
+	/// Recharge la liste des comptes depuis SwiftData et valide la sélection
 	private func fetchAccounts() {
 		let descriptor = FetchDescriptor<Account>(sortBy: [SortDescriptor(\.name)])
 		accounts = (try? modelContext.fetch(descriptor)) ?? []
+		
+		// Vérifier que le compte sélectionné existe toujours
+		if let id = selectedAccountId, !accounts.contains(where: { $0.id == id }) {
+			// Le compte a été supprimé (ex: sync CloudKit) → réinitialiser
+			selectedAccountId = accounts.first?.id
+		}
 	}
 	
 	// MARK: - Persistance du compte sélectionné (UserDefaults — préférence UI)
@@ -325,5 +331,11 @@ class AccountsManager: ObservableObject {
 	/// Sauvegarde publique pour besoins externes
 	func saveData() {
 		persist()
+	}
+	
+	/// Rafraîchit les données depuis le store SwiftData.
+	/// Appelé quand l'app revient au premier plan pour récupérer les changements CloudKit.
+	func refreshFromStore() {
+		fetchAccounts()
 	}
 }
