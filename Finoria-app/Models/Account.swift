@@ -20,6 +20,8 @@ enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 	case piggy       // Tirelire
 	case wallet      // Portefeuille
 	case business    // Professionnel
+	case travel      // Voyage
+	case grocery     // Courses / Quotidien
 	
 	var id: String { rawValue }
 	
@@ -33,6 +35,8 @@ enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 		case .piggy:      return "gift.fill"
 		case .wallet:     return "wallet.bifold.fill"
 		case .business:   return "briefcase.fill"
+		case .travel:     return "airplane"
+		case .grocery:    return "cart.fill"
 		}
 	}
 	
@@ -46,6 +50,8 @@ enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 		case .piggy:      return .pink
 		case .wallet:     return .brown
 		case .business:   return .indigo
+		case .travel:     return .teal
+		case .grocery:    return .mint
 		}
 	}
 	
@@ -59,6 +65,8 @@ enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 		case .piggy:      return "Tirelire"
 		case .wallet:     return "Portefeuille"
 		case .business:   return "Professionnel"
+		case .travel:     return "Voyage"
+		case .grocery:    return "Courses"
 		}
 	}
 	
@@ -79,6 +87,10 @@ enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 			return .piggy
 		} else if text.contains("portefeuille") || text.contains("wallet") {
 			return .wallet
+		} else if text.contains("voyage") || text.contains("vacance") || text.contains("trip") {
+			return .travel
+		} else if text.contains("course") || text.contains("quotidien") || text.contains("supermarché") {
+			return .grocery
 		} else if text.contains("pro") || text.contains("entreprise") || text.contains("business") {
 			return .business
 		}
