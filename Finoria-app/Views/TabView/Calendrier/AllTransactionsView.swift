@@ -97,4 +97,5 @@ struct AllTransactionsView: View {
 			AddTransactionView(accountsManager: accountsManager)
 		}
 	
+	}
 }
