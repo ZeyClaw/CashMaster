@@ -67,7 +67,7 @@ struct WelcomeView: View {
                             .multilineTextAlignment(.center)
                         Text("Finoria")
                             .font(.largeTitle.weight(.bold))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                             .multilineTextAlignment(.center)
                     }
                     .padding(.top, 60)
