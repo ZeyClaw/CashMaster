@@ -14,6 +14,10 @@ struct ContentView: View {
 	@State private var tabSelection: TabItem = .home
 	@Environment(\.scenePhase) private var scenePhase
 	
+	// MARK: - Welcome Sheet (premier lancement)
+	@AppStorage("hasSeenWelcome") private var hasSeenWelcome = false
+	@State private var showWelcomeSheet = false
+	
 	// MARK: - CloudKit Alert
 	@State private var showCloudKitAlert = false
 	@State private var cloudKitAlertTitle = ""
@@ -87,6 +91,10 @@ struct ContentView: View {
 			accountsManager.processRecurringTransactions()
 			// Vérifier le statut CloudKit au lancement
 			checkCloudKit()
+			// Afficher la sheet de bienvenue au premier lancement
+			if !hasSeenWelcome {
+				showWelcomeSheet = true
+			}
 		}
 		.onChange(of: scenePhase) { _, newPhase in
 			if newPhase == .active {
@@ -100,6 +108,11 @@ struct ContentView: View {
 			Button("OK", role: .cancel) { }
 		} message: {
 			Text(cloudKitAlertMessage)
+		}
+		.sheet(isPresented: $showWelcomeSheet, onDismiss: {
+			hasSeenWelcome = true
+		}) {
+			WelcomeView()
 		}
 	}
 	
