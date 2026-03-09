@@ -20,6 +20,7 @@ struct AnalysesView: View {
 	/// Mois et année actuellement sélectionnés
 	@State private var selectedMonth: Int
 	@State private var selectedYear: Int
+	@State private var showingAddTransactionSheet = false
 	
 	/// Mois/année courants (pour limiter la navigation au présent)
 	private let currentMonth: Int
@@ -143,6 +144,12 @@ struct AnalysesView: View {
 		.onChange(of: analysisType) {
 			selectedSlice = nil
 		}
+		.sheet(isPresented: $showingAddTransactionSheet) {
+			AddTransactionView(
+				accountsManager: accountsManager,
+				initialTransactionType: analysisType == .income ? .income : .expense
+			)
+		}
 	}
 	
 	// MARK: - Composants
@@ -201,16 +208,21 @@ struct AnalysesView: View {
 	
 	/// État vide quand aucune transaction
 	private var emptyStateView: some View {
-		VStack(spacing: 12) {
-			Image(systemName: analysisType == .expenses ? "cart" : "banknote")
-				.font(.system(size: 48))
-				.foregroundStyle(.tertiary)
-			Text(analysisType == .expenses ? "Aucune dépense ce mois" : "Aucun revenu ce mois")
-				.font(.headline)
-				.foregroundStyle(.secondary)
+		Button {
+			showingAddTransactionSheet = true
+		} label: {
+			VStack(spacing: 12) {
+				Image(systemName: analysisType == .expenses ? "cart" : "banknote")
+					.font(.system(size: 48))
+					.foregroundStyle(.tertiary)
+				Text(analysisType == .expenses ? "Aucune dépense ce mois" : "Aucun revenu ce mois")
+					.font(.headline)
+					.foregroundStyle(.secondary)
+			}
+			.frame(maxWidth: .infinity)
+			.padding(.vertical, 60)
 		}
-		.frame(maxWidth: .infinity)
-		.padding(.vertical, 60)
+		.buttonStyle(.plain)
 	}
 	
 }

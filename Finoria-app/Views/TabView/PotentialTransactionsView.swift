@@ -40,15 +40,10 @@ struct PotentialTransactionsView: View {
 				Button {
 					showingAddTransactionSheet = true
 				} label: {
-					VStack(spacing: 12) {
-						Image(systemName: "plus.circle")
-							.font(.system(size: 40))
-							.foregroundStyle(.blue)
-						Text("Aucune transaction potentielle")
-							.foregroundStyle(.secondary)
-					}
-					.frame(maxWidth: .infinity)
-					.padding(.vertical, 40)
+					Text("Aucune transaction potentielle")
+						.foregroundStyle(.secondary)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 40)
 				}
 				.buttonStyle(.plain)
 			} else {

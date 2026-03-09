@@ -13,6 +13,7 @@ struct AllTransactionsView: View {
 	
 	@State private var showingAccountPicker = false
 	@State private var transactionToEdit: Transaction? = nil
+	@State private var showingAddTransactionSheet = false
 	
 	/// Toutes les transactions validées, triées par date décroissante
 	private var allTransactions: [Transaction] {
@@ -33,7 +34,18 @@ struct AllTransactionsView: View {
 	
 	var body: some View {
 		List {
-			ForEach(transactionsGroupedByDay, id: \.date) { group in
+			if allTransactions.isEmpty {
+				Button {
+					showingAddTransactionSheet = true
+				} label: {
+					Text("Aucune transaction")
+						.foregroundStyle(.secondary)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 40)
+				}
+				.buttonStyle(.plain)
+			} else {
+				ForEach(transactionsGroupedByDay, id: \.date) { group in
 				Section {
 					ForEach(group.transactions) { transaction in
 						TransactionRow(transaction: transaction)
@@ -58,6 +70,7 @@ struct AllTransactionsView: View {
 						.foregroundStyle(.secondary)
 				}
 			}
+			}
 		}
 		.scrollContentBackground(embedded ? .hidden : .visible)
 		.if(!embedded) { view in
@@ -80,6 +93,8 @@ struct AllTransactionsView: View {
 		.sheet(item: $transactionToEdit) { transaction in
 			AddTransactionView(accountsManager: accountsManager, transactionToEdit: transaction)
 		}
-	}
+		.sheet(isPresented: $showingAddTransactionSheet) {
+			AddTransactionView(accountsManager: accountsManager)
+		}
 	
 }

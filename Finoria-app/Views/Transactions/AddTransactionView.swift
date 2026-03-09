@@ -16,6 +16,7 @@ struct AddTransactionView: View {
 
 	/// Valeur initiale du toggle "potentiel" pour une nouvelle transaction
 	var initialIsPotentiel: Bool = false
+	var initialTransactionType: TransactionType = .expense
 	
 	// MARK: - Limites
 	private let maxCommentLength = 30
@@ -129,6 +130,10 @@ struct AddTransactionView: View {
 					selectedCategory = t.category
 				} else {
 					isPotentiel = initialIsPotentiel
+					transactionType = initialTransactionType
+					if !hasManuallySelectedCategory {
+						selectedCategory = initialTransactionType == .income ? .income : .expense
+					}
 				}
 			}
 		}

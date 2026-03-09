@@ -13,10 +13,27 @@ struct TransactionsListView: View {
 	var year: Int? = nil
 	@State private var showingAccountPicker = false
 	@State private var transactionToEdit: Transaction? = nil
+	@State private var showingAddTransactionSheet = false
+	
+	private var sortedTransactions: [Transaction] {
+		accountsManager.validatedTransactions(year: year, month: month)
+			.sorted { ($0.date ?? Date.distantPast) > ($1.date ?? Date.distantPast) }
+	}
 	
 	var body: some View {
 		List {
-			ForEach(accountsManager.validatedTransactions(year: year, month: month).sorted { ($0.date ?? Date.distantPast) > ($1.date ?? Date.distantPast) }) { transaction in
+			if sortedTransactions.isEmpty {
+				Button {
+					showingAddTransactionSheet = true
+				} label: {
+					Text("Aucune transaction")
+						.foregroundStyle(.secondary)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 40)
+				}
+				.buttonStyle(.plain)
+			} else {
+				ForEach(sortedTransactions) { transaction in
 				TransactionRow(transaction: transaction)
 					.contentShape(Rectangle())
 					.onTapGesture {
@@ -29,6 +46,7 @@ struct TransactionsListView: View {
 							Label("Supprimer", systemImage: "trash")
 						}
 					}
+			}
 			}
 		}
 		.navigationTitle(titleText)
@@ -47,6 +65,9 @@ struct TransactionsListView: View {
 		}
 		.sheet(item: $transactionToEdit) { transaction in
 			AddTransactionView(accountsManager: accountsManager, transactionToEdit: transaction)
+		}
+		.sheet(isPresented: $showingAddTransactionSheet) {
+			AddTransactionView(accountsManager: accountsManager)
 		}
 	}
 	
