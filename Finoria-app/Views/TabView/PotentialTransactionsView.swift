@@ -40,7 +40,7 @@ struct PotentialTransactionsView: View {
 				Button {
 					showingAddTransactionSheet = true
 				} label: {
-					Text("Aucune transaction potentielle")
+					Text("Aucune transaction future")
 						.foregroundStyle(.secondary)
 						.frame(maxWidth: .infinity)
 						.padding(.vertical, 40)

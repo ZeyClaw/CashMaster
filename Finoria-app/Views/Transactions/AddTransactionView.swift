@@ -80,7 +80,7 @@ struct AddTransactionView: View {
 				}
 				
 				Section("Date et statut") {
-					Toggle("Transaction potentielle", isOn: $isPotentiel)
+					Toggle("Transaction future", isOn: $isPotentiel)
 					if !isPotentiel {
 						DatePicker("Date", selection: $transactionDate, displayedComponents: .date)
 							.datePickerStyle(.graphical)
@@ -146,8 +146,15 @@ struct AddTransactionView: View {
 			return
 		}
 		
+		let trimmedComment = transactionComment.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !trimmedComment.isEmpty else {
+			errorMessage = "Veuillez entrer un commentaire."
+			showingErrorAlert = true
+			return
+		}
+		
 		if m > maxMontant {
-			errorMessage = "Montant maximum: \(maxMontant.formatted()) €"
+			errorMessage = "Montant maximum : \(maxMontant.formatted()) €"
 			showingErrorAlert = true
 			return
 		}

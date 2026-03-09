@@ -22,6 +22,7 @@ struct AddWidgetShortcutView: View {
 	@State private var type: TransactionType = .income
 	@State private var selectedCategory: TransactionCategory = .income
 	@State private var showError = false
+	@State private var errorMessage = ""
 	@State private var hasManuallySelectedCategory = false
 	
 	private var isEditMode: Bool { shortcutToEdit != nil }
@@ -87,7 +88,7 @@ struct AddWidgetShortcutView: View {
 					}
 				}
 			}
-			.navigationTitle(isEditMode ? "Modifier le raccourci" : "Nouveau widget")
+			.navigationTitle(isEditMode ? "Modifier le raccourci" : "Nouveau raccourci")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Annuler") { dismiss() }
@@ -98,10 +99,10 @@ struct AddWidgetShortcutView: View {
 					}
 				}
 			}
-			.alert("Montant invalide", isPresented: $showError) {
+			.alert("Erreur", isPresented: $showError) {
 				Button("OK", role: .cancel) {}
 			} message: {
-				Text("Veuillez entrer un montant positif valide.")
+				Text(errorMessage)
 			}
 			.onAppear {
 				if let shortcut = shortcutToEdit {
@@ -116,6 +117,14 @@ struct AddWidgetShortcutView: View {
 	
 	private func saveShortcut() {
 		guard let amount = amount, amount > 0 else {
+			errorMessage = "Veuillez entrer un montant positif."
+			showError = true
+			return
+		}
+		
+		let trimmedComment = comment.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !trimmedComment.isEmpty else {
+			errorMessage = "Veuillez entrer un commentaire."
 			showError = true
 			return
 		}

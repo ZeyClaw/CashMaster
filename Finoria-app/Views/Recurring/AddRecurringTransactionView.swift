@@ -25,6 +25,7 @@ struct AddRecurringTransactionView: View {
 	@State private var frequency: RecurrenceFrequency = .monthly
 	@State private var startDate: Date = Date()
 	@State private var showError = false
+	@State private var errorMessage = ""
 	@State private var hasManuallySelectedCategory = false
 	
 	private var isEditMode: Bool { recurringToEdit != nil }
@@ -115,10 +116,10 @@ struct AddRecurringTransactionView: View {
 					}
 				}
 			}
-			.alert("Montant invalide", isPresented: $showError) {
+			.alert("Erreur", isPresented: $showError) {
 				Button("OK", role: .cancel) {}
 			} message: {
-				Text("Veuillez entrer un montant positif valide.")
+				Text(errorMessage)
 			}
 			.onAppear {
 			if let recurring = recurringToEdit {
@@ -137,6 +138,14 @@ struct AddRecurringTransactionView: View {
 	
 	private func saveRecurring() {
 		guard let amount = amount, amount > 0 else {
+			errorMessage = "Veuillez entrer un montant positif."
+			showError = true
+			return
+		}
+		
+		let trimmedComment = comment.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !trimmedComment.isEmpty else {
+			errorMessage = "Veuillez entrer un commentaire."
 			showError = true
 			return
 		}

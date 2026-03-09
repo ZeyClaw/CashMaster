@@ -29,7 +29,7 @@ struct ContentView: View {
 			Tab(value: TabItem.home) {
 				HomeTabView(accountsManager: accountsManager)
 			} label: {
-				Label("Home", systemImage: "house")
+				Label("Accueil", systemImage: "house")
 			}
 			
 			// Onglet Analyses
