@@ -54,6 +54,7 @@
 		F8ACBAA12F5A1C560074CE1B /* SwiftDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAA02F5A1C550074CE1B /* SwiftDataService.swift */; };
 		F8ACBAA62F5A3A0A0074CE1B /* DatabaseErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAA52F5A3A0A0074CE1B /* DatabaseErrorView.swift */; };
 		F8ACBAA82F5A59590074CE1B /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAA72F5A59590074CE1B /* CloudKitService.swift */; };
+		F8ACBAAA2F5ECA9A0074CE1B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8ACBAA92F5ECA9A0074CE1B /* Localizable.strings */; };
 		F8B79A6F2CAEC5E4002D88AE /* FinoriaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */; };
 		F8B79A732CAEC5EE002D88AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A722CAEC5EE002D88AE /* Assets.xcassets */; };
 		F8B79A762CAEC5EE002D88AE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A752CAEC5EE002D88AE /* Preview Assets.xcassets */; };
@@ -132,6 +133,7 @@
 		F8ACBAA42F5A22420074CE1B /* FinoriaRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FinoriaRelease.entitlements; sourceTree = "<group>"; };
 		F8ACBAA52F5A3A0A0074CE1B /* DatabaseErrorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseErrorView.swift; sourceTree = "<group>"; };
 		F8ACBAA72F5A59590074CE1B /* CloudKitService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
+		F8ACBAA92F5ECA9A0074CE1B /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinoriaApp.swift; sourceTree = "<group>"; };
 		F8B79A722CAEC5EE002D88AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -354,6 +356,7 @@
 		F8B79A6D2CAEC5E4002D88AE /* Finoria-app */ = {
 			isa = PBXGroup;
 			children = (
+				F8ACBAA92F5ECA9A0074CE1B /* Localizable.strings */,
 				F812E1F92CC7BCFF00619857 /* LaunchScreen.storyboard */,
 				F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */,
 				F807613D2CC6E31B00C34EDD /* Notifications.swift */,
@@ -498,6 +501,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F812E1FA2CC7BCFF00619857 /* LaunchScreen.storyboard in Resources */,
+				F8ACBAAA2F5ECA9A0074CE1B /* Localizable.strings in Resources */,
 				F8B79A762CAEC5EE002D88AE /* Preview Assets.xcassets in Resources */,
 				F8B79A732CAEC5EE002D88AE /* Assets.xcassets in Resources */,
 			);
