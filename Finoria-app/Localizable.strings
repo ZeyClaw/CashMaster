@@ -1,0 +1,5 @@
+/* Notifications push CloudKit — Annonces */
+/* %1$@ est remplacé par la valeur du champ correspondant du record Announcements */
+
+"CK_ANNOUNCEMENT_TITLE" = "%1$@";
+"CK_ANNOUNCEMENT_BODY" = "%1$@";

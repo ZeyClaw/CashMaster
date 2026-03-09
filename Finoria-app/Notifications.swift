@@ -24,15 +24,29 @@ private let notifLogger = Logger(
 ///
 /// Depuis le CloudKit Dashboard (https://icloud.developer.apple.com), vous pouvez aussi
 /// envoyer des push visibles à tous les utilisateurs via les Subscriptions CloudKit.
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 	
 	func application(
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
 	) -> Bool {
+		// Devenir le delegate pour afficher les notifications même quand l'app est au premier plan
+		UNUserNotificationCenter.current().delegate = self
+		
 		// Inscription aux notifications distantes (push silencieux CloudKit + push visibles)
 		application.registerForRemoteNotifications()
 		return true
+	}
+	
+	// MARK: - UNUserNotificationCenterDelegate
+	
+	/// Affiche les notifications push même quand l'app est au premier plan.
+	func userNotificationCenter(
+		_ center: UNUserNotificationCenter,
+		willPresent notification: UNNotification,
+		withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+	) {
+		completionHandler([.banner, .sound, .badge])
 	}
 	
 	func application(

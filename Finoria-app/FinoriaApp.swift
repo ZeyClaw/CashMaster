@@ -55,6 +55,11 @@ struct FinoriaApp: App {
 		// 3. Notifications
 		NotificationManager.shared.requestNotificationPermission()
 		NotificationManager.shared.scheduleWeeklyNotificationIfNeeded()
+		
+		// 4. Subscription CloudKit pour les notifications push (annonces)
+		Task {
+			await CloudKitService.subscribeToAnnouncements()
+		}
 	}
 	
 	var body: some Scene {

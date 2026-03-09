@@ -29,6 +29,60 @@ enum CloudKitService {
 	/// Container CloudKit de l'application
 	private static let container = CKContainer(identifier: "iCloud.com.godefroyinformatique.GDF-app")
 	
+	/// Clé UserDefaults pour éviter de recréer la subscription à chaque lancement
+	private static let subscriptionSavedKey = "ck_announcements_subscription_saved"
+	
+	// MARK: - Subscription Push Notifications
+	
+	/// Souscrit aux notifications d'annonces via CKQuerySubscription sur la base **publique**.
+	///
+	/// Quand un nouveau record **Announcements** est créé (depuis le CloudKit Dashboard),
+	/// **tous** les utilisateurs ayant l'app installée reçoivent une notification push.
+	///
+	/// ### Configuration requise dans le CloudKit Dashboard :
+	/// 1. Aller sur https://icloud.developer.apple.com
+	/// 2. Sélectionner le container `iCloud.com.godefroyinformatique.GDF-app`
+	/// 3. Dans **Schema → Record Types**, créer le type **Announcements** avec :
+	///    - `title` (String) — titre de la notification
+	///    - `body` (String) — contenu de la notification
+	/// 4. Pour envoyer une notif : créer un nouveau record dans **Data → Public Database → Announcements**
+	static func subscribeToAnnouncements() async {
+		guard !UserDefaults.standard.bool(forKey: subscriptionSavedKey) else {
+			logger.info("CloudKit: subscription annonces déjà enregistrée")
+			return
+		}
+		
+		let predicate = NSPredicate(value: true)
+		let subscription = CKQuerySubscription(
+			recordType: "Announcements",
+			predicate: predicate,
+			subscriptionID: "all-announcements",
+			options: [.firesOnRecordCreation]
+		)
+		
+		let notificationInfo = CKSubscription.NotificationInfo()
+		notificationInfo.titleLocalizationKey = "CK_ANNOUNCEMENT_TITLE"
+		notificationInfo.titleLocalizationArgs = ["title"]
+		notificationInfo.alertLocalizationKey = "CK_ANNOUNCEMENT_BODY"
+		notificationInfo.alertLocalizationArgs = ["body"]
+		notificationInfo.soundName = "default"
+		notificationInfo.shouldBadge = true
+		subscription.notificationInfo = notificationInfo
+		
+		do {
+			_ = try await container.publicCloudDatabase.save(subscription)
+			logger.info("CloudKit: subscription annonces créée ✓")
+			UserDefaults.standard.set(true, forKey: subscriptionSavedKey)
+		} catch {
+			if let ckError = error as? CKError, ckError.code == .serverRejectedRequest {
+				logger.info("CloudKit: subscription annonces existe déjà côté serveur")
+				UserDefaults.standard.set(true, forKey: subscriptionSavedKey)
+			} else {
+				logger.error("CloudKit: erreur subscription annonces: \(error.localizedDescription)")
+			}
+		}
+	}
+	
 	// MARK: - Statut CloudKit
 	
 	/// Résultat du diagnostic CloudKit
