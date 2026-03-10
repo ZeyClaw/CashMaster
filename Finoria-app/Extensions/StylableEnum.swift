@@ -183,11 +183,17 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 							}
 						}
 						.onEnded { value in
-							let threshold = pageWidth * 0.5
-							withAnimation(.interpolatingSpring(stiffness: 300, damping: 30)) {
-								if value.translation.width < -threshold && currentPage < totalPages - 1 {
+							let velocity = value.predictedEndTranslation.width - value.translation.width
+							let distanceThreshold = pageWidth * 0.35
+							let velocityThreshold: CGFloat = 200
+							
+							let shouldGoNext = (value.translation.width < -distanceThreshold || velocity < -velocityThreshold) && currentPage < totalPages - 1
+							let shouldGoPrev = (value.translation.width > distanceThreshold || velocity > velocityThreshold) && currentPage > 0
+							
+							withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+								if shouldGoNext {
 									currentPage += 1
-								} else if value.translation.width > threshold && currentPage > 0 {
+								} else if shouldGoPrev {
 									currentPage -= 1
 								}
 								dragOffset = 0
