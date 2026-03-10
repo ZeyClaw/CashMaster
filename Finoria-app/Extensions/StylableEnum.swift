@@ -123,12 +123,10 @@ struct AccountCategoryPicker<Style: StylableEnum>: View {
 
 // MARK: - Paginated Style Picker Grid
 
-/// Grille paginée de sélection de style avec swipe horizontal interactif.
+/// Grille paginée de sélection de style utilisant TabView natif.
 /// Affiche 5 colonnes × 2 lignes par page (10 items/page) avec :
-/// - Défilement qui suit le doigt en temps réel
-/// - Snap sur la page suivante si le seuil de 50 % est dépassé, sinon retour avec ressort
-/// - Résistance élastique aux bords extrêmes
-/// - Indicateur de page (points) en bas
+/// - Swipe horizontal natif iOS (physique réaliste, snap automatique)
+/// - Indicateur de page (points) intégré
 struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	@Binding var selectedStyle: Style
 	var onManualSelection: (() -> Void)? = nil
@@ -138,7 +136,6 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	private var itemsPerPage: Int { columns * rowsPerPage }
 	
 	@State private var currentPage = 0
-	@State private var dragOffset: CGFloat = 0
 	
 	private var allItems: [Style] { Array(Style.allCases) }
 	private var totalPages: Int {
@@ -158,50 +155,14 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	}
 	
 	var body: some View {
-		VStack(spacing: 12) {
-			GeometryReader { geometry in
-				let pageWidth = geometry.size.width
-				
-				HStack(spacing: 0) {
-					ForEach(0..<totalPages, id: \.self) { page in
-						pageView(items: itemsForPage(page))
-							.frame(width: pageWidth)
-					}
+		VStack(spacing: 4) {
+			TabView(selection: $currentPage) {
+				ForEach(0..<totalPages, id: \.self) { page in
+					pageView(items: itemsForPage(page))
+						.tag(page)
 				}
-				.offset(x: -CGFloat(currentPage) * pageWidth + dragOffset)
-				.contentShape(Rectangle())
-				.simultaneousGesture(
-					DragGesture(minimumDistance: 10)
-						.onChanged { value in
-							let translation = value.translation.width
-							// Résistance élastique aux bords
-							if (currentPage == 0 && translation > 0) ||
-								(currentPage == totalPages - 1 && translation < 0) {
-								dragOffset = translation * 0.3
-							} else {
-								dragOffset = translation
-							}
-						}
-						.onEnded { value in
-							let velocity = value.predictedEndTranslation.width - value.translation.width
-							let distanceThreshold = pageWidth * 0.35
-							let velocityThreshold: CGFloat = 200
-							
-							let shouldGoNext = (value.translation.width < -distanceThreshold || velocity < -velocityThreshold) && currentPage < totalPages - 1
-							let shouldGoPrev = (value.translation.width > distanceThreshold || velocity > velocityThreshold) && currentPage > 0
-							
-							withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-								if shouldGoNext {
-									currentPage += 1
-								} else if shouldGoPrev {
-									currentPage -= 1
-								}
-								dragOffset = 0
-							}
-						}
-				)
 			}
-			.clipped()
+			.tabViewStyle(.page(indexDisplayMode: .never))
 			.frame(height: 160)
 			
 			// Indicateur de page (points)
