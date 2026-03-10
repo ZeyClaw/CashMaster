@@ -12,61 +12,61 @@ import SwiftUI
 // MARK: - Style des comptes (icône + couleur liés)
 
 enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
-	case bank        // Compte courant
-	case savings     // Épargne
-	case investment  // Investissements
-	case card        // Carte
-	case cash        // Espèces
-	case piggy       // Tirelire
-	case wallet      // Portefeuille
-	case business    // Professionnel
-	case travel      // Voyage
-	case grocery     // Courses / Quotidien
+	case bank           // Compte courant
+	case savings        // Épargne
+	case investment     // Investissements
+	case business       // Professionnel
+	case travel         // Voyage
+	case grocery        // Courses / Quotidien
+	case student        // Étudiant
+	case family         // Famille
+	case property       // Immobilier
+	case entertainment  // Loisirs
 	
 	var id: String { rawValue }
 	
 	var icon: String {
 		switch self {
-		case .bank:       return "building.columns.fill"
-		case .savings:    return "banknote.fill"
-		case .investment: return "chart.line.uptrend.xyaxis"
-		case .card:       return "creditcard.fill"
-		case .cash:       return "dollarsign.circle.fill"
-		case .piggy:      return "gift.fill"
-		case .wallet:     return "wallet.bifold.fill"
-		case .business:   return "briefcase.fill"
-		case .travel:     return "airplane"
-		case .grocery:    return "cart.fill"
+		case .bank:          return "building.columns.fill"
+		case .savings:       return "banknote.fill"
+		case .investment:    return "chart.line.uptrend.xyaxis"
+		case .business:      return "briefcase.fill"
+		case .travel:        return "airplane"
+		case .grocery:       return "cart.fill"
+		case .student:       return "graduationcap.fill"
+		case .family:        return "person.2.fill"
+		case .property:      return "house.fill"
+		case .entertainment: return "gamecontroller.fill"
 		}
 	}
 	
 	var color: Color {
 		switch self {
-		case .bank:       return .blue
-		case .savings:    return .orange
-		case .investment: return .purple
-		case .card:       return .green
-		case .cash:       return .cyan
-		case .piggy:      return .pink
-		case .wallet:     return .brown
-		case .business:   return .indigo
-		case .travel:     return .teal
-		case .grocery:    return .mint
+		case .bank:          return .blue
+		case .savings:       return .orange
+		case .investment:    return .purple
+		case .business:      return .indigo
+		case .travel:        return .teal
+		case .grocery:       return .green
+		case .student:       return .cyan
+		case .family:        return .pink
+		case .property:      return .brown
+		case .entertainment: return .red
 		}
 	}
 	
 	var label: String {
 		switch self {
-		case .bank:       return "Compte courant"
-		case .savings:    return "Épargne"
-		case .investment: return "Investissements"
-		case .card:       return "Carte"
-		case .cash:       return "Espèces"
-		case .piggy:      return "Tirelire"
-		case .wallet:     return "Portefeuille"
-		case .business:   return "Professionnel"
-		case .travel:     return "Voyage"
-		case .grocery:    return "Courses"
+		case .bank:          return "Courant"
+		case .savings:       return "Épargne"
+		case .investment:    return "Investissement"
+		case .business:      return "Professionnel"
+		case .travel:        return "Voyage"
+		case .grocery:       return "Courses"
+		case .student:       return "Étudiant"
+		case .family:        return "Famille"
+		case .property:      return "Immobilier"
+		case .entertainment: return "Loisirs"
 		}
 	}
 	
@@ -79,20 +79,20 @@ enum AccountStyle: String, Codable, CaseIterable, Identifiable, StylableEnum {
 			return .savings
 		} else if text.contains("invest") || text.contains("pea") || text.contains("crypto") || text.contains("bourse") || text.contains("action") {
 			return .investment
-		} else if text.contains("carte") || text.contains("revolut") || text.contains("n26") || text.contains("lydia") {
-			return .card
-		} else if text.contains("espèce") || text.contains("cash") || text.contains("liquide") {
-			return .cash
-		} else if text.contains("tirelire") || text.contains("économie") {
-			return .piggy
-		} else if text.contains("portefeuille") || text.contains("wallet") {
-			return .wallet
+		} else if text.contains("pro") || text.contains("entreprise") || text.contains("business") {
+			return .business
 		} else if text.contains("voyage") || text.contains("vacance") || text.contains("trip") {
 			return .travel
 		} else if text.contains("course") || text.contains("quotidien") || text.contains("supermarché") {
 			return .grocery
-		} else if text.contains("pro") || text.contains("entreprise") || text.contains("business") {
-			return .business
+		} else if text.contains("étudiant") || text.contains("école") || text.contains("université") || text.contains("fac") {
+			return .student
+		} else if text.contains("famille") || text.contains("commun") || text.contains("joint") {
+			return .family
+		} else if text.contains("immo") || text.contains("maison") || text.contains("appart") || text.contains("loyer") {
+			return .property
+		} else if text.contains("loisir") || text.contains("jeu") || text.contains("divertissement") || text.contains("sorti") {
+			return .entertainment
 		}
 		return .bank
 	}

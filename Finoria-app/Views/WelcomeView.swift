@@ -89,11 +89,10 @@ struct WelcomeView: View {
             } label: {
                 Text("Continuer")
                     .font(.body.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
+                    .frame(maxWidth: 200)
+                    .padding(.vertical, 12)
             }
             .buttonStyle(.borderedProminent)
-            .controlSize(.large)
             .padding(.horizontal, 24)
             .padding(.bottom, 8)
         }

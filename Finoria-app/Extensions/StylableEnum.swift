@@ -121,6 +121,136 @@ struct StylePickerGrid<Style: StylableEnum>: View {
 	}
 }
 
+// MARK: - Paginated Style Picker Grid
+
+/// Grille paginée de sélection de style avec swipe horizontal interactif.
+/// Affiche 5 colonnes × 2 lignes par page (10 items/page) avec :
+/// - Défilement qui suit le doigt en temps réel
+/// - Snap sur la page suivante si le seuil de 50 % est dépassé, sinon retour avec ressort
+/// - Résistance élastique aux bords extrêmes
+/// - Indicateur de page (points) en bas
+struct PaginatedStylePickerGrid<Style: StylableEnum>: View {
+	@Binding var selectedStyle: Style
+	var onManualSelection: (() -> Void)? = nil
+	
+	private let columns = 5
+	private let rowsPerPage = 2
+	private var itemsPerPage: Int { columns * rowsPerPage }
+	
+	@State private var currentPage = 0
+	@State private var dragOffset: CGFloat = 0
+	
+	private var allItems: [Style] { Array(Style.allCases) }
+	private var totalPages: Int {
+		max(1, (allItems.count + itemsPerPage - 1) / itemsPerPage)
+	}
+	
+	private func itemsForPage(_ page: Int) -> [Style] {
+		let start = page * itemsPerPage
+		let end = min(start + itemsPerPage, allItems.count)
+		guard start < allItems.count else { return [] }
+		return Array(allItems[start..<end])
+	}
+	
+	private func initialPage() -> Int {
+		guard let index = allItems.firstIndex(where: { $0.id == selectedStyle.id }) else { return 0 }
+		return allItems.distance(from: allItems.startIndex, to: index) / itemsPerPage
+	}
+	
+	var body: some View {
+		VStack(spacing: 12) {
+			GeometryReader { geometry in
+				let pageWidth = geometry.size.width
+				
+				HStack(spacing: 0) {
+					ForEach(0..<totalPages, id: \.self) { page in
+						pageView(items: itemsForPage(page))
+							.frame(width: pageWidth)
+					}
+				}
+				.offset(x: -CGFloat(currentPage) * pageWidth + dragOffset)
+				.contentShape(Rectangle())
+				.gesture(
+					DragGesture()
+						.onChanged { value in
+							let translation = value.translation.width
+							// Résistance élastique aux bords
+							if (currentPage == 0 && translation > 0) ||
+								(currentPage == totalPages - 1 && translation < 0) {
+								dragOffset = translation * 0.3
+							} else {
+								dragOffset = translation
+							}
+						}
+						.onEnded { value in
+							let threshold = pageWidth * 0.5
+							withAnimation(.interpolatingSpring(stiffness: 300, damping: 30)) {
+								if value.translation.width < -threshold && currentPage < totalPages - 1 {
+									currentPage += 1
+								} else if value.translation.width > threshold && currentPage > 0 {
+									currentPage -= 1
+								}
+								dragOffset = 0
+							}
+						}
+				)
+			}
+			.clipped()
+			.frame(height: 160)
+			
+			// Indicateur de page (points)
+			if totalPages > 1 {
+				HStack(spacing: 8) {
+					ForEach(0..<totalPages, id: \.self) { page in
+						Circle()
+							.fill(page == currentPage ? Color.white : Color.gray.opacity(0.5))
+							.frame(width: 8, height: 8)
+							.animation(.easeInOut(duration: 0.2), value: currentPage)
+					}
+				}
+			}
+		}
+		.padding(.vertical, 8)
+		.onAppear {
+			currentPage = initialPage()
+		}
+	}
+	
+	@ViewBuilder
+	private func pageView(items: [Style]) -> some View {
+		LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
+			ForEach(items, id: \.id) { style in
+				Button {
+					selectedStyle = style
+					onManualSelection?()
+				} label: {
+					VStack(spacing: 6) {
+						ZStack {
+							Circle()
+								.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
+								.frame(width: 52, height: 52)
+							Image(systemName: style.icon)
+								.font(.system(size: 22))
+								.foregroundStyle(style.color)
+						}
+						.overlay(
+							Circle()
+								.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
+						)
+						
+						Text(style.label)
+							.font(.caption2)
+							.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
+							.lineLimit(1)
+					}
+				}
+				.buttonStyle(PlainButtonStyle())
+			}
+		}
+		.padding(.horizontal, 4)
+	}
+}
+
 // MARK: - Vue icône de style (réutilisable)
 
 /// Affiche une icône de style avec son cercle coloré
