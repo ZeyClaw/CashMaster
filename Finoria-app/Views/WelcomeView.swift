@@ -83,7 +83,7 @@ struct WelcomeView: View {
                 .padding(.bottom, 100)
             }
 
-            // MARK: - Continue button (flottant avec flou)
+            // MARK: - Continue button (flottant avec dégradé flou)
             VStack(spacing: 0) {
                 Button {
                     dismiss()
@@ -97,8 +97,25 @@ struct WelcomeView: View {
                 .padding(.bottom, 8)
             }
             .frame(maxWidth: .infinity)
-            .padding(.top, 16)
-            .background(.ultraThinMaterial)
+            .padding(.top, 24)
+            .background(
+                ZStack {
+                    // Couche de flou
+                    VisualEffectBlur()
+                        .mask(
+                            LinearGradient(
+                                stops: [
+                                    .init(color: .clear, location: 0),
+                                    .init(color: .black.opacity(0.5), location: 0.3),
+                                    .init(color: .black, location: 0.6),
+                                    .init(color: .black, location: 1)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                }
+            )
         }
         .interactiveDismissDisabled()
     }
@@ -137,6 +154,15 @@ private struct FeatureRow: View {
             Spacer(minLength: 0)
         }
     }
+}
+
+// MARK: - UIVisualEffectView wrapper
+
+private struct VisualEffectBlur: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
+    }
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
 
 // MARK: - Preview
