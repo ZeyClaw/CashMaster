@@ -78,37 +78,20 @@ struct WelcomeView: View {
                     }
                 }
                 .padding(.horizontal, 24)
+
+                // MARK: - Continue button
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Continuer")
+                        .font(.body.weight(.semibold))
+                        .frame(maxWidth: 200)
+                        .padding(.vertical, 12)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.top, 16)
             }
-            .padding(.bottom, 32)
-        }
-        .safeAreaInset(edge: .bottom) {
-            // MARK: - Continue button (flottant avec dégradé flou progressif)
-            Button {
-                dismiss()
-            } label: {
-                Text("Continuer")
-                    .font(.body.weight(.semibold))
-                    .frame(maxWidth: 200)
-                    .padding(.vertical, 12)
-            }
-            .buttonStyle(.borderedProminent)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(
-                VisualEffectBlur()
-                    .mask(
-                        VStack(spacing: 0) {
-                            LinearGradient(
-                                colors: [.clear, .black],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                            .frame(height: 30)
-                            Color.black
-                        }
-                    )
-                    .ignoresSafeArea(edges: .bottom)
-            )
+            .padding(.bottom, 40)
         }
         .interactiveDismissDisabled()
     }
@@ -147,15 +130,6 @@ private struct FeatureRow: View {
             Spacer(minLength: 0)
         }
     }
-}
-
-// MARK: - UIVisualEffectView wrapper
-
-private struct VisualEffectBlur: UIViewRepresentable {
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-    }
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
 
 // MARK: - Preview
