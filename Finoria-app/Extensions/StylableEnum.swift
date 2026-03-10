@@ -186,30 +186,37 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	@ViewBuilder
 	private func pageView(items: [Style]) -> some View {
 		LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
-			ForEach(items, id: \.id) { style in
-				VStack(spacing: 6) {
-					ZStack {
-						Circle()
-							.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
-							.frame(width: 52, height: 52)
-						Image(systemName: style.icon)
-							.font(.system(size: 22))
-							.foregroundStyle(style.color)
+			ForEach(0..<itemsPerPage, id: \.self) { index in
+				if index < items.count {
+					let style = items[index]
+					VStack(spacing: 6) {
+						ZStack {
+							Circle()
+								.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
+								.frame(width: 52, height: 52)
+							Image(systemName: style.icon)
+								.font(.system(size: 22))
+								.foregroundStyle(style.color)
+						}
+						.overlay(
+							Circle()
+								.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
+						)
+						
+						Text(style.label)
+							.font(.caption2)
+							.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
+							.lineLimit(1)
 					}
-					.overlay(
-						Circle()
-							.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
-					)
-					
-					Text(style.label)
-						.font(.caption2)
-						.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
-						.lineLimit(1)
-				}
-				.contentShape(Rectangle())
-				.onTapGesture {
-					selectedStyle = style
-					onManualSelection?()
+					.contentShape(Rectangle())
+					.onTapGesture {
+						selectedStyle = style
+						onManualSelection?()
+					}
+				} else {
+					// Espace invisible pour maintenir la grille 5×2
+					Color.clear
+						.frame(width: 52, height: 70)
 				}
 			}
 		}
