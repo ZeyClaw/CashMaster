@@ -74,7 +74,7 @@ struct AddTransactionView: View {
 				}
 				
 				Section("Catégorie") {
-					PaginatedStylePickerGrid(selectedStyle: $selectedCategory) {
+					TransactionCategoryPicker(selectedStyle: $selectedCategory) {
 						hasManuallySelectedCategory = true
 					}
 				}

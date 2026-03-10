@@ -63,7 +63,7 @@ struct AddAccountSheet: View {
 				}
 				
 				Section("Icône") {
-					StylePickerGrid(selectedStyle: $style, columns: 5) {
+					AccountCategoryPicker(selectedStyle: $style, columns: 5) {
 						hasManuallySelectedStyle = true
 					}
 				}

@@ -65,7 +65,7 @@ struct AddWidgetShortcutView: View {
 				
 				// MARK: - Sélecteur de catégorie
 				Section("Catégorie") {
-					PaginatedStylePickerGrid(selectedStyle: $selectedCategory) {
+					TransactionCategoryPicker(selectedStyle: $selectedCategory) {
 						hasManuallySelectedCategory = true
 					}
 				}

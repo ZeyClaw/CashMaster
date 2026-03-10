@@ -82,7 +82,7 @@ struct AddRecurringTransactionView: View {
 				
 				// MARK: - Sélecteur d'icône
 				Section("Catégorie") {
-					PaginatedStylePickerGrid(selectedStyle: $selectedCategory) {
+					TransactionCategoryPicker(selectedStyle: $selectedCategory) {
 						hasManuallySelectedCategory = true
 					}
 				}

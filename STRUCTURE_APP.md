@@ -432,7 +432,8 @@ L'app s'inscrit aux notifications push via `registerForRemoteNotifications()` :
 
 | Composant | Usage |
 |-----------|-------|
-| `StylePickerGrid<Style>` | Grille de sélection d'icône/couleur |
+| `AccountCategoryPicker<Style>` | Grille de sélection d'icône/couleur (comptes) |
+| `TransactionCategoryPicker<Style>` | Grille paginée avec swipe (transactions, raccourcis, récurrences) |
 | `StyleIconView<Style>` | Icône ronde avec fond coloré |
 | `compactAmount(_:)` | Montant compact : 2 850 € → 2,85k € |
 
@@ -502,7 +503,7 @@ Views ──────▶ AccountsManager ──────▶ ModelContext (
 
 FinoriaApp ─▶ SwiftDataService (crée ModelContainer)
 
-Views ──────▶ StylableEnum (StylePickerGrid, StyleIconView)
+Views ──────▶ StylableEnum (AccountCategoryPicker, TransactionCategoryPicker, StyleIconView)
 Views ──────▶ ViewModifiers (adaptiveGroupedBackground, accountPickerToolbar)
 ```
 
