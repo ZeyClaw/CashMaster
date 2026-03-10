@@ -57,64 +57,57 @@ struct WelcomeView: View {
     ]
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            ScrollView {
-                VStack(spacing: 32) {
-                    // MARK: - Header
-                    VStack(spacing: 8) {
-                        Text("Bienvenue dans")
-                            .font(.largeTitle.weight(.bold))
-                            .multilineTextAlignment(.center)
-                        Text("Finoria")
-                            .font(.largeTitle.weight(.bold))
-                            .foregroundStyle(Color.accentColor)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.top, 60)
-
-                    // MARK: - Features list
-                    VStack(spacing: 24) {
-                        ForEach(features) { feature in
-                            FeatureRow(feature: feature)
-                        }
-                    }
-                    .padding(.horizontal, 24)
+        ScrollView {
+            VStack(spacing: 32) {
+                // MARK: - Header
+                VStack(spacing: 8) {
+                    Text("Bienvenue dans")
+                        .font(.largeTitle.weight(.bold))
+                        .multilineTextAlignment(.center)
+                    Text("Finoria")
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundStyle(Color.accentColor)
+                        .multilineTextAlignment(.center)
                 }
-                .padding(.bottom, 100)
-            }
+                .padding(.top, 60)
 
-            // MARK: - Continue button (flottant avec dégradé flou)
-            VStack(spacing: 0) {
-                Button {
-                    dismiss()
-                } label: {
-                    Text("Continuer")
-                        .font(.body.weight(.semibold))
-                        .frame(maxWidth: 200)
-                        .padding(.vertical, 12)
+                // MARK: - Features list
+                VStack(spacing: 24) {
+                    ForEach(features) { feature in
+                        FeatureRow(feature: feature)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 24)
             }
+            .padding(.bottom, 32)
+        }
+        .safeAreaInset(edge: .bottom) {
+            // MARK: - Continue button (flottant avec dégradé flou progressif)
+            Button {
+                dismiss()
+            } label: {
+                Text("Continuer")
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: 200)
+                    .padding(.vertical, 12)
+            }
+            .buttonStyle(.borderedProminent)
             .frame(maxWidth: .infinity)
-            .padding(.top, 24)
+            .padding(.vertical, 12)
             .background(
-                ZStack {
-                    // Couche de flou
-                    VisualEffectBlur()
-                        .mask(
+                VisualEffectBlur()
+                    .mask(
+                        VStack(spacing: 0) {
                             LinearGradient(
-                                stops: [
-                                    .init(color: .clear, location: 0),
-                                    .init(color: .black.opacity(0.5), location: 0.3),
-                                    .init(color: .black, location: 0.6),
-                                    .init(color: .black, location: 1)
-                                ],
+                                colors: [.clear, .black],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
-                        )
-                }
+                            .frame(height: 30)
+                            Color.black
+                        }
+                    )
+                    .ignoresSafeArea(edges: .bottom)
             )
         }
         .interactiveDismissDisabled()
