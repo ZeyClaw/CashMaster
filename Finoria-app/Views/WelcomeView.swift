@@ -57,7 +57,7 @@ struct WelcomeView: View {
     ]
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(spacing: 32) {
                     // MARK: - Header
@@ -80,21 +80,25 @@ struct WelcomeView: View {
                     }
                     .padding(.horizontal, 24)
                 }
-                .padding(.bottom, 32)
+                .padding(.bottom, 100)
             }
 
-            // MARK: - Continue button
-            Button {
-                dismiss()
-            } label: {
-                Text("Continuer")
-                    .font(.body.weight(.semibold))
-                    .frame(maxWidth: 200)
-                    .padding(.vertical, 12)
+            // MARK: - Continue button (flottant avec flou)
+            VStack(spacing: 0) {
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Continuer")
+                        .font(.body.weight(.semibold))
+                        .frame(maxWidth: 200)
+                        .padding(.vertical, 12)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.bottom, 8)
             }
-            .buttonStyle(.borderedProminent)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 8)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 16)
+            .background(.ultraThinMaterial)
         }
         .interactiveDismissDisabled()
     }
