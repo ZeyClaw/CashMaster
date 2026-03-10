@@ -29,7 +29,7 @@ extension StylableEnum {
 /// Grille de sélection de style réutilisable pour tout enum conforme à StylableEnum.
 /// Supporte un mode replié (`collapsedRows`) qui n'affiche que les N premières lignes
 /// avec un bouton pour déplier et voir toutes les options.
-struct StylePickerGrid<Style: StylableEnum>: View {
+struct AccountCategoryPicker<Style: StylableEnum>: View {
 	@Binding var selectedStyle: Style
 	let columns: Int
 	let collapsedRows: Int?
@@ -129,7 +129,7 @@ struct StylePickerGrid<Style: StylableEnum>: View {
 /// - Snap sur la page suivante si le seuil de 50 % est dépassé, sinon retour avec ressort
 /// - Résistance élastique aux bords extrêmes
 /// - Indicateur de page (points) en bas
-struct PaginatedStylePickerGrid<Style: StylableEnum>: View {
+struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	@Binding var selectedStyle: Style
 	var onManualSelection: (() -> Void)? = nil
 	
@@ -170,8 +170,8 @@ struct PaginatedStylePickerGrid<Style: StylableEnum>: View {
 				}
 				.offset(x: -CGFloat(currentPage) * pageWidth + dragOffset)
 				.contentShape(Rectangle())
-				.gesture(
-					DragGesture()
+				.simultaneousGesture(
+					DragGesture(minimumDistance: 10)
 						.onChanged { value in
 							let translation = value.translation.width
 							// Résistance élastique aux bords
@@ -220,31 +220,30 @@ struct PaginatedStylePickerGrid<Style: StylableEnum>: View {
 	private func pageView(items: [Style]) -> some View {
 		LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
 			ForEach(items, id: \.id) { style in
-				Button {
+				VStack(spacing: 6) {
+					ZStack {
+						Circle()
+							.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
+							.frame(width: 52, height: 52)
+						Image(systemName: style.icon)
+							.font(.system(size: 22))
+							.foregroundStyle(style.color)
+					}
+					.overlay(
+						Circle()
+							.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
+					)
+					
+					Text(style.label)
+						.font(.caption2)
+						.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
+						.lineLimit(1)
+				}
+				.contentShape(Rectangle())
+				.onTapGesture {
 					selectedStyle = style
 					onManualSelection?()
-				} label: {
-					VStack(spacing: 6) {
-						ZStack {
-							Circle()
-								.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
-								.frame(width: 52, height: 52)
-							Image(systemName: style.icon)
-								.font(.system(size: 22))
-								.foregroundStyle(style.color)
-						}
-						.overlay(
-							Circle()
-								.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
-						)
-						
-						Text(style.label)
-							.font(.caption2)
-							.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
-							.lineLimit(1)
-					}
 				}
-				.buttonStyle(PlainButtonStyle())
 			}
 		}
 		.padding(.horizontal, 4)
