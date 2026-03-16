@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "searchbar",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SzpakKamil/SearchBar.git",
+      "state" : {
+        "revision" : "458d8bab23c589555a9a300e43e0113cea45a5ff",
+        "version" : "2.1.4"
+      }
+    },
+    {
+      "identity" : "symbolpicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SzpakKamil/SymbolPicker.git",
+      "state" : {
+        "revision" : "f0ac44573924748cd09d2fc9af6f027b823b5fb1",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 2
+}
