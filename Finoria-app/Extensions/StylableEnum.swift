@@ -171,7 +171,7 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 					.padding(.top, 4)
 			}
 		}
-		.padding(.top, 8)
+		.padding(.top, 4)
 		.padding(.bottom, 4)
 		.onAppear {
 			currentPage = pageIndex(for: selectedStyle)
@@ -218,7 +218,7 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 				} else {
 					// Espace invisible pour maintenir la grille 5×2
 					Color.clear
-						.frame(width: 52, height: 70)
+						.frame(width: 52, height: 60)
 				}
 			}
 		}
@@ -249,10 +249,10 @@ private struct PageControlIndicator: View {
 				let isActive = index == currentPage
 				Circle()
 					.fill(isActive ? activeColor : inactiveColor)
-					.frame(width: 8, height: 8)
+					.frame(width: 7, height: 7)
 					.scaleEffect(isActive ? 1.12 : 1)
 					.animation(.easeInOut(duration: 0.2), value: currentPage)
-					.frame(width: 20, height: 20)
+					.frame(width: 12, height: 12)
 					.contentShape(Rectangle())
 					.onTapGesture {
 						withAnimation(.easeInOut(duration: 0.2)) {
@@ -263,8 +263,8 @@ private struct PageControlIndicator: View {
 					.accessibilityAddTraits(isActive ? [.isSelected] : [])
 			}
 		}
-		.padding(.horizontal, 14)
-		.padding(.vertical, 8)
+		.padding(.horizontal, 9)
+		.padding(.vertical, 5)
 		.background(containerBackground, in: Capsule(style: .continuous))
 		.accessibilityElement(children: .contain)
 		.accessibilityLabel("Pages")
