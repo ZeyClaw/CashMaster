@@ -133,7 +133,7 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	
 	private let columns = 5
 	private let rowsPerPage = 2
-	private let baseGridHeight: CGFloat = 160
+	private let baseGridHeight: CGFloat = 168
 	private var itemsPerPage: Int { columns * rowsPerPage }
 	
 	@State private var currentPage = 0
@@ -171,7 +171,8 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 					.padding(.top, 4)
 			}
 		}
-		.padding(.vertical, 8)
+		.padding(.top, 8)
+		.padding(.bottom, 4)
 		.onAppear {
 			currentPage = pageIndex(for: selectedStyle)
 		}
