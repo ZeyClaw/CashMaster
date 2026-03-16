@@ -6,9 +6,6 @@
 //
 
 import SwiftUI
-#if canImport(SymbolPicker)
-import SymbolPicker
-#endif
 
 struct AddCustomTransactionCategorySheet: View {
 	@Environment(\.dismiss) private var dismiss
@@ -24,9 +21,26 @@ struct AddCustomTransactionCategorySheet: View {
 	@State private var name: String
 	@State private var selectedSymbol: String
 	@State private var selectedColor: Color
-	@State private var showingSymbolPicker = false
 	@State private var showingErrorAlert = false
 	@State private var errorMessage = ""
+
+	private let symbolOptions: [String] = [
+		"plus", "tag.fill", "briefcase.fill", "arrow.down.circle.fill", "arrow.up.circle.fill",
+		"house.fill", "bolt.fill", "cart.fill", "fork.knife", "cup.and.saucer.fill",
+		"car.fill", "bus.fill", "fuelpump.fill", "banknote.fill", "chart.line.uptrend.xyaxis",
+		"doc.text.fill", "bag.fill", "airplane", "theatermasks.fill", "figure.run",
+		"cross.case.fill", "gift.fill", "graduationcap.fill", "pawprint.fill", "heart.fill",
+		"person.2.fill", "gamecontroller.fill", "sparkles", "phone.fill", "wifi",
+		"creditcard.fill", "basket.fill", "barcode.viewfinder", "qrcode.viewfinder", "building.2.fill",
+		"bed.double.fill", "bicycle", "birthday.cake.fill", "wineglass.fill", "leaf.fill",
+		"pills.fill", "stethoscope", "book.fill", "books.vertical.fill", "backpack.fill",
+		"folder.fill", "archivebox.fill", "film.fill", "music.note", "tv.fill",
+		"camera.fill", "photo.fill", "dog.fill", "cat.fill", "icloud.fill",
+		"desktopcomputer", "lightbulb.fill", "flame.fill", "drop.fill", "calendar",
+		"timer", "alarm.fill", "chart.bar.fill", "chart.pie.fill", "checkmark.circle.fill",
+		"xmark.circle.fill", "exclamationmark.triangle.fill", "shield.fill", "lock.fill", "map.fill",
+		"location.fill", "suitcase.fill", "sun.max.fill", "moon.fill", "cloud.rain.fill"
+	]
 
 	init(
 		title: String,
@@ -72,55 +86,58 @@ struct AddCustomTransactionCategorySheet: View {
 				}
 
 				Section {
-					Button {
-						showingSymbolPicker = true
-					} label: {
-						HStack(spacing: 12) {
-							ZStack {
-								Circle()
-									.fill(selectedColor.opacity(0.16))
-									.frame(width: 40, height: 40)
-								Image(systemName: selectedSymbol)
-									.font(.system(size: 17, weight: .semibold))
-									.foregroundStyle(selectedColor)
-							}
+					ColorPicker("Choisir une couleur", selection: $selectedColor, supportsOpacity: false)
+				} header: {
+					Text("Couleur")
+				}
 
-							VStack(alignment: .leading, spacing: 2) {
-								Text("Choisir le symbole")
-								Text(selectedSymbol)
-									.font(.caption)
-									.foregroundStyle(.secondary)
-							}
+				Section {
+					HStack(spacing: 12) {
+						ZStack {
+							Circle()
+								.fill(selectedColor.opacity(0.16))
+								.frame(width: 40, height: 40)
+							Image(systemName: selectedSymbol)
+								.font(.system(size: 17, weight: .semibold))
+								.foregroundStyle(selectedColor)
+						}
 
-							Spacer()
-							Image(systemName: "chevron.right")
-								.font(.footnote.weight(.semibold))
-								.foregroundStyle(.tertiary)
+						VStack(alignment: .leading, spacing: 2) {
+							Text("Symbole sélectionné")
+							Text(selectedSymbol)
+								.font(.caption)
+								.foregroundStyle(.secondary)
+						}
+
+						Spacer()
+					}
+
+					LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
+						ForEach(symbolOptions, id: \.self) { symbol in
+							Button {
+								selectedSymbol = symbol
+							} label: {
+								ZStack {
+									Circle()
+										.fill(selectedColor.opacity(selectedSymbol == symbol ? 0.28 : 0.12))
+										.frame(width: 42, height: 42)
+									Image(systemName: symbol)
+										.font(.system(size: 16, weight: .semibold))
+										.foregroundStyle(selectedColor)
+								}
+								.overlay(
+									Circle()
+										.stroke(selectedColor, lineWidth: selectedSymbol == symbol ? 2 : 0)
+								)
+							}
+							.buttonStyle(.plain)
 						}
 					}
-					.buttonStyle(.plain)
-					#if canImport(SymbolPicker)
-					.symbolPicker(
-						isPresented: $showingSymbolPicker,
-						symbolName: $selectedSymbol,
-						color: $selectedColor
-					)
-					.symbolPickerSymbolsStyle(.filled)
-					.symbolPickerDismiss(type: .onSymbolSelect)
-					#endif
-
-					#if !canImport(SymbolPicker)
-					ColorPicker("Choisir une couleur", selection: $selectedColor, supportsOpacity: false)
-						.padding(.top, 8)
-
-					Text("Ajoute le package SymbolPicker pour activer le sélecteur natif (recherche + couleurs).")
-						.font(.caption)
-						.foregroundStyle(.secondary)
-					#endif
+					.padding(.vertical, 4)
 				} header: {
-					Text("Symbole et couleur")
+					Text("Symbole")
 				} footer: {
-					Text("Le sélecteur natif propose la recherche et la personnalisation de couleur.")
+					Text("Choisis un symbole parmi la liste pour représenter ta catégorie.")
 				}
 			}
 			.navigationTitle(title)
