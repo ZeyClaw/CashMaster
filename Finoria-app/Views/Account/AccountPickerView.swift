@@ -111,7 +111,7 @@ struct AccountPickerView: View {
 				}
 				Button("Annuler", role: .cancel) { }
 			} message: {
-				Text("Toutes les transactions de ce compte seront supprimées. Cette action est irréversible.")
+				Text("Toutes les transactions de ce compte seront supprimées. Les raccourcis, transactions récurrentes et catégories personnalisées seront conservés. Cette action est irréversible.")
 			}
 		}
 	}

@@ -158,12 +158,6 @@ class AccountsManager: ObservableObject {
 		for transaction in account.transactions {
 			modelContext.delete(transaction)
 		}
-		for shortcut in account.widgetShortcuts {
-			modelContext.delete(shortcut)
-		}
-		for recurring in account.recurringTransactions {
-			modelContext.delete(recurring)
-		}
 		persist()
 	}
 	

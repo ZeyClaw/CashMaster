@@ -53,6 +53,12 @@ struct WelcomeView: View {
             color: .cyan,
             title: "Synchronisation iCloud",
             description: "Vos données sont synchronisées automatiquement sur tous vos appareils Apple."
+        ),
+        Feature(
+            icon: "tag",
+            color: .indigo,
+            title: "Catégories personnalisées",
+            description: "Créez vos propres catégories avec une icône et une couleur pour mieux organiser vos transactions."
         )
     ]
 
