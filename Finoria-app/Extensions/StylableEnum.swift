@@ -232,21 +232,27 @@ private struct PageControlIndicator: View {
 	@Environment(\.colorScheme) private var colorScheme
 
 	private var activeColor: Color {
-		Color.primary.opacity(colorScheme == .dark ? 0.92 : 0.78)
+		Color.primary.opacity(colorScheme == .dark ? 0.95 : 0.8)
 	}
 
 	private var inactiveColor: Color {
-		Color.primary.opacity(colorScheme == .dark ? 0.34 : 0.2)
+		Color.primary.opacity(colorScheme == .dark ? 0.4 : 0.24)
+	}
+
+	private var containerBackground: Color {
+		colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.06)
 	}
 
 	var body: some View {
-		HStack(spacing: 8) {
+		HStack(spacing: 9) {
 			ForEach(0..<numberOfPages, id: \.self) { index in
 				let isActive = index == currentPage
-				Capsule(style: .continuous)
+				Circle()
 					.fill(isActive ? activeColor : inactiveColor)
-					.frame(width: isActive ? 14 : 6, height: 6)
+					.frame(width: 8, height: 8)
+					.scaleEffect(isActive ? 1.12 : 1)
 					.animation(.easeInOut(duration: 0.2), value: currentPage)
+					.frame(width: 20, height: 20)
 					.contentShape(Rectangle())
 					.onTapGesture {
 						withAnimation(.easeInOut(duration: 0.2)) {
@@ -257,13 +263,9 @@ private struct PageControlIndicator: View {
 					.accessibilityAddTraits(isActive ? [.isSelected] : [])
 			}
 		}
-		.padding(.horizontal, 10)
-		.padding(.vertical, 6)
-		.background(.ultraThinMaterial, in: Capsule(style: .continuous))
-		.overlay {
-			Capsule(style: .continuous)
-				.stroke(Color.primary.opacity(colorScheme == .dark ? 0.2 : 0.1), lineWidth: 0.5)
-		}
+		.padding(.horizontal, 14)
+		.padding(.vertical, 8)
+		.background(containerBackground, in: Capsule(style: .continuous))
 		.accessibilityElement(children: .contain)
 		.accessibilityLabel("Pages")
 	}
