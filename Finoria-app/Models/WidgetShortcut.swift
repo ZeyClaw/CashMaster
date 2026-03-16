@@ -22,6 +22,7 @@ final class WidgetShortcut {
 	var comment: String = ""
 	var type: TransactionType = TransactionType.expense
 	var category: TransactionCategory = TransactionCategory.other
+	var customCategory: CustomTransactionCategory?
 	
 	// MARK: - Relations
 	
@@ -30,12 +31,32 @@ final class WidgetShortcut {
 	
 	// MARK: - Init
 	
-	init(id: UUID = UUID(), amount: Double, comment: String, type: TransactionType, category: TransactionCategory? = nil) {
+	init(
+		id: UUID = UUID(),
+		amount: Double,
+		comment: String,
+		type: TransactionType,
+		category: TransactionCategory? = nil,
+		customCategory: CustomTransactionCategory? = nil
+	) {
 		self.id = id
 		self.amount = amount
 		self.comment = comment
 		self.type = type
-		// Si pas de catégorie fournie, on la devine automatiquement
-		self.category = category ?? TransactionCategory.guessFrom(comment: comment, type: type)
+		self.customCategory = customCategory
+		if customCategory != nil {
+			self.category = .other
+		} else {
+			// Si pas de catégorie fournie, on la devine automatiquement
+			self.category = category ?? TransactionCategory.guessFrom(comment: comment, type: type)
+		}
+	}
+
+	var displayCategoryIcon: String {
+		customCategory?.symbol ?? category.icon
+	}
+
+	var displayCategoryColor: Color {
+		customCategory?.resolvedColor ?? category.color
 	}
 }

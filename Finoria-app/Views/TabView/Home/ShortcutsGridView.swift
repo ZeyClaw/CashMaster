@@ -83,7 +83,14 @@ private struct ShortcutCard: View {
 		} label: {
 			HStack(spacing: 12) {
 				// Icône colorée (composant réutilisable)
-				StyleIconView(style: shortcut.category, size: 40)
+				ZStack {
+					Circle()
+						.fill(shortcut.displayCategoryColor.opacity(0.15))
+						.frame(width: 40, height: 40)
+					Image(systemName: shortcut.displayCategoryIcon)
+						.font(.system(size: 18))
+						.foregroundStyle(shortcut.displayCategoryColor)
+				}
 				
 				// Texte
 				VStack(alignment: .leading, spacing: 2) {

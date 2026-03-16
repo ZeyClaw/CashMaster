@@ -21,6 +21,7 @@ struct AddWidgetShortcutView: View {
 	@State private var comment = ""
 	@State private var type: TransactionType = .income
 	@State private var selectedCategory: TransactionCategory = .income
+	@State private var selectedCustomCategoryId: UUID?
 	@State private var showError = false
 	@State private var errorMessage = ""
 	@State private var hasManuallySelectedCategory = false
@@ -40,7 +41,9 @@ struct AddWidgetShortcutView: View {
 							}
 							// Ne pas auto-deviner la catégorie si mode édition ou sélection manuelle
 							if !isEditMode && !hasManuallySelectedCategory {
-								selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: type)
+								if selectedCustomCategoryId == nil {
+									selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: type)
+								}
 							}
 						}
 				} footer: {
@@ -58,14 +61,18 @@ struct AddWidgetShortcutView: View {
 				.pickerStyle(.segmented)
 				.onChange(of: type) { _, newValue in
 					// Met à jour la catégorie si c'est la catégorie par défaut (seulement si pas en mode édition et pas de sélection manuelle)
-					if !isEditMode && !hasManuallySelectedCategory && (selectedCategory == .income || selectedCategory == .expense) {
+					if !isEditMode && !hasManuallySelectedCategory && selectedCustomCategoryId == nil && (selectedCategory == .income || selectedCategory == .expense) {
 						selectedCategory = newValue == .income ? .income : .expense
 					}
 				}
 				
 				// MARK: - Sélecteur de catégorie
 				Section("Catégorie") {
-					TransactionCategoryPicker(selectedStyle: $selectedCategory) {
+					TransactionCategoryPicker(
+						accountsManager: accountsManager,
+						selectedStyle: $selectedCategory,
+						selectedCustomCategoryId: $selectedCustomCategoryId
+					) {
 						hasManuallySelectedCategory = true
 					}
 				}
@@ -109,7 +116,13 @@ struct AddWidgetShortcutView: View {
 					amount = shortcut.amount
 					comment = shortcut.comment
 					type = shortcut.type
-					selectedCategory = shortcut.category
+					if let customCategory = shortcut.customCategory {
+						selectedCategory = .other
+						selectedCustomCategoryId = customCategory.id
+					} else {
+						selectedCategory = shortcut.category
+						selectedCustomCategoryId = nil
+					}
 				}
 			}
 		}
@@ -129,6 +142,9 @@ struct AddWidgetShortcutView: View {
 			return
 		}
 		
+		let customCategory = selectedCustomCategoryId.flatMap { accountsManager.customTransactionCategory(with: $0) }
+		let builtInCategory: TransactionCategory = customCategory == nil ? selectedCategory : .other
+
 		if let existingShortcut = shortcutToEdit {
 			// Mode édition: mutation en place de l'objet SwiftData
 			accountsManager.updateWidgetShortcut(
@@ -136,7 +152,8 @@ struct AddWidgetShortcutView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				category: selectedCategory
+				category: builtInCategory,
+				customCategory: customCategory
 			)
 		} else {
 			// Mode création: nouveau raccourci
@@ -144,7 +161,8 @@ struct AddWidgetShortcutView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				category: selectedCategory
+				category: builtInCategory,
+				customCategory: customCategory
 			)
 			accountsManager.addWidgetShortcut(shortcut)
 		}

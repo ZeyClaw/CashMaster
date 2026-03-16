@@ -128,6 +128,9 @@ final class Account {
 	
 	@Relationship(deleteRule: .cascade, inverse: \RecurringTransaction.account)
 	var recurringTransactions: [RecurringTransaction] = []
+
+	@Relationship(deleteRule: .cascade, inverse: \CustomTransactionCategory.account)
+	var customTransactionCategories: [CustomTransactionCategory] = []
 	
 	// MARK: - Init
 	

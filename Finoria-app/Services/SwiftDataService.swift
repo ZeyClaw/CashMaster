@@ -33,7 +33,8 @@ enum SwiftDataService {
 		Account.self,
 		Transaction.self,
 		WidgetShortcut.self,
-		RecurringTransaction.self
+		RecurringTransaction.self,
+		CustomTransactionCategory.self
 	]
 	
 	// MARK: - Production Container (CloudKit activé)
@@ -49,7 +50,7 @@ enum SwiftDataService {
 		)
 		
 		return try ModelContainer(
-			for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self,
+			for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self, CustomTransactionCategory.self,
 			configurations: configuration
 		)
 	}
@@ -68,7 +69,7 @@ enum SwiftDataService {
 		)
 		
 		return try ModelContainer(
-			for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self,
+			for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self, CustomTransactionCategory.self,
 			configurations: configuration
 		)
 	}
@@ -86,7 +87,7 @@ enum SwiftDataService {
 		)
 		
 		return try ModelContainer(
-			for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self,
+			for: Account.self, Transaction.self, WidgetShortcut.self, RecurringTransaction.self, CustomTransactionCategory.self,
 			configurations: configuration
 		)
 	}

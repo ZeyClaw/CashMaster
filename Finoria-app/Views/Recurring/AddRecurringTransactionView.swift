@@ -22,6 +22,7 @@ struct AddRecurringTransactionView: View {
 	@State private var comment = ""
 	@State private var type: TransactionType = .expense
 	@State private var selectedCategory: TransactionCategory = .other
+	@State private var selectedCustomCategoryId: UUID?
 	@State private var frequency: RecurrenceFrequency = .monthly
 	@State private var startDate: Date = Date()
 	@State private var showError = false
@@ -45,7 +46,9 @@ struct AddRecurringTransactionView: View {
 								comment = String(newValue.prefix(maxCommentLength))
 							}
 							if !isEditMode && !hasManuallySelectedCategory {
-								selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: type)
+								if selectedCustomCategoryId == nil {
+									selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: type)
+								}
 							}
 						}
 				} footer: {
@@ -63,7 +66,7 @@ struct AddRecurringTransactionView: View {
 				}
 				.pickerStyle(.segmented)
 				.onChange(of: type) { _, newValue in
-					if !isEditMode && !hasManuallySelectedCategory && (selectedCategory == .salary || selectedCategory == .other) {
+					if !isEditMode && !hasManuallySelectedCategory && selectedCustomCategoryId == nil && (selectedCategory == .salary || selectedCategory == .other) {
 						selectedCategory = newValue == .income ? .salary : .other
 					}
 				}
@@ -82,7 +85,11 @@ struct AddRecurringTransactionView: View {
 				
 				// MARK: - Sélecteur d'icône
 				Section("Catégorie") {
-					TransactionCategoryPicker(selectedStyle: $selectedCategory) {
+					TransactionCategoryPicker(
+						accountsManager: accountsManager,
+						selectedStyle: $selectedCategory,
+						selectedCustomCategoryId: $selectedCustomCategoryId
+					) {
 						hasManuallySelectedCategory = true
 					}
 				}
@@ -126,7 +133,13 @@ struct AddRecurringTransactionView: View {
 					amount = recurring.amount
 					comment = recurring.comment
 					type = recurring.type
-					selectedCategory = recurring.category
+					if let customCategory = recurring.customCategory {
+						selectedCategory = .other
+						selectedCustomCategoryId = customCategory.id
+					} else {
+						selectedCategory = recurring.category
+						selectedCustomCategoryId = nil
+					}
 					frequency = recurring.frequency
 					startDate = recurring.startDate
 				}
@@ -150,6 +163,9 @@ struct AddRecurringTransactionView: View {
 			return
 		}
 		
+		let customCategory = selectedCustomCategoryId.flatMap { accountsManager.customTransactionCategory(with: $0) }
+		let builtInCategory: TransactionCategory = customCategory == nil ? selectedCategory : .other
+
 		if let existing = recurringToEdit {
 			// Mode édition: mutation en place de l'objet SwiftData
 			accountsManager.updateRecurringTransaction(
@@ -157,7 +173,8 @@ struct AddRecurringTransactionView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				category: selectedCategory,
+				category: builtInCategory,
+				customCategory: customCategory,
 				frequency: frequency,
 				startDate: startDate
 			)
@@ -166,7 +183,8 @@ struct AddRecurringTransactionView: View {
 				amount: amount,
 				comment: comment,
 				type: type,
-				category: selectedCategory,
+				category: builtInCategory,
+				customCategory: customCategory,
 				frequency: frequency,
 				startDate: startDate
 			)

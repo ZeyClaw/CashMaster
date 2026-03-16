@@ -85,7 +85,14 @@ private struct RecurringCard: View {
 		} label: {
 			HStack(spacing: 12) {
 				// Icône colorée (composant réutilisable)
-				StyleIconView(style: recurring.category, size: 40)
+				ZStack {
+					Circle()
+						.fill(recurring.displayCategoryColor.opacity(0.15))
+						.frame(width: 40, height: 40)
+					Image(systemName: recurring.displayCategoryIcon)
+						.font(.system(size: 18))
+						.foregroundStyle(recurring.displayCategoryColor)
+				}
 				
 				// Texte
 				VStack(alignment: .leading, spacing: 2) {

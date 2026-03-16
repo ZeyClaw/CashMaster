@@ -13,7 +13,14 @@ struct TransactionRow: View {
 	var body: some View {
 		HStack(spacing: 12) {
 			// Icône catégorie
-			StyleIconView(style: transaction.category, size: 36)
+			ZStack {
+				Circle()
+					.fill(transaction.displayCategoryColor.opacity(0.15))
+					.frame(width: 36, height: 36)
+				Image(systemName: transaction.displayCategoryIcon)
+					.font(.system(size: 16))
+					.foregroundStyle(transaction.displayCategoryColor)
+			}
 			
 			VStack(alignment: .leading) {
 				Text(transaction.comment)

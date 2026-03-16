@@ -10,18 +10,18 @@ import SwiftUI
 struct AddTransactionView: View {
 	@Environment(\.dismiss) var dismiss
 	@ObservedObject var accountsManager: AccountsManager
-	
+
 	// Transaction à éditer (nil = nouvelle transaction)
 	var transactionToEdit: Transaction? = nil
 
 	/// Valeur initiale du toggle "potentiel" pour une nouvelle transaction
 	var initialIsPotentiel: Bool = false
 	var initialTransactionType: TransactionType = .expense
-	
+
 	// MARK: - Limites
 	private let maxCommentLength = 30
 	private let maxMontant: Double = 999_999_999.99
-	
+
 	// MARK: - State
 	@State private var montant: Double? = nil
 	@State private var transactionComment: String = ""
@@ -29,12 +29,13 @@ struct AddTransactionView: View {
 	@State private var transactionDate: Date = Date()
 	@State private var isPotentiel: Bool = false
 	@State private var selectedCategory: TransactionCategory = .expense
+	@State private var selectedCustomCategoryId: UUID?
 	@State private var hasManuallySelectedCategory = false
 	@State private var showingErrorAlert = false
 	@State private var errorMessage = ""
-	
+
 	private var isEditMode: Bool { transactionToEdit != nil }
-	
+
 	var body: some View {
 		NavigationView {
 			Form {
@@ -46,12 +47,12 @@ struct AddTransactionView: View {
 					}
 					.pickerStyle(.segmented)
 					.onChange(of: transactionType) { _, newValue in
-						if !isEditMode && !hasManuallySelectedCategory && (selectedCategory == .income || selectedCategory == .expense) {
+						if !isEditMode && !hasManuallySelectedCategory && selectedCustomCategoryId == nil && (selectedCategory == .income || selectedCategory == .expense) {
 							selectedCategory = newValue == .income ? .income : .expense
 						}
 					}
 				}
-				
+
 				Section {
 					CurrencyTextField("Montant", amount: $montant)
 
@@ -60,7 +61,7 @@ struct AddTransactionView: View {
 							if newValue.count > maxCommentLength {
 								transactionComment = String(newValue.prefix(maxCommentLength))
 							}
-							if !isEditMode && !hasManuallySelectedCategory {
+							if !isEditMode && !hasManuallySelectedCategory && selectedCustomCategoryId == nil {
 								selectedCategory = TransactionCategory.guessFrom(comment: newValue, type: transactionType)
 							}
 						}
@@ -72,13 +73,17 @@ struct AddTransactionView: View {
 						Text("\(transactionComment.count)/\(maxCommentLength)")
 					}
 				}
-				
+
 				Section("Catégorie") {
-					TransactionCategoryPicker(selectedStyle: $selectedCategory) {
+					TransactionCategoryPicker(
+						accountsManager: accountsManager,
+						selectedStyle: $selectedCategory,
+						selectedCustomCategoryId: $selectedCustomCategoryId
+					) {
 						hasManuallySelectedCategory = true
 					}
 				}
-				
+
 				Section("Date et statut") {
 					Toggle("Transaction future", isOn: $isPotentiel)
 					if !isPotentiel {
@@ -86,7 +91,7 @@ struct AddTransactionView: View {
 							.datePickerStyle(.graphical)
 					}
 				}
-				
+
 				if isEditMode {
 					Section {
 						Button(role: .destructive) {
@@ -127,60 +132,69 @@ struct AddTransactionView: View {
 					transactionType = t.amount >= 0 ? .income : .expense
 					isPotentiel = t.potentiel
 					transactionDate = t.date ?? Date()
-					selectedCategory = t.category
+					if let customCategory = t.customCategory {
+						selectedCategory = .other
+						selectedCustomCategoryId = customCategory.id
+					} else {
+						selectedCategory = t.category
+						selectedCustomCategoryId = nil
+					}
 				} else {
 					isPotentiel = initialIsPotentiel
 					transactionType = initialTransactionType
 					if !hasManuallySelectedCategory {
 						selectedCategory = initialTransactionType == .income ? .income : .expense
+						selectedCustomCategoryId = nil
 					}
 				}
 			}
 		}
 	}
-	
+
 	private func saveTransaction() {
 		guard let m = montant, m > 0 else {
 			errorMessage = "Veuillez entrer un montant positif."
 			showingErrorAlert = true
 			return
 		}
-		
+
 		let trimmedComment = transactionComment.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !trimmedComment.isEmpty else {
 			errorMessage = "Veuillez entrer un commentaire."
 			showingErrorAlert = true
 			return
 		}
-		
+
 		if m > maxMontant {
 			errorMessage = "Montant maximum : \(maxMontant.formatted()) €"
 			showingErrorAlert = true
 			return
 		}
-		
+
 		let finalAmount = transactionType == .income ? m : -m
 		let finalComment = String(transactionComment.prefix(maxCommentLength))
 		let finalDate: Date? = isPotentiel ? nil : transactionDate
-		
+		let customCategory = selectedCustomCategoryId.flatMap { accountsManager.customTransactionCategory(with: $0) }
+		let builtInCategory: TransactionCategory = customCategory == nil ? selectedCategory : .other
+
 		if let existingTransaction = transactionToEdit {
-			// Edit mode: mutation en place de l'objet SwiftData
 			accountsManager.updateTransaction(
 				existingTransaction,
 				amount: finalAmount,
 				comment: finalComment,
 				potentiel: isPotentiel,
 				date: finalDate,
-				category: selectedCategory
+				category: builtInCategory,
+				customCategory: customCategory
 			)
 		} else {
-			// Creation mode: new transaction
 			accountsManager.addTransaction(Transaction(
 				amount: finalAmount,
 				comment: finalComment,
 				potentiel: isPotentiel,
 				date: finalDate,
-				category: selectedCategory
+				category: builtInCategory,
+				customCategory: customCategory
 			))
 		}
 		dismiss()

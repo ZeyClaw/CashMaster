@@ -1,0 +1,42 @@
+//
+//  CustomTransactionCategory.swift
+//  Finoria
+//
+//  Created by GitHub Copilot on 16/03/2026.
+//
+
+import Foundation
+import SwiftData
+import SwiftUI
+
+/// Catégorie personnalisée créée localement pour un compte.
+@Model
+final class CustomTransactionCategory {
+	var id: UUID = UUID()
+	var name: String = ""
+	var symbol: String = "tag.fill"
+	var colorHex: String = "#8E8E93"
+
+	/// Compte propriétaire de la catégorie personnalisée.
+	var account: Account?
+
+	/// Transactions rattachées à cette catégorie personnalisée.
+	@Relationship(deleteRule: .nullify, inverse: \Transaction.customCategory)
+	var transactions: [Transaction] = []
+
+	init(
+		id: UUID = UUID(),
+		name: String,
+		symbol: String,
+		colorHex: String
+	) {
+		self.id = id
+		self.name = name
+		self.symbol = symbol
+		self.colorHex = colorHex
+	}
+
+	var resolvedColor: Color {
+		Color(finoriaHex: colorHex)
+	}
+}

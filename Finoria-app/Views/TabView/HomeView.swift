@@ -172,7 +172,8 @@ struct HomeView: View {
 			comment: shortcut.comment,
 			potentiel: false,
 			date: Date(),
-			category: shortcut.category
+			category: shortcut.category,
+			customCategory: shortcut.customCategory
 		)
 		accountsManager.addTransaction(transaction)
 		addToast(message: "Transaction ajoutée 💸")

@@ -196,13 +196,54 @@ class AccountsManager: ObservableObject {
 		comment: String,
 		potentiel: Bool,
 		date: Date?,
-		category: TransactionCategory
+		category: TransactionCategory,
+		customCategory: CustomTransactionCategory? = nil
 	) {
 		transaction.amount = amount
 		transaction.comment = comment
 		transaction.potentiel = potentiel
 		transaction.date = date
 		transaction.category = category
+		transaction.customCategory = customCategory
+		if customCategory != nil {
+			transaction.importedCategoryName = nil
+		}
+		persist()
+	}
+
+	// MARK: - Catégories personnalisées (transactions)
+
+	func customTransactionCategories() -> [CustomTransactionCategory] {
+		guard let account = selectedAccount else { return [] }
+		return account.customTransactionCategories
+	}
+
+	func customTransactionCategory(with id: UUID) -> CustomTransactionCategory? {
+		customTransactionCategories().first { $0.id == id }
+	}
+
+	func addCustomTransactionCategory(name: String, symbol: String, colorHex: String) -> CustomTransactionCategory? {
+		guard let account = selectedAccount else { return nil }
+		let category = CustomTransactionCategory(name: name, symbol: symbol, colorHex: colorHex)
+		category.account = account
+		modelContext.insert(category)
+		relinkImportedTransactions(in: account, to: category)
+		persist()
+		return category
+	}
+
+	func updateCustomTransactionCategory(_ category: CustomTransactionCategory, name: String, symbol: String, colorHex: String) {
+		category.name = name
+		category.symbol = symbol
+		category.colorHex = colorHex
+		if let account = category.account {
+			relinkImportedTransactions(in: account, to: category)
+		}
+		persist()
+	}
+
+	func deleteCustomTransactionCategory(_ category: CustomTransactionCategory) {
+		modelContext.delete(category)
 		persist()
 	}
 	
@@ -269,12 +310,14 @@ class AccountsManager: ObservableObject {
 		amount: Double,
 		comment: String,
 		type: TransactionType,
-		category: TransactionCategory
+		category: TransactionCategory,
+		customCategory: CustomTransactionCategory? = nil
 	) {
 		shortcut.amount = amount
 		shortcut.comment = comment
 		shortcut.type = type
 		shortcut.category = category
+		shortcut.customCategory = customCategory
 		persist()
 	}
 	
@@ -289,6 +332,14 @@ class AccountsManager: ObservableObject {
 		guard let account = selectedAccount else { return 0 }
 		let imported = CSVService.importCSV(from: url)
 		for tx in imported {
+			if let importedName = tx.importedCategoryName,
+				let matchedCustom = account.customTransactionCategories.first(where: {
+					normalizeCategoryName($0.name) == normalizeCategoryName(importedName)
+				}) {
+				tx.customCategory = matchedCustom
+				tx.category = .other
+				tx.importedCategoryName = nil
+			}
 			tx.account = account
 			modelContext.insert(tx)
 		}
@@ -322,6 +373,7 @@ class AccountsManager: ObservableObject {
 		comment: String,
 		type: TransactionType,
 		category: TransactionCategory,
+		customCategory: CustomTransactionCategory? = nil,
 		frequency: RecurrenceFrequency,
 		startDate: Date
 	) {
@@ -330,6 +382,7 @@ class AccountsManager: ObservableObject {
 		recurring.comment = comment
 		recurring.type = type
 		recurring.category = category
+		recurring.customCategory = customCategory
 		recurring.frequency = frequency
 		recurring.startDate = startDate
 		recurring.lastGeneratedDate = nil
@@ -370,5 +423,28 @@ class AccountsManager: ObservableObject {
 	func refreshFromStore() {
 		Self.logger.info("Rafraîchissement depuis le store (CloudKit sync)")
 		fetchAccounts()
+	}
+
+	private func relinkImportedTransactions(in account: Account, to customCategory: CustomTransactionCategory) {
+		let target = normalizeCategoryName(customCategory.name)
+		guard !target.isEmpty else { return }
+
+		for transaction in account.transactions {
+			guard transaction.customCategory == nil,
+				let importedName = transaction.importedCategoryName,
+				normalizeCategoryName(importedName) == target else {
+				continue
+			}
+
+			transaction.customCategory = customCategory
+			transaction.category = .other
+			transaction.importedCategoryName = nil
+		}
+	}
+
+	private func normalizeCategoryName(_ value: String) -> String {
+		value
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+			.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
 	}
 }

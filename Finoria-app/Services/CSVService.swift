@@ -137,10 +137,14 @@ struct CSVService {
 				
 				// Parse Catégorie (colonne 6 si présente, sinon .other)
 				var category: TransactionCategory = .other
+				var importedCategoryName: String? = nil
 				if columns.count >= 6 {
 					let categoryLabel = columns[5].trimmingCharacters(in: .whitespacesAndNewlines)
 					if let matched = TransactionCategory.allCases.first(where: { $0.label == categoryLabel }) {
 						category = matched
+					} else if !categoryLabel.isEmpty {
+						// Catégorie inconnue dans le compte actuel: fallback "Autre" + mémorisation du libellé CSV
+						importedCategoryName = categoryLabel
 					}
 				}
 				
@@ -149,7 +153,8 @@ struct CSVService {
 					comment: comment,
 					potentiel: isPotentielle,
 					date: isPotentielle ? nil : (date ?? Date()),
-					category: category
+					category: category,
+					importedCategoryName: importedCategoryName
 				)
 				
 				importedTransactions.append(transaction)

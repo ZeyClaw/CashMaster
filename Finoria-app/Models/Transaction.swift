@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 
 enum TransactionType: String, CaseIterable, Codable, Identifiable {
@@ -41,6 +42,7 @@ final class Transaction {
 	var potentiel: Bool = true
 	var date: Date?
 	var category: TransactionCategory = TransactionCategory.other
+	var importedCategoryName: String?
 	
 	// MARK: - Relations
 	
@@ -49,6 +51,9 @@ final class Transaction {
 	
 	/// Récurrence source ayant généré cette transaction (nil si manuelle)
 	var sourceRecurringTransaction: RecurringTransaction?
+
+	/// Catégorie personnalisée utilisée par la transaction (optionnelle).
+	var customCategory: CustomTransactionCategory?
 	
 	// MARK: - Init
 	
@@ -68,7 +73,9 @@ final class Transaction {
 		potentiel: Bool = true,
 		date: Date? = nil,
 		category: TransactionCategory = .other,
-		sourceRecurringTransaction: RecurringTransaction? = nil
+		sourceRecurringTransaction: RecurringTransaction? = nil,
+		customCategory: CustomTransactionCategory? = nil,
+		importedCategoryName: String? = nil
 	) {
 		self.id = id
 		self.amount = amount
@@ -77,6 +84,8 @@ final class Transaction {
 		self.date = date
 		self.category = category
 		self.sourceRecurringTransaction = sourceRecurringTransaction
+		self.customCategory = customCategory
+		self.importedCategoryName = importedCategoryName
 	}
 	
 	// MARK: - Mutations
@@ -100,12 +109,30 @@ final class Transaction {
 		comment: String? = nil,
 		potentiel: Bool? = nil,
 		date: Date?? = nil,
-		category: TransactionCategory? = nil
+		category: TransactionCategory? = nil,
+		customCategory: CustomTransactionCategory?? = nil,
+		importedCategoryName: String?? = nil
 	) {
 		if let amount { self.amount = amount }
 		if let comment { self.comment = comment }
 		if let potentiel { self.potentiel = potentiel }
 		if let date { self.date = date }
 		if let category { self.category = category }
+		if let customCategory { self.customCategory = customCategory }
+		if let importedCategoryName { self.importedCategoryName = importedCategoryName }
+	}
+
+	// MARK: - Présentation
+
+	var displayCategoryLabel: String {
+		customCategory?.name ?? category.label
+	}
+
+	var displayCategoryIcon: String {
+		customCategory?.symbol ?? category.icon
+	}
+
+	var displayCategoryColor: Color {
+		customCategory?.resolvedColor ?? category.color
 	}
 }

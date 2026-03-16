@@ -121,40 +121,60 @@ struct AccountCategoryPicker<Style: StylableEnum>: View {
 	}
 }
 
-// MARK: - Paginated Style Picker Grid
+// MARK: - Paginated Transaction Category Picker Grid
 
-/// Grille paginée de sélection de style utilisant TabView natif.
-/// Affiche 5 colonnes × 2 lignes par page (10 items/page) avec :
-/// - Swipe horizontal natif iOS (physique réaliste, snap automatique)
-/// - Indicateur de page (points) intégré
-struct TransactionCategoryPicker<Style: StylableEnum>: View {
-	@Binding var selectedStyle: Style
+/// Grille paginée de sélection de catégorie de transaction.
+/// Étend le comportement existant avec les catégories personnalisées + bouton d'ajout.
+struct TransactionCategoryPicker: View {
+	@ObservedObject var accountsManager: AccountsManager
+	@Binding var selectedStyle: TransactionCategory
+	@Binding var selectedCustomCategoryId: UUID?
 	var onManualSelection: (() -> Void)? = nil
-	
+
 	private let columns = 5
 	private let rowsPerPage = 2
 	private let baseGridHeight: CGFloat = 168
+	private let maxCategoryNameLength = 15
 	private var itemsPerPage: Int { columns * rowsPerPage }
-	
+
 	@State private var currentPage = 0
-	
-	private var allItems: [Style] { Array(Style.allCases) }
+	@State private var sheetContext: CategorySheetContext?
+	@State private var categoryPendingDeletion: CustomTransactionCategory?
+	@State private var showingDeleteCategoryAlert = false
+
+	init(
+		accountsManager: AccountsManager,
+		selectedStyle: Binding<TransactionCategory>,
+		selectedCustomCategoryId: Binding<UUID?> = .constant(nil),
+		onManualSelection: (() -> Void)? = nil
+	) {
+		self.accountsManager = accountsManager
+		self._selectedStyle = selectedStyle
+		self._selectedCustomCategoryId = selectedCustomCategoryId
+		self.onManualSelection = onManualSelection
+	}
+
+	private var customCategories: [CustomTransactionCategory] {
+		accountsManager.customTransactionCategories()
+			.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+	}
+
+	private var customCategoryById: [UUID: CustomTransactionCategory] {
+		Dictionary(uniqueKeysWithValues: customCategories.map { ($0.id, $0) })
+	}
+
+	private var allItems: [CategoryPickerItem] {
+		let builtIns = TransactionCategory.allCases.map { CategoryPickerItem(kind: .builtIn($0)) }
+		let customs = customCategories.map {
+			CategoryPickerItem(kind: .custom(id: $0.id, name: $0.name, icon: $0.symbol, color: $0.resolvedColor))
+		}
+		return builtIns + customs + [CategoryPickerItem(kind: .addButton)]
+	}
+
 	private var totalPages: Int {
 		max(1, (allItems.count + itemsPerPage - 1) / itemsPerPage)
 	}
 
-	private func pageIndex(for style: Style) -> Int {
-		guard let index = allItems.firstIndex(where: { $0.id == style.id }) else { return 0 }
-		return allItems.distance(from: allItems.startIndex, to: index) / itemsPerPage
-	}
-	
-	private func itemsForPage(_ page: Int) -> [Style] {
-		let start = page * itemsPerPage
-		let end = min(start + itemsPerPage, allItems.count)
-		guard start < allItems.count else { return [] }
-		return Array(allItems[start..<end])
-	}
-	
 	var body: some View {
 		VStack(spacing: 4) {
 			TabView(selection: $currentPage) {
@@ -171,58 +191,298 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 					.padding(.top, 4)
 			}
 		}
-		.padding(.top, 4)
-		.padding(.bottom, 4)
-		.onAppear {
-			currentPage = pageIndex(for: selectedStyle)
-		}
-		.onChange(of: selectedStyle.id) { _, _ in
-			let targetPage = pageIndex(for: selectedStyle)
-			guard targetPage != currentPage else { return }
-			withAnimation(.easeInOut(duration: 0.2)) {
-				currentPage = targetPage
+		.padding(.top, 3)
+		.padding(.bottom, 3)
+		.alert("Supprimer la catégorie ?", isPresented: $showingDeleteCategoryAlert) {
+			Button("Supprimer", role: .destructive) {
+				if let category = categoryPendingDeletion {
+					deleteCustomCategory(category)
+				}
 			}
+			Button("Annuler", role: .cancel) {
+				categoryPendingDeletion = nil
+			}
+		} message: {
+			Text("Suppression définitive.")
+		}
+		.sheet(item: $sheetContext) { context in
+			AddCustomTransactionCategorySheet(
+				title: context.category == nil ? "Nouvelle catégorie" : "Modifier la catégorie",
+				initialName: context.category?.name ?? "",
+				initialSymbol: context.category?.symbol ?? "tag.fill",
+				initialColorHex: context.category?.colorHex ?? "#8E8E93",
+				maxNameLength: maxCategoryNameLength,
+				onValidateName: { proposedName in
+					validateCustomCategoryName(proposedName, editingCategoryId: context.category?.id)
+				},
+				onSave: { name, symbol, colorHex in
+					saveCustomCategory(name: name, symbol: symbol, colorHex: colorHex, editingCategory: context.category)
+				}
+			)
+		}
+		.onAppear {
+			currentPage = pageIndexForCurrentSelection()
+		}
+		.onChange(of: selectedStyle) { _, _ in
+			syncCurrentPageWithSelection()
+		}
+		.onChange(of: selectedCustomCategoryId) { _, _ in
+			syncCurrentPageWithSelection()
 		}
 	}
-	
+
 	@ViewBuilder
-	private func pageView(items: [Style]) -> some View {
+	private func pageView(items: [CategoryPickerItem]) -> some View {
 		LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
 			ForEach(0..<itemsPerPage, id: \.self) { index in
 				if index < items.count {
-					let style = items[index]
-					VStack(spacing: 6) {
-						ZStack {
-							Circle()
-								.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
-								.frame(width: 52, height: 52)
-							Image(systemName: style.icon)
-								.font(.system(size: 22))
-								.foregroundStyle(style.color)
+					let item = items[index]
+					TransactionCategoryTileView(item: item, isSelected: isItemSelected(item))
+						.contentShape(Rectangle())
+						.onTapGesture {
+							handleTap(item)
 						}
-						.overlay(
-							Circle()
-								.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
-						)
-						
-						Text(style.label)
-							.font(.caption2)
-							.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
-							.lineLimit(1)
-					}
-					.contentShape(Rectangle())
-					.onTapGesture {
-						selectedStyle = style
-						onManualSelection?()
-					}
+						.contextMenu {
+							buildContextMenu(for: item)
+						}
 				} else {
-					// Espace invisible pour maintenir la grille 5×2
 					Color.clear
-						.frame(width: 52, height: 60)
+						.frame(width: 52, height: 70)
 				}
 			}
 		}
 		.padding(.horizontal, 4)
+	}
+
+	@ViewBuilder
+	private func buildContextMenu(for item: CategoryPickerItem) -> some View {
+		switch item.kind {
+		case .builtIn:
+			Button {
+				// Information seulement
+			} label: {
+				Label("D'origine", systemImage: "lock.fill")
+			}
+		case let .custom(id, _, _, _):
+			if let customCategory = customCategoryById[id] {
+				Button("Modifier", systemImage: "pencil") {
+					sheetContext = CategorySheetContext(category: customCategory)
+				}
+				Button("Supprimer", systemImage: "trash", role: .destructive) {
+					categoryPendingDeletion = customCategory
+					showingDeleteCategoryAlert = true
+				}
+			}
+		case .addButton:
+			EmptyView()
+		}
+	}
+
+	private func handleTap(_ item: CategoryPickerItem) {
+		switch item.kind {
+		case let .builtIn(category):
+			selectedStyle = category
+			selectedCustomCategoryId = nil
+			onManualSelection?()
+		case let .custom(id, _, _, _):
+			selectedStyle = .other
+			selectedCustomCategoryId = id
+			onManualSelection?()
+		case .addButton:
+			sheetContext = CategorySheetContext(category: nil)
+		}
+	}
+
+	private func isItemSelected(_ item: CategoryPickerItem) -> Bool {
+		switch item.kind {
+		case let .builtIn(category):
+			return selectedCustomCategoryId == nil && selectedStyle == category
+		case let .custom(id, _, _, _):
+			return selectedCustomCategoryId == id
+		case .addButton:
+			return false
+		}
+	}
+
+	private func itemsForPage(_ page: Int) -> [CategoryPickerItem] {
+		let start = page * itemsPerPage
+		let end = min(start + itemsPerPage, allItems.count)
+		guard start < allItems.count else { return [] }
+		return Array(allItems[start..<end])
+	}
+
+	private func pageIndexForCurrentSelection() -> Int {
+		let index = allItems.firstIndex { item in
+			switch item.kind {
+			case let .builtIn(category):
+				return selectedCustomCategoryId == nil && selectedStyle == category
+			case let .custom(id, _, _, _):
+				return selectedCustomCategoryId == id
+			case .addButton:
+				return false
+			}
+		} ?? 0
+
+		return index / itemsPerPage
+	}
+
+	private func syncCurrentPageWithSelection() {
+		let targetPage = pageIndexForCurrentSelection()
+		guard targetPage != currentPage else { return }
+		withAnimation(.easeInOut(duration: 0.2)) {
+			currentPage = targetPage
+		}
+	}
+
+	private func saveCustomCategory(
+		name: String,
+		symbol: String,
+		colorHex: String,
+		editingCategory: CustomTransactionCategory?
+	) {
+		if let editingCategory {
+			accountsManager.updateCustomTransactionCategory(
+				editingCategory,
+				name: name,
+				symbol: symbol,
+				colorHex: colorHex
+			)
+			selectedStyle = .other
+			selectedCustomCategoryId = editingCategory.id
+		} else if let createdCategory = accountsManager.addCustomTransactionCategory(
+			name: name,
+			symbol: symbol,
+			colorHex: colorHex
+		) {
+			selectedStyle = .other
+			selectedCustomCategoryId = createdCategory.id
+		}
+
+		onManualSelection?()
+	}
+
+	private func deleteCustomCategory(_ category: CustomTransactionCategory) {
+		accountsManager.deleteCustomTransactionCategory(category)
+		if selectedCustomCategoryId == category.id {
+			selectedCustomCategoryId = nil
+			selectedStyle = .other
+		}
+		categoryPendingDeletion = nil
+	}
+
+	private func validateCustomCategoryName(_ name: String, editingCategoryId: UUID?) -> String? {
+		let normalized = normalizeCategoryName(name)
+		if normalized.isEmpty {
+			return "Le nom est obligatoire."
+		}
+
+		let builtInNames = Set(TransactionCategory.allCases.map { normalizeCategoryName($0.label) })
+		if builtInNames.contains(normalized) {
+			return "Nom déjà utilisé."
+		}
+
+		let duplicate = customCategories.contains { customCategory in
+			normalizeCategoryName(customCategory.name) == normalized && customCategory.id != editingCategoryId
+		}
+		if duplicate {
+			return "Nom déjà utilisé."
+		}
+
+		return nil
+	}
+
+	private func normalizeCategoryName(_ name: String) -> String {
+		name
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+			.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+	}
+}
+
+private struct CategorySheetContext: Identifiable {
+	let id = UUID()
+	let category: CustomTransactionCategory?
+}
+
+private struct CategoryPickerItem: Identifiable {
+	enum Kind {
+		case builtIn(TransactionCategory)
+		case custom(id: UUID, name: String, icon: String, color: Color)
+		case addButton
+	}
+
+	let id: String
+	let kind: Kind
+
+	init(kind: Kind) {
+		self.kind = kind
+		switch kind {
+		case let .builtIn(category):
+			self.id = "builtin-\(category.rawValue)"
+		case let .custom(id, _, _, _):
+			self.id = "custom-\(id.uuidString)"
+		case .addButton:
+			self.id = "add-button"
+		}
+	}
+
+	var label: String {
+		switch kind {
+		case let .builtIn(category):
+			return category.label
+		case let .custom(_, name, _, _):
+			return name
+		case .addButton:
+			return "Ajouter"
+		}
+	}
+
+	var icon: String {
+		switch kind {
+		case let .builtIn(category):
+			return category.icon
+		case let .custom(_, _, icon, _):
+			return icon
+		case .addButton:
+			return "plus"
+		}
+	}
+
+	var color: Color {
+		switch kind {
+		case let .builtIn(category):
+			return category.color
+		case let .custom(_, _, _, color):
+			return color
+		case .addButton:
+			return .gray
+		}
+	}
+}
+
+private struct TransactionCategoryTileView: View {
+	let item: CategoryPickerItem
+	let isSelected: Bool
+
+	var body: some View {
+		VStack(spacing: 6) {
+			ZStack {
+				Circle()
+					.fill(item.color.opacity(isSelected ? 0.3 : 0.1))
+					.frame(width: 52, height: 52)
+				Image(systemName: item.icon)
+					.font(.system(size: 22))
+					.foregroundStyle(item.color)
+			}
+			.overlay(
+				Circle()
+					.stroke(item.color, lineWidth: isSelected ? 2 : 0)
+			)
+
+			Text(item.label)
+				.font(.caption2)
+				.foregroundStyle(isSelected ? item.color : .secondary)
+				.lineLimit(1)
+		}
 	}
 }
 

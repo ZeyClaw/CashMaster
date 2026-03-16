@@ -54,6 +54,7 @@ final class RecurringTransaction {
 	var comment: String = ""
 	var type: TransactionType = TransactionType.expense
 	var category: TransactionCategory = TransactionCategory.other
+	var customCategory: CustomTransactionCategory?
 	var frequency: RecurrenceFrequency = RecurrenceFrequency.monthly
 	var startDate: Date = Date()
 	/// Date de la dernière transaction générée (pour éviter les doublons)
@@ -78,6 +79,7 @@ final class RecurringTransaction {
 		comment: String,
 		type: TransactionType,
 		category: TransactionCategory? = nil,
+		customCategory: CustomTransactionCategory? = nil,
 		frequency: RecurrenceFrequency = .monthly,
 		startDate: Date = Date(),
 		lastGeneratedDate: Date? = nil,
@@ -87,7 +89,12 @@ final class RecurringTransaction {
 		self.amount = amount
 		self.comment = comment
 		self.type = type
-		self.category = category ?? TransactionCategory.guessFrom(comment: comment, type: type)
+		self.customCategory = customCategory
+		if customCategory != nil {
+			self.category = .other
+		} else {
+			self.category = category ?? TransactionCategory.guessFrom(comment: comment, type: type)
+		}
 		self.frequency = frequency
 		self.startDate = startDate
 		self.lastGeneratedDate = lastGeneratedDate
@@ -163,9 +170,18 @@ final class RecurringTransaction {
 					potentiel: !isToday,
 					date: date,
 					category: category,
-					sourceRecurringTransaction: self
+					sourceRecurringTransaction: self,
+					customCategory: customCategory
 				)
 				return (date: date, transaction: transaction)
 			}
+	}
+
+	var displayCategoryIcon: String {
+		customCategory?.symbol ?? category.icon
+	}
+
+	var displayCategoryColor: Color {
+		customCategory?.resolvedColor ?? category.color
 	}
 }
