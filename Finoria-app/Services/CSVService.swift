@@ -48,7 +48,7 @@ struct CSVService {
 			let amount = String(format: "%.2f", abs(transaction.amount))
 			let comment = transaction.comment.replacingOccurrences(of: ",", with: ";")
 			let status = transaction.potentiel ? "Potentielle" : "Validée"
-			let category = transaction.category.label
+			let category = transaction.displayCategoryLabel
 			
 			csvText += "\(dateString),\(type),\(amount),\(comment),\(status),\(category)\n"
 		}
