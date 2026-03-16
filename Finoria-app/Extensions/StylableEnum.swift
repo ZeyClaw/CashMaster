@@ -134,7 +134,6 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	private let columns = 5
 	private let rowsPerPage = 2
 	private let baseGridHeight: CGFloat = 160
-	private let pageIndicatorReservedHeight: CGFloat = 28
 	private var itemsPerPage: Int { columns * rowsPerPage }
 	
 	@State private var currentPage = 0
@@ -142,10 +141,6 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	private var allItems: [Style] { Array(Style.allCases) }
 	private var totalPages: Int {
 		max(1, (allItems.count + itemsPerPage - 1) / itemsPerPage)
-	}
-
-	private var tabViewHeight: CGFloat {
-		baseGridHeight + pageIndicatorReservedHeight
 	}
 
 	private func pageIndex(for style: Style) -> Int {
@@ -168,9 +163,13 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 						.tag(page)
 				}
 			}
-			.tabViewStyle(.page(indexDisplayMode: .automatic))
-			.indexViewStyle(.page(backgroundDisplayMode: .always))
-			.frame(height: tabViewHeight)
+			.tabViewStyle(.page(indexDisplayMode: .never))
+			.frame(height: baseGridHeight)
+
+			if totalPages > 1 {
+				PageControlIndicator(currentPage: $currentPage, numberOfPages: totalPages)
+					.padding(.top, 4)
+			}
 		}
 		.padding(.vertical, 8)
 		.onAppear {
@@ -187,46 +186,85 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	
 	@ViewBuilder
 	private func pageView(items: [Style]) -> some View {
-		VStack(spacing: 0) {
-			LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
-				ForEach(0..<itemsPerPage, id: \.self) { index in
-					if index < items.count {
-						let style = items[index]
-						VStack(spacing: 6) {
-							ZStack {
-								Circle()
-									.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
-									.frame(width: 52, height: 52)
-								Image(systemName: style.icon)
-									.font(.system(size: 22))
-									.foregroundStyle(style.color)
-							}
-							.overlay(
-								Circle()
-									.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
-							)
-							
-							Text(style.label)
-								.font(.caption2)
-								.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
-								.lineLimit(1)
+		LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
+			ForEach(0..<itemsPerPage, id: \.self) { index in
+				if index < items.count {
+					let style = items[index]
+					VStack(spacing: 6) {
+						ZStack {
+							Circle()
+								.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
+								.frame(width: 52, height: 52)
+							Image(systemName: style.icon)
+								.font(.system(size: 22))
+								.foregroundStyle(style.color)
 						}
-						.contentShape(Rectangle())
-						.onTapGesture {
-							selectedStyle = style
-							onManualSelection?()
-						}
-					} else {
-						// Espace invisible pour maintenir la grille 5×2
-						Color.clear
-							.frame(width: 52, height: 70)
+						.overlay(
+							Circle()
+								.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
+						)
+						
+						Text(style.label)
+							.font(.caption2)
+							.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
+							.lineLimit(1)
 					}
+					.contentShape(Rectangle())
+					.onTapGesture {
+						selectedStyle = style
+						onManualSelection?()
+					}
+				} else {
+					// Espace invisible pour maintenir la grille 5×2
+					Color.clear
+						.frame(width: 52, height: 70)
 				}
 			}
-			.padding(.horizontal, 4)
-
-			Spacer(minLength: pageIndicatorReservedHeight)
 		}
+		.padding(.horizontal, 4)
+	}
+}
+
+private struct PageControlIndicator: View {
+	@Binding var currentPage: Int
+	let numberOfPages: Int
+	@Environment(\.colorScheme) private var colorScheme
+
+	private var activeColor: Color {
+		Color.primary.opacity(colorScheme == .dark ? 0.92 : 0.78)
+	}
+
+	private var inactiveColor: Color {
+		Color.primary.opacity(colorScheme == .dark ? 0.34 : 0.2)
+	}
+
+	var body: some View {
+		HStack(spacing: 8) {
+			ForEach(0..<numberOfPages, id: \.self) { index in
+				let isActive = index == currentPage
+				Capsule(style: .continuous)
+					.fill(isActive ? activeColor : inactiveColor)
+					.frame(width: isActive ? 14 : 6, height: 6)
+					.animation(.easeInOut(duration: 0.2), value: currentPage)
+					.contentShape(Rectangle())
+					.onTapGesture {
+						withAnimation(.easeInOut(duration: 0.2)) {
+							currentPage = index
+						}
+					}
+					.accessibilityLabel("Page \(index + 1)")
+					.accessibilityAddTraits(isActive ? [.isSelected] : [])
+			}
+		}
+		.padding(.horizontal, 10)
+		.padding(.vertical, 6)
+		.background(.ultraThinMaterial, in: Capsule(style: .continuous))
+		.overlay {
+			Capsule(style: .continuous)
+				.stroke(Color.primary.opacity(colorScheme == .dark ? 0.2 : 0.1), lineWidth: 0.5)
+		}
+		.accessibilityElement(children: .contain)
+		.accessibilityLabel("Pages")
 	}
 }
 
