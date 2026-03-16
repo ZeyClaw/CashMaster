@@ -58,7 +58,7 @@ struct AddCustomTransactionCategorySheet: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				Section("Nom") {
+				Section {
 					TextField("Nom de catégorie", text: $name)
 						.textInputAutocapitalization(.words)
 						.disableAutocorrection(true)
@@ -67,6 +67,8 @@ struct AddCustomTransactionCategorySheet: View {
 								name = String(newValue.prefix(maxNameLength))
 							}
 						}
+				} header: {
+					Text("Nom")
 				} footer: {
 					HStack {
 						Spacer()
@@ -74,11 +76,13 @@ struct AddCustomTransactionCategorySheet: View {
 					}
 				}
 
-				Section("Couleur") {
+				Section {
 					ColorPicker("Choisir une couleur", selection: $selectedColor, supportsOpacity: false)
+				} header: {
+					Text("Couleur")
 				}
 
-				Section("Symbole") {
+				Section {
 					LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
 						ForEach(symbolOptions, id: \.self) { symbol in
 							Button {
@@ -101,6 +105,8 @@ struct AddCustomTransactionCategorySheet: View {
 						}
 					}
 					.padding(.vertical, 4)
+				} header: {
+					Text("Symbole")
 				}
 			}
 			.navigationTitle(title)
