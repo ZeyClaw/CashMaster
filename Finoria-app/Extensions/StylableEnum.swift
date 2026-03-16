@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 /// Protocole unifiant les enums qui ont une représentation visuelle (icône, couleur, label)
 /// Utilisé par AccountStyle et TransactionCategory pour factoriser le code
@@ -140,6 +141,9 @@ struct TransactionCategoryPicker: View {
 	@State private var currentPage = 0
 	@State private var sheetContext: CategorySheetContext?
 	@State private var categoryPendingDeletion: CustomTransactionCategory?
+	@State private var longPressedItem: CategoryPickerItem?
+	@State private var showingCustomCategoryActions = false
+	@State private var showingBuiltInInfoAlert = false
 	@State private var showingDeleteCategoryAlert = false
 
 	init(
@@ -205,6 +209,29 @@ struct TransactionCategoryPicker: View {
 		} message: {
 			Text("Suppression définitive.")
 		}
+		.alert("Catégorie d'origine", isPresented: $showingBuiltInInfoAlert) {
+			Button("OK", role: .cancel) {}
+		} message: {
+			Text("Non modifiable")
+		}
+		.confirmationDialog(
+			"Catégorie personnalisée",
+			isPresented: $showingCustomCategoryActions,
+			titleVisibility: .visible,
+			presenting: longPressedItem
+		) { item in
+			if case let .custom(id, _, _, _) = item.kind,
+				let customCategory = customCategoryById[id] {
+				Button("Modifier") {
+					sheetContext = CategorySheetContext(category: customCategory)
+				}
+				Button("Supprimer", role: .destructive) {
+					categoryPendingDeletion = customCategory
+					showingDeleteCategoryAlert = true
+				}
+			}
+			Button("Annuler", role: .cancel) {}
+		}
 		.sheet(item: $sheetContext) { context in
 			AddCustomTransactionCategorySheet(
 				title: context.category == nil ? "Nouvelle catégorie" : "Modifier la catégorie",
@@ -242,9 +269,12 @@ struct TransactionCategoryPicker: View {
 						.onTapGesture {
 							handleTap(item)
 						}
-						.contextMenu {
-							buildContextMenu(for: item)
-						}
+						.simultaneousGesture(
+							LongPressGesture(minimumDuration: 0.45)
+								.onEnded { _ in
+									handleLongPress(item)
+								}
+						)
 				} else {
 					Color.clear
 						.frame(width: 52, height: 70)
@@ -252,30 +282,6 @@ struct TransactionCategoryPicker: View {
 			}
 		}
 		.padding(.horizontal, 4)
-	}
-
-	@ViewBuilder
-	private func buildContextMenu(for item: CategoryPickerItem) -> some View {
-		switch item.kind {
-		case .builtIn:
-			Button {
-				// Information seulement
-			} label: {
-				Label("D'origine", systemImage: "lock.fill")
-			}
-		case let .custom(id, _, _, _):
-			if let customCategory = customCategoryById[id] {
-				Button("Modifier", systemImage: "pencil") {
-					sheetContext = CategorySheetContext(category: customCategory)
-				}
-				Button("Supprimer", systemImage: "trash", role: .destructive) {
-					categoryPendingDeletion = customCategory
-					showingDeleteCategoryAlert = true
-				}
-			}
-		case .addButton:
-			EmptyView()
-		}
 	}
 
 	private func handleTap(_ item: CategoryPickerItem) {
@@ -290,6 +296,21 @@ struct TransactionCategoryPicker: View {
 			onManualSelection?()
 		case .addButton:
 			sheetContext = CategorySheetContext(category: nil)
+		}
+	}
+
+	private func handleLongPress(_ item: CategoryPickerItem) {
+		let feedback = UIImpactFeedbackGenerator(style: .medium)
+		feedback.impactOccurred()
+
+		switch item.kind {
+		case .builtIn:
+			showingBuiltInInfoAlert = true
+		case .custom:
+			longPressedItem = item
+			showingCustomCategoryActions = true
+		case .addButton:
+			break
 		}
 	}
 
