@@ -56,6 +56,9 @@
 		F8ACBAA82F5A59590074CE1B /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAA72F5A59590074CE1B /* CloudKitService.swift */; };
 		F8ACBAAA2F5ECA9A0074CE1B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8ACBAA92F5ECA9A0074CE1B /* Localizable.strings */; };
 		F8ACBAAC2F5EF2970074CE1B /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAAB2F5EF2970074CE1B /* WelcomeView.swift */; };
+		F8ACBAAE2F68B33E0074CE1B /* ColorHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAAD2F68B33E0074CE1B /* ColorHex.swift */; };
+		F8ACBAB02F68B3530074CE1B /* AddCustomTransactionCategorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAAF2F68B3530074CE1B /* AddCustomTransactionCategorySheet.swift */; };
+		F8ACBAB22F68B3620074CE1B /* CustomTransactionCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAB12F68B3620074CE1B /* CustomTransactionCategory.swift */; };
 		F8B79A6F2CAEC5E4002D88AE /* FinoriaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */; };
 		F8B79A732CAEC5EE002D88AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A722CAEC5EE002D88AE /* Assets.xcassets */; };
 		F8B79A762CAEC5EE002D88AE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A752CAEC5EE002D88AE /* Preview Assets.xcassets */; };
@@ -136,6 +139,9 @@
 		F8ACBAA72F5A59590074CE1B /* CloudKitService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		F8ACBAA92F5ECA9A0074CE1B /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		F8ACBAAB2F5EF2970074CE1B /* WelcomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		F8ACBAAD2F68B33E0074CE1B /* ColorHex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorHex.swift; sourceTree = "<group>"; };
+		F8ACBAAF2F68B3530074CE1B /* AddCustomTransactionCategorySheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddCustomTransactionCategorySheet.swift; sourceTree = "<group>"; };
+		F8ACBAB12F68B3620074CE1B /* CustomTransactionCategory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTransactionCategory.swift; sourceTree = "<group>"; };
 		F8B79A6B2CAEC5E4002D88AE /* Finoria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finoria.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinoriaApp.swift; sourceTree = "<group>"; };
 		F8B79A722CAEC5EE002D88AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -189,6 +195,7 @@
 		F810E3042E43EA7B00C2DFA9 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F8ACBAB12F68B3620074CE1B /* CustomTransactionCategory.swift */,
 				F8388EA02F3BD3B30081F2F9 /* TransactionCategory.swift */,
 				F8388E9E2F3BC61C0081F2F9 /* RecurringTransaction.swift */,
 				F8388E722F349A380081F2F9 /* Account.swift */,
@@ -287,6 +294,7 @@
 		F8388E882F3563CB0081F2F9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				F8ACBAAD2F68B33E0074CE1B /* ColorHex.swift */,
 				F8388EAB2F3E3FC00081F2F9 /* ViewModifiers.swift */,
 				F8388E892F3563CB0081F2F9 /* DateFormatting.swift */,
 				F8388E8A2F3563CB0081F2F9 /* StylableEnum.swift */,
@@ -305,6 +313,7 @@
 		F8388E942F356BB10081F2F9 /* Transactions */ = {
 			isa = PBXGroup;
 			children = (
+				F8ACBAAF2F68B3530074CE1B /* AddCustomTransactionCategorySheet.swift */,
 				F8388E952F356BB10081F2F9 /* TransactionRow.swift */,
 				F8388E962F356BB10081F2F9 /* AddTransactionView.swift */,
 			);
@@ -540,12 +549,14 @@
 				F8388EAF2F3E3FDE0081F2F9 /* RecurrenceEngine.swift in Sources */,
 				F8ACBAA62F5A3A0A0074CE1B /* DatabaseErrorView.swift in Sources */,
 				F8388E732F349A380081F2F9 /* Account.swift in Sources */,
+				F8ACBAAE2F68B33E0074CE1B /* ColorHex.swift in Sources */,
 				F810E30E2E45331900C2DFA9 /* HomeView.swift in Sources */,
 				F800A3F32E4F6D3400918507 /* ToastView.swift in Sources */,
 				F8388E972F356BB10081F2F9 /* TransactionRow.swift in Sources */,
 				F8388EA82F3DE67B0081F2F9 /* AnalysesView.swift in Sources */,
 				F807613E2CC6E31C00C34EDD /* Notifications.swift in Sources */,
 				F800A3F12E4F6D1E00918507 /* ToastData.swift in Sources */,
+				F8ACBAB02F68B3530074CE1B /* AddCustomTransactionCategorySheet.swift in Sources */,
 				F8388E982F356BB10081F2F9 /* AddTransactionView.swift in Sources */,
 				F810E3142E46082900C2DFA9 /* AddWidgetShortcutView.swift in Sources */,
 				F8388E8F2F3563DD0081F2F9 /* CurrencyTextField.swift in Sources */,
@@ -582,6 +593,7 @@
 				F810E3102E46067700C2DFA9 /* WidgetShortcut.swift in Sources */,
 				F800A3F72E5C72F200918507 /* ToastCard.swift in Sources */,
 				F8388EAA2F3DF5470081F2F9 /* CategoryTransactionsView.swift in Sources */,
+				F8ACBAB22F68B3620074CE1B /* CustomTransactionCategory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
