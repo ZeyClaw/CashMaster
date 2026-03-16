@@ -63,6 +63,43 @@ enum TransactionCategory: String, Codable, CaseIterable, Identifiable, StylableE
 	// Génériques
 	case expense      // Dépense générique
 	case other        // Autre
+
+	static var allCases: [TransactionCategory] {
+		[
+			.income,
+			.expense,
+			.salary,
+			.freelance,
+			.bonus,
+			.rent,
+			.utilities,
+			.home,
+			.subscription,
+			.phone,
+			.insurance,
+			.food,
+			.grocery,
+			.coffee,
+			.fuel,
+			.transport,
+			.car,
+			.loan,
+			.savings,
+			.investment,
+			.tax,
+			.shopping,
+			.party,
+			.sport,
+			.travel,
+			.culture,
+			.family,
+			.health,
+			.gift,
+			.education,
+			.pet,
+			.other
+		]
+	}
 	
 	var id: String { rawValue }
 	

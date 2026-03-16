@@ -141,17 +141,17 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	private var totalPages: Int {
 		max(1, (allItems.count + itemsPerPage - 1) / itemsPerPage)
 	}
+
+	private func pageIndex(for style: Style) -> Int {
+		guard let index = allItems.firstIndex(where: { $0.id == style.id }) else { return 0 }
+		return allItems.distance(from: allItems.startIndex, to: index) / itemsPerPage
+	}
 	
 	private func itemsForPage(_ page: Int) -> [Style] {
 		let start = page * itemsPerPage
 		let end = min(start + itemsPerPage, allItems.count)
 		guard start < allItems.count else { return [] }
 		return Array(allItems[start..<end])
-	}
-	
-	private func initialPage() -> Int {
-		guard let index = allItems.firstIndex(where: { $0.id == selectedStyle.id }) else { return 0 }
-		return allItems.distance(from: allItems.startIndex, to: index) / itemsPerPage
 	}
 	
 	var body: some View {
@@ -162,24 +162,20 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 						.tag(page)
 				}
 			}
-			.tabViewStyle(.page(indexDisplayMode: .never))
+			.tabViewStyle(.page(indexDisplayMode: .automatic))
+			.indexViewStyle(.page(backgroundDisplayMode: .always))
 			.frame(height: 160)
-			
-			// Indicateur de page (points)
-			if totalPages > 1 {
-				HStack(spacing: 8) {
-					ForEach(0..<totalPages, id: \.self) { page in
-						Circle()
-							.fill(page == currentPage ? Color.white : Color.gray.opacity(0.5))
-							.frame(width: 8, height: 8)
-							.animation(.easeInOut(duration: 0.2), value: currentPage)
-					}
-				}
-			}
 		}
 		.padding(.vertical, 8)
 		.onAppear {
-			currentPage = initialPage()
+			currentPage = pageIndex(for: selectedStyle)
+		}
+		.onChange(of: selectedStyle.id) { _, _ in
+			let targetPage = pageIndex(for: selectedStyle)
+			guard targetPage != currentPage else { return }
+			withAnimation(.easeInOut(duration: 0.2)) {
+				currentPage = targetPage
+			}
 		}
 	}
 	
