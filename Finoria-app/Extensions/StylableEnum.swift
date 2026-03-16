@@ -129,12 +129,12 @@ struct AccountCategoryPicker<Style: StylableEnum>: View {
 /// - Indicateur de page (points) intégré
 struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	@Binding var selectedStyle: Style
-	@Environment(\.dynamicTypeSize) private var dynamicTypeSize
 	var onManualSelection: (() -> Void)? = nil
 	
 	private let columns = 5
 	private let rowsPerPage = 2
 	private let baseGridHeight: CGFloat = 160
+	private let pageIndicatorReservedHeight: CGFloat = 28
 	private var itemsPerPage: Int { columns * rowsPerPage }
 	
 	@State private var currentPage = 0
@@ -144,23 +144,8 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 		max(1, (allItems.count + itemsPerPage - 1) / itemsPerPage)
 	}
 
-	private var pageIndicatorInset: CGFloat {
-		guard totalPages > 1 else { return 0 }
-		if dynamicTypeSize.isAccessibilitySize { return 44 }
-		switch dynamicTypeSize {
-		case .xSmall, .small, .medium:
-			return 24
-		case .large:
-			return 28
-		case .xLarge, .xxLarge, .xxxLarge:
-			return 34
-		default:
-			return 38
-		}
-	}
-
 	private var tabViewHeight: CGFloat {
-		baseGridHeight + pageIndicatorInset
+		baseGridHeight + pageIndicatorReservedHeight
 	}
 
 	private func pageIndex(for style: Style) -> Int {
@@ -187,7 +172,7 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 			.indexViewStyle(.page(backgroundDisplayMode: .always))
 			.frame(height: tabViewHeight)
 		}
-		.padding(.top, 8)
+		.padding(.vertical, 8)
 		.onAppear {
 			currentPage = pageIndex(for: selectedStyle)
 		}
@@ -202,44 +187,46 @@ struct TransactionCategoryPicker<Style: StylableEnum>: View {
 	
 	@ViewBuilder
 	private func pageView(items: [Style]) -> some View {
-		LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
-			ForEach(0..<itemsPerPage, id: \.self) { index in
-				if index < items.count {
-					let style = items[index]
-					VStack(spacing: 6) {
-						ZStack {
-							Circle()
-								.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
-								.frame(width: 52, height: 52)
-							Image(systemName: style.icon)
-								.font(.system(size: 22))
-								.foregroundStyle(style.color)
+		VStack(spacing: 0) {
+			LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns), spacing: 16) {
+				ForEach(0..<itemsPerPage, id: \.self) { index in
+					if index < items.count {
+						let style = items[index]
+						VStack(spacing: 6) {
+							ZStack {
+								Circle()
+									.fill(style.color.opacity(selectedStyle.id == style.id ? 0.3 : 0.1))
+									.frame(width: 52, height: 52)
+								Image(systemName: style.icon)
+									.font(.system(size: 22))
+									.foregroundStyle(style.color)
+							}
+							.overlay(
+								Circle()
+									.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
+							)
+							
+							Text(style.label)
+								.font(.caption2)
+								.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
+								.lineLimit(1)
 						}
-						.overlay(
-							Circle()
-								.stroke(style.color, lineWidth: selectedStyle.id == style.id ? 2 : 0)
-						)
-						
-						Text(style.label)
-							.font(.caption2)
-							.foregroundStyle(selectedStyle.id == style.id ? style.color : .secondary)
-							.lineLimit(1)
+						.contentShape(Rectangle())
+						.onTapGesture {
+							selectedStyle = style
+							onManualSelection?()
+						}
+					} else {
+						// Espace invisible pour maintenir la grille 5×2
+						Color.clear
+							.frame(width: 52, height: 70)
 					}
-					.contentShape(Rectangle())
-					.onTapGesture {
-						selectedStyle = style
-						onManualSelection?()
-					}
-				} else {
-					// Espace invisible pour maintenir la grille 5×2
-					Color.clear
-						.frame(width: 52, height: 70)
 				}
 			}
+			.padding(.horizontal, 4)
+
+			Spacer(minLength: pageIndicatorReservedHeight)
 		}
-		.padding(.horizontal, 4)
-		.padding(.bottom, pageIndicatorInset)
-		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 	}
 }
 
