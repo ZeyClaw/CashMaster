@@ -25,21 +25,18 @@ struct AddCustomTransactionCategorySheet: View {
 	@State private var errorMessage = ""
 
 	private let symbolOptions: [String] = [
-		"plus", "tag.fill", "briefcase.fill", "arrow.down.circle.fill", "arrow.up.circle.fill",
-		"house.fill", "bolt.fill", "cart.fill", "fork.knife", "cup.and.saucer.fill",
-		"car.fill", "bus.fill", "fuelpump.fill", "banknote.fill", "chart.line.uptrend.xyaxis",
-		"doc.text.fill", "bag.fill", "airplane", "theatermasks.fill", "figure.run",
-		"cross.case.fill", "gift.fill", "graduationcap.fill", "pawprint.fill", "heart.fill",
-		"person.2.fill", "gamecontroller.fill", "sparkles", "phone.fill", "wifi",
-		"creditcard.fill", "basket.fill", "barcode.viewfinder", "qrcode.viewfinder", "building.2.fill",
-		"bed.double.fill", "bicycle", "birthday.cake.fill", "wineglass.fill", "leaf.fill",
-		"pills.fill", "stethoscope", "book.fill", "books.vertical.fill", "backpack.fill",
-		"folder.fill", "archivebox.fill", "film.fill", "music.note", "tv.fill",
-		"camera.fill", "photo.fill", "dog.fill", "cat.fill", "icloud.fill",
-		"desktopcomputer", "lightbulb.fill", "flame.fill", "drop.fill", "calendar",
-		"timer", "alarm.fill", "chart.bar.fill", "chart.pie.fill", "checkmark.circle.fill",
-		"xmark.circle.fill", "exclamationmark.triangle.fill", "shield.fill", "lock.fill", "map.fill",
-		"location.fill", "suitcase.fill", "sun.max.fill", "moon.fill", "cloud.rain.fill"
+		"tag.fill", "questionmark.circle.fill", "cart.fill", "basket.fill", "fork.knife", "cup.and.saucer.fill",
+		"takeoutbag.and.cup.and.straw.fill", "birthday.cake.fill", "wineglass.fill", "house.fill", "building.2.fill", "bed.double.fill",
+		"bolt.fill", "drop.fill", "flame.fill", "wifi", "phone.fill", "car.fill",
+		"bus.fill", "bicycle", "tram.fill", "fuelpump.fill", "airplane", "banknote.fill",
+		"creditcard.fill", "eurosign.circle.fill", "dollarsign.circle.fill", "sterlingsign.circle.fill", "yensign.circle.fill", "chart.line.uptrend.xyaxis",
+		"chart.bar.fill", "chart.pie.fill", "briefcase.fill", "doc.text.fill", "folder.fill", "archivebox.fill",
+		"hammer.fill", "wrench.and.screwdriver.fill", "cross.case.fill", "pills.fill", "stethoscope", "heart.fill",
+		"bandage.fill", "gift.fill", "graduationcap.fill", "book.fill", "books.vertical.fill", "figure.run",
+		"figure.walk", "gamecontroller.fill", "film.fill", "music.note", "tv.fill", "camera.fill",
+		"pawprint.fill", "dog.fill", "cat.fill", "sparkles", "leaf.fill", "tree.fill",
+		"carrot.fill", "fish.fill", "clock.fill", "calendar", "alarm.fill", "timer",
+		"shield.fill", "lock.fill", "mappin.and.ellipse", "location.fill", "suitcase.fill", "bag.fill"
 	]
 
 	init(
@@ -137,7 +134,7 @@ struct AddCustomTransactionCategorySheet: View {
 				} header: {
 					Text("Symbole")
 				} footer: {
-					Text("Choisis un symbole parmi la liste pour représenter ta catégorie.")
+					Text("Choisissez un symbole parmi la liste pour représenter votre catégorie.")
 				}
 			}
 			.navigationTitle(title)
