@@ -59,7 +59,6 @@
 		F8ACBAAE2F68B33E0074CE1B /* ColorHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAAD2F68B33E0074CE1B /* ColorHex.swift */; };
 		F8ACBAB02F68B3530074CE1B /* AddCustomTransactionCategorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAAF2F68B3530074CE1B /* AddCustomTransactionCategorySheet.swift */; };
 		F8ACBAB22F68B3620074CE1B /* CustomTransactionCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8ACBAB12F68B3620074CE1B /* CustomTransactionCategory.swift */; };
-		F8ACBAB52F68C69B0074CE1B /* SymbolPicker in Frameworks */ = {isa = PBXBuildFile; productRef = F8ACBAB42F68C69B0074CE1B /* SymbolPicker */; };
 		F8B79A6F2CAEC5E4002D88AE /* FinoriaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B79A6E2CAEC5E4002D88AE /* FinoriaApp.swift */; };
 		F8B79A732CAEC5EE002D88AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A722CAEC5EE002D88AE /* Assets.xcassets */; };
 		F8B79A762CAEC5EE002D88AE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8B79A752CAEC5EE002D88AE /* Preview Assets.xcassets */; };
@@ -163,7 +162,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F8ACBAB52F68C69B0074CE1B /* SymbolPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,7 +424,6 @@
 			);
 			name = Finoria;
 			packageProductDependencies = (
-				F8ACBAB42F68C69B0074CE1B /* SymbolPicker */,
 			);
 			productName = "GDF-app";
 			productReference = F8B79A6B2CAEC5E4002D88AE /* Finoria.app */;
@@ -502,7 +499,6 @@
 			);
 			mainGroup = F8B79A622CAEC5E4002D88AE;
 			packageReferences = (
-				F8ACBAB32F68C69B0074CE1B /* XCRemoteSwiftPackageReference "SymbolPicker" */,
 			);
 			productRefGroup = F8B79A6C2CAEC5E4002D88AE /* Products */;
 			projectDirPath = "";
@@ -943,22 +939,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		F8ACBAB32F68C69B0074CE1B /* XCRemoteSwiftPackageReference "SymbolPicker" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SzpakKamil/SymbolPicker";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F8ACBAB42F68C69B0074CE1B /* SymbolPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F8ACBAB32F68C69B0074CE1B /* XCRemoteSwiftPackageReference "SymbolPicker" */;
-			productName = SymbolPicker;
-		};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F8B79A632CAEC5E4002D88AE /* Project object */;
